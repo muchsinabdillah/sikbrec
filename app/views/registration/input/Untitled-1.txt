@@ -1,0 +1,1821 @@
+<script type="text/javascript">
+ $(document).ready(function () { 
+  $("#nosep").hide();
+$('#btnCekKepesertaan').click(function(){
+  getKepesertaan();
+});
+  var idreg = "<?php echo $id ?>";
+    setTimeout(function() {
+      ShowDataPasienPoliklinik(idreg);
+    }, 400);
+    console.log(idreg);
+    if(idreg!=""){
+   $('#Notif_awal_registrasi').modal('hide');
+ }else{
+  $('#Notif_awal_registrasi').modal('show');
+   //$('#modalcariDatapasien').modal('show');
+ }
+
+ $('#btn_caridatamr').click(function(){
+  setTimeout(function() {
+  loaddatamr();
+                  }, 100)
+});
+ 
+$("#isDiagnosaawalBPJS").select2({
+
+  ajax: {  
+    url: function (params) {
+      return 'controller/Pendaftaran/Pendaftaran.php?action=getICDX';
+    },
+   type: "post",
+   dataType: 'json',
+   delay: 250,
+    data: function (params) {
+    return {
+      searchTerm: params.term 
+    };
+    },
+     processResults: function (response) {
+       return {
+          results: response
+       };
+     },
+    cache: true
+  },
+
+    placeholder: 'Search for a repository',
+    minimumInputLength: 3
+  });
+$('#btnValidateNIK').click(function(){
+   // cek Data Karyawan 
+    var RSY_Kartu_NoPeserta =  $("#RSY_Kartu_NoPeserta").val();
+       if(RSY_Kartu_NoPeserta!=""){
+              //console.log(xTempMr);
+          $.ajax({
+            data: "q=" + RSY_Kartu_NoPeserta,
+            url: "controller/HRD/Exec_Master.php?action=get_dataPegawaiPolis",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+                beforeSend:function(){
+                           
+                },
+                success: function(data){ 
+                  if(data.Nip == null || data.Nip == ''){
+                    new PNotify({
+                        title: 'Notifikasi',
+                        text: 'NIK Tidak Ditemukan, Mohon Periksa Kembali !',
+                        type: 'danger'
+                        });
+                    return;
+                  }
+                  $("#RSY_Kartu_NamaPemegangKartu").val(data.Nama);
+                  $("#RSY_Kartu_HakKelas").val(data.HakKelasPlafonRS);
+                  $("#RSY_Kartu_PlafonRJ").val(data.Plafon_RJ);
+                  $("#RSY_PlafonRI").val(data.Plafon_RI);
+                  $("#RSY_stsPeg").val(data.Status_Aktif);
+
+
+           
+                },error: function () {
+                            
+                }
+          });
+           
+       }else{
+           new PNotify({
+            title: 'Notifikasi',
+            text: 'Silahkan Masukan NIK Karyawan !',
+            type: 'danger'
+            });
+       }
+       
+});
+
+ 
+   
+
+$('#dokterid').click(function(){
+  var noreservasi = $("#pxNoReservasi").val();
+  if(noreservasi != ""){
+    alert("Tranasksi Dari No. Booking. Edit tidak diizinkan !");
+  }else{
+       $("#hide_dokter").show();
+       $('#dokter').select2();
+  }
+});
+$('#namajaminanid').click(function(){
+       $("#hide_jaminan").show();
+       $('#NamaJaminan').select2();
+});
+$('#referralid').click(function(){
+       $("#hide_referal").show();
+       $('#referral').select2();
+});
+
+         $("#Medrec_kabupaten").select2();
+          $("#Medrec_Kecamatan").select2();
+          $("#Medrec_Kelurahan").select2();
+
+  getDataCaraMasuk(); 
+  getDataPoliklonik();
+  //getdatalistadministrasi();
+  getdataJenisJaminan();
+  getShift(); 
+  getProvinsi(); 
+  getStatusHubunganKeluarga();
+  //document.getElementById("caridataMR").addEventListener("click", show_data); 
+  document.getElementById("caridatapoli").addEventListener("click", show_data_poli); 
+  document.getElementById("btnCariReservasi").addEventListener("click", show_data_reservasi); 
+
+$(document).on('click', '#btnInputTrsOrderRad', function () {
+    var NoRegistrasi =  $("#pxNoRegistrasi").val();
+    console.log(NoRegistrasi);
+    window.location = "../SIRYARSI/home.php?page=order-rad&rand="+NoRegistrasi;
+});
+$(document).on('click', '#btnInputTrsOrderLab', function () {
+    var NoRegistrasi =  $("#pxNoRegistrasi").val();
+    console.log(NoRegistrasi);
+    window.location = "../SIRYARSI/home.php?page=order-lab&rand="+NoRegistrasi;
+});
+$(document).on('click', '#btnInputTrsOrderMCU', function () {
+    var NoRegistrasi =  $("#pxNoRegistrasi").val();
+    window.location = "../SIRYARSI/home.php?page=mcu&noreg="+NoRegistrasi;
+});
+$(document).on('click', '#btnadmclosemodal', function () {
+        $('#nodal_admedika').modal('hide');
+});
+$('#Medical_Provinsi').change(function(){
+        getKabupaten();
+      //Some code
+         $("#Medrec_kabupaten").empty();
+         var newRow = '<option value="">-- Pilih Kabupaten --</option';
+         $("#Medrec_kabupaten").append(newRow);
+         $("#Medrec_kabupaten").select2();
+
+          $("#Medrec_Kecamatan").empty();
+          var newRow = '<option value="">-- Pilih Kecamatan --</option';
+          $("#Medrec_Kecamatan").append(newRow);
+          $("#Medrec_Kecamatan").select2();
+
+          $("#Medrec_Kelurahan").empty();
+          var newRow = '<option value="">-- Pilih Kelurahan --</option';
+          $("#Medrec_Kelurahan").append(newRow); 
+          $("#Medrec_Kelurahan").select2();
+}); 
+
+
+
+$('#CloseMeC').click(function(){
+
+                              var count = parseFloat($('#totalrow').val());
+                                  //Loop array
+                                  for (row_id=0; row_id<=count; row_id++){
+                                    $('#row_' + row_id + '').remove();
+                                  }
+                                  $("#totalrow").val('0');
+      $('#ModalInputMRBAru').modal('show');
+      $('#modalcariDataMRSave').modal('hide');
+});
+// Medical_Provinsi Focus Out
+$('#Medical_Provinsi').focusout(function(){
+        getKabupaten();
+});
+
+// Medical_Provinsi Focus Out
+$('#Medrec_kabupaten').focusout(function(){
+        getKecamtan();
+});
+$('#Medrec_kabupaten').change(function(){
+        getKecamtan();
+});
+// Medical_Provinsi Focus Out
+$('#Medrec_Kecamatan').focusout(function(){
+        getKelurahan();
+});
+$('#Medrec_Kecamatan').change(function(){
+        getKelurahan();
+
+});
+$('#Medrec_Kelurahan').change(function(){
+        getKodepos();
+});
+
+$(document).on('click', '#btnCreateNewMR', function () {
+       var d = "2";
+       console.log(d);
+       var xTempMr =  $("#PasienNoMR").val();
+       if(xTempMr!=""){
+              //console.log(xTempMr);
+           $.ajax({
+            data: "q=" + xTempMr,
+            url: "controller/Pendaftaran/Pendaftaran.php?action=showdatabyIDMR",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+                beforeSend:function(){
+                           
+                },
+                success: function(data){
+                  //console.log(data);   
+                  $("#Medrec_NoMR").val(data.NoMR);
+                  $("#Medrec_NamaPasien").val(data.PatientName); 
+                  $("#Medical_JKel").val(data.Gander);
+                  $("#Medrec_Tgl_Lahir").val(data.Date_of_birth);
+                  $("#Medrec_Alamat").val(data.Address); 
+                  $("#Medrec_NoIdPengenal").val(data.ID_Card_number);
+                  $("#Medrec_Tpt_lahir").val(data.BirthPlace);
+                  $("#Medrec_Pekerjaan").val(data.Ocupation);
+                  $('#Medical_Provinsi').val(data.Medical_Provinsi).trigger('change');
+                 // $("#Medical_Provinsi").val(data.Medical_Provinsi);
+
+                 setTimeout(function() {
+                        $('#Medrec_kabupaten').val(data.Medrec_kabupaten).trigger('change');
+                     // $("#Medrec_kabupaten").val(data.Medrec_kabupaten);
+                             setTimeout(function() {
+                             // $("#Medrec_Kecamatan").val(data.Medrec_Kecamatan); 
+                              $('#Medrec_Kecamatan').val(data.Medrec_Kecamatan).trigger('change');
+                                       setTimeout(function() {
+                                        $('#Medrec_Kelurahan').val(data.Medrec_Kelurahan).trigger('change');
+                                        //$("#Medrec_Kelurahan").val(data.Medrec_Kelurahan); 
+                                        }, 500);
+                              }, 200);
+
+                  }, 100);
+
+               
+
+
+                         
+
+                 
+                  
+
+                  getProvinsi();
+                  getKabupaten();
+                  getKelurahan2(data.Medrec_Kecamatan);
+                  getKecamtan2(data.Medrec_kabupaten);
+
+                  $("#Medrec_Warganegara").val(data.Medrec_Warganegara);
+                  $("#Medrec_HomePhone").val(data.Medrec_HomePhone);
+                  $("#Medrec_handphone").val(data.Medrec_handphone);
+                  $("#Medical_Agama").val(data.Medical_Agama);
+                  $("#Medrec_statusNikah").val(data.Medrec_statusNikah);
+                  $("#Medrec_Pendidikan").val(data.Medrec_Pendidikan);
+                  $("#Medrec_Email").val(data.Medrec_Email);
+                  $("#Medrec_Status").val(data.Medrec_Status);
+                  $("#Medrec_NamaIbuKandung").val(data.Mother);
+                    $("#Medrec_Ibu_Kandung").val(data.NoMR_IBU);  
+                   $("#Medrec_Kodepos").val(data.kodepos);
+
+                   $("#Medrec_DaruratNama").val(data.Contact_Name);
+                   $("#Medrec_DaruratAlamat").val(data.CONTACT_PHONE);
+                   $("#Medrec_DaruratTlp").val(data.Contact_Address);
+                   $("#Medrec_DaruratHub").val(data.CONTACT_STATUS);
+
+                   $("#Medrec_PerusahaanNama").val(data.Office_Name);
+                   $("#Medrec_PerusahaanAlamat").val(data.Office_Address);
+                   $("#Medrec_PerusahaanTlp").val(data.Office_Phone);
+                   $("#Medrec_PerusahaanFax").val(data.Office_Fax);
+
+                   $("#petugasupdate").val(data.Petugas_Update);
+                   $("#jamupdate").val(data.UpdateDate.date);
+
+                   $("#Medrec_Bahasa").val(data.Bahasa);
+                   $("#Medrec_IdPengenal").val(data.Tipe_Idcard);
+                   $("#Medrec_Etnis").val(data.Etnis);
+                   $("#Medrec_Bin").val(data.Father);
+                   setTimeout(function() {
+                     ShowDataArsip(data.NoMR);
+                  }, 100);
+
+                    document.getElementById("petugasupdate").innerHTML = data.Petugas_Update;
+                     document.getElementById("jamupdate").innerHTML = data.UpdateDate.date;
+                      document.getElementById("petugasinput").innerHTML = data.petugasinput;
+                     document.getElementById("jaminput").innerHTML = data.jaminput.date;
+                },error: function () {
+                            
+                }
+        });
+           
+       }
+       
+});
+
+$(document).on('click', '#btnclosemodalcetak', function () {
+        window.location = "home.php?page=pasien_rajal_list"
+   });
+    $(document).on('click', '#btnClosePolis', function () {
+        $('#Notif_awal_registrasi2').modal('hide');
+   });
+    $(document).on('click', '#btnprint', function () {
+      var idlayanan = $("#poliklinikid").val();
+      var noregistrasi  = $("#pxNoRegistrasi").val();
+      var shownamaperusahaanfix  = $("#shownamaperusahaanfix").val();
+      console.log(shownamaperusahaanfix);
+$("#namajaminanlab").val(shownamaperusahaanfix);
+
+      if (noregistrasi ==""){
+            new PNotify({
+            title: 'Notifikasi',
+            text: 'No. Registrasi Kosong, Silahkan Masukan No. Registrasi Anda !',
+            type: 'danger'
+            });
+      }else if (noregistrasi !=""){
+         var substringnoreg=noregistrasi.substring(4, 0);
+          console.log(substringnoreg);
+          console.log(idlayanan,'dd');
+          if(substringnoreg=="RJUR"){
+              document.getElementById("btnInputTrsOrderRad").disabled = false;
+              document.getElementById("btnInputTrsOrderLab").disabled = true;
+              document.getElementById("btnInputTrsOrderMCU").disabled = true;
+          }else if(substringnoreg=="RJUL"){
+             document.getElementById("btnInputTrsOrderRad").disabled = true;
+              document.getElementById("btnInputTrsOrderLab").disabled = false;
+              document.getElementById("btnInputTrsOrderMCU").disabled = true;
+          }
+          else if(idlayanan=="53"){
+             document.getElementById("btnInputTrsOrderRad").disabled = true;
+              document.getElementById("btnInputTrsOrderLab").disabled = true;
+              document.getElementById("btnInputTrsOrderMCU").disabled = false;
+          }else{
+            document.getElementById("btnInputTrsOrderRad").disabled = true;
+              document.getElementById("btnInputTrsOrderLab").disabled = true;
+              document.getElementById("btnInputTrsOrderMCU").disabled = true;
+          }
+          
+          $('#notif_Cetak').modal('show');
+      }
+         
+   });
+
+    $(document).on('click', '#simapnMR', function () {
+      var y = 'simpan';
+      simpanMR(y);
+   });
+    $(document).on('click', '#simapnMRx', function () {
+      var y = 'lanjutsimpan';
+      simpanMR(y);
+   });
+    $('#print_kartumr').click(function(){
+          print_kartumr();
+      });
+
+
+
+
+
+    // SIMPAN MR simapnMR
+              function simpanMR(y){
+                var str = $( "#FRMcreatemr" ).serialize();
+                var x = "2";
+                console.log(y,'xx');
+                $.ajax({
+                    type: "POST", // Method pengiriman data bisa dengan GET atau POST
+                    url: "controller/Pendaftaran/Pendaftaran.php?action=createRekamMedik&q="+y,
+                    data:  str,
+                    dataType: "JSON",
+                      beforeSend:function(){
+                          $('#simapnMR').html('Sending...');
+                          $('#simapnMR').addClass('btn-danger');
+                          document.getElementById("simapnMR").disabled = true;
+                     },
+                      success: function(data){
+                          if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.errorname,
+                                        type: 'danger'
+                              });
+                            }else if(data.status=="success")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: 'Rekam Medik Berhasil disimpan !',
+                                        type: 'success'
+                              });
+                                 $("#PasienNoMR").val(data.NoMR);
+                                 $("#PasienNama").val(data.PatientName);
+                                 $("#PasienAlamat").val(data.Address);
+                                 $("#PasienIdJKel").val(data.Gander);
+                                 //$("#PasienNamaJKel").val(data.NoEpisode); 
+                                 $("#PasienTptLahir").val(data.TptLahir);
+                                 $("#PasienTglLahir").val(data.Date_of_birth);
+                                 $("#PasienPekerjaan").val(data.Pekerjaan);
+                                 $("#PasienNIK").val(data.NIK);
+                                 $('#modalcariDataMRSave').modal('hide');
+                              $('#ModalInputMRBAru').modal('hide');
+                              document.getElementById("FRMcreatemr").reset();
+
+
+                            }else if(data.status=="update")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: 'Rekam Medik Berhasil dirubah !',
+                                        type: 'success'
+                              });
+                                 
+                              $('#ModalInputMRBAru').modal('hide');
+                              document.getElementById("FRMcreatemr").reset();
+
+                            }else if(data.status=="double")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: 'Ada Kemiripan Data, Pastikan Data yang anda input belum ada di Sistem, agar tidak Dobel Rekam Medik!',
+                                        type: 'success'
+                              });
+                                 
+                              //$('#ModalInputMRBAru').modal('hide');
+                              $('#modalcariDataMRSave').appendTo("body").modal('show');
+                             // $('#modalcariDataMRSave').modal('show');
+                               var dataHandler = $("#user_data");
+                              dataHandler.html("");
+                                   //var resultObj = JSON.parse(result);
+                                   if($('#totalrow').val()==0){
+                                      var count =0;
+                                    }else{
+                                      var count = parseFloat($('#totalrow').val());
+                                    }
+                                    $.each(data.data.datarekammedik, function (key, val) {
+                                    countx = count + 1; 
+                                      var newRow = $("<tr  id='row_" + count + "'>");
+                                      newRow.html("<td><font size='1'>" + val.NoMR +"</td><td><font size='1'>" + val.PatientName +"</td><td><font size='1'>" + val.Address +"</td><td><font size='1'>" + val.tgl_lahir.date +"</td> <td><font size='1'>" + val.Mother +"<br> Tlp Rumah : " + val.tlprumah +"<br> Tlp Hp : " + val.hp +"</td>  <td><font size='1'>" + val.ID_Card_number +"</td>   </tr>");
+                                      dataHandler.append(newRow);
+                                    });
+                                   $('#totalrow').val(countx);
+
+
+                            }
+                            $('#simapnMR').removeClass('btn-danger'); 
+                            $('#simapnMR').html('SIMPAN');
+                            document.getElementById("simapnMR").disabled = false;
+                      },
+                     error: function(data)
+                     {
+                              $('#simapnMR').removeClass('btn-danger'); 
+                              $('#simapnMR').html('SIMPAN');
+                              document.getElementById("simapnMR").disabled = false;
+                     }
+              });
+          }
+    // BATAL REGISTRASI
+      $(document).on('click', '#btnVoidTrsReg', function () {
+                var str = $( "#frmBatalReg" ).serialize();
+                var x = "2";
+                console.log(x);
+                $.ajax({
+                    type: "POST", // Method pengiriman data bisa dengan GET atau POST
+                    url: "controller/Pendaftaran/Pendaftaran.php?action=VoidReg",
+                    data:  str,
+                    dataType: "JSON",
+                      beforeSend:function(){
+                          $('#btnVoidTrsReg').html('Sending...');
+                          $('#btnVoidTrsReg').addClass('btn-danger');
+                          document.getElementById("btnVoidTrsReg").disabled = true;
+                     },
+                      success: function(data){
+                          if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.errorname,
+                                        type: 'danger'
+                              });
+                            }else if(data.status=="success")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: 'Batal Berhasil !',
+                                        type: 'success'
+                              });
+                                // location.reload();
+                                window.location = "regis-rajal";
+                            }
+                            $('#btnVoidTrsReg').removeClass('btn-danger'); 
+                            $('#btnVoidTrsReg').html('YA');
+                            document.getElementById("btnVoidTrsReg").disabled = false;  
+                      },
+                     error: function(data)
+                     {
+                            $('#btnVoidTrsReg').removeClass('btn-danger'); 
+                            $('#btnVoidTrsReg').html('YA');
+                            document.getElementById("btnVoidTrsReg").disabled = false;  
+                     }
+              });
+      });    
+  //simpan registrasi
+      $(document).on('click', '#btnsimpanTrsReg', function () {
+                var str = $( "#frmSimpanTrsRegistrasi" ).serialize();
+                var x = "2";
+                console.log(x);
+                $.ajax({
+                    type: "POST", // Method pengiriman data bisa dengan GET atau POST
+                    url: "controller/Pendaftaran/Pendaftaran.php?action=Createregistrasi",
+                    data:  str,
+                    dataType: "JSON",
+                      beforeSend:function(){
+                          $('#btnsimpanTrsReg').html('Sending...');
+                          $('#btnsimpanTrsReg').addClass('btn-danger');
+                          document.getElementById("btnsimpanTrsReg").disabled = true;
+                     },
+                      success: function(data){
+                          if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.errorname,
+                                        type: 'danger'
+                              });
+                            }else if(data.status=="success")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: 'Simpan Berhasil !',
+                                        type: 'success'
+                              });
+                                var noregistrasi  = data.NoRegistrasi;
+                                var substringnoreg=noregistrasi.substring(4, 0);
+                                var idlayanan = $("#poliklinikid").val();
+                                console.log(idlayanan,'dd');
+                                console.log(substringnoreg);
+                                if(substringnoreg=="RJUR"){
+                                    document.getElementById("btnInputTrsOrderRad").disabled = false;
+                                    document.getElementById("btnInputTrsOrderLab").disabled = true;
+                                    document.getElementById("btnInputTrsOrderMCU").disabled = true;
+                                }else if(substringnoreg=="RJUL"){
+                                   document.getElementById("btnInputTrsOrderRad").disabled = true;
+                                    document.getElementById("btnInputTrsOrderLab").disabled = false;
+                                    document.getElementById("btnInputTrsOrderMCU").disabled = true;
+                                }
+                                else if(idlayanan=="53"){
+                                   document.getElementById("btnInputTrsOrderRad").disabled = true;
+                                    document.getElementById("btnInputTrsOrderLab").disabled = true;
+                                    document.getElementById("btnInputTrsOrderMCU").disabled = false;
+                                }else{
+                                    document.getElementById("btnInputTrsOrderRad").disabled = true;
+                                      document.getElementById("btnInputTrsOrderLab").disabled = true;
+                                      document.getElementById("btnInputTrsOrderMCU").disabled = true;
+                                  }
+                                  $('#notif_Cetak').modal('show');
+                                  clearforms();
+                                 $("#pxnoEpisode").val(data.NoEpisode);
+                                 $("#pxNoRegistrasi").val(data.NoRegistrasi);
+                                 $("#pxNoAntrian").val(data.NoAntrianPoli);
+                                 $("#pxNoSep").val(data.NoAntrianPoli); 
+                                 $("#cetaknoregis").val(data.NoRegistrasi); 
+                                 $("#cetaknoregis2").val(data.NoRegistrasi); 
+                                 $("#cetaklabel").val(data.NoMR);
+                                 $('#Notif_awal_registrasi2').modal('hide');
+                            }
+                            $('#btnsimpanTrsReg').removeClass('btn-danger'); 
+                            $('#btnsimpanTrsReg').html('YA');
+                            document.getElementById("btnsimpanTrsReg").disabled = false;
+                      },
+                     error: function(data)
+                     {
+                            $('#btnsimpanTrsReg').removeClass('btn-danger'); 
+                            $('#btnsimpanTrsReg').html('YA');
+                            document.getElementById("btnsimpanTrsReg").disabled = false;
+                     }
+              });
+      });
+  //simpan kartu
+      $(document).on('click', '#btnSavePoli', function () {
+                 var str = $( "#FrmDataPolisKartu" ).serialize();
+                 var x = "2";
+                console.log(x);
+                $.ajax({
+                    type: "POST", // Method pengiriman data bisa dengan GET atau POST
+                    url: "controller/Pendaftaran/Pendaftaran.php?action=insertPolis",
+                    data:  str,
+                    dataType: "JSON",
+                      beforeSend:function(){
+                          $('#Confirm').html('Sending...');
+                          $('#Confirm').addClass('btn-danger');
+                     },
+                      success: function(data){
+                          if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.pesan,
+                                        type: 'danger'
+                              });
+                            }else if(data.status=="success")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.pesan,
+                                        type: 'success'
+                              });
+                               
+                             document.getElementById("FrmDataPolisKartu").reset();
+                             $('#Notif_awal_registrasi2').modal('hide');
+                            }
+                      },
+                     error: function(data)
+                     {
+                                     
+                     }
+              });
+      });
+      //simpan kartu
+      $(document).on('click', '#btnSavePoli2', function () {
+        var statuspegawaix = $("#RSY_stsPeg").val(); 
+       
+                var str = $( "#frmKartuRSYarsi" ).serialize();
+                var x = "2";
+                console.log(x);
+                $.ajax({
+                    type: "POST", // Method pengiriman data bisa dengan GET atau POST
+                    url: "controller/Pendaftaran/Pendaftaran.php?action=insertPolis2",
+                    data:  str,
+                    dataType: "JSON",
+                      beforeSend:function(){
+                          $('#Confirm').html('Sending...');
+                          $('#Confirm').addClass('btn-danger');
+                     },
+                      success: function(data){
+                          if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.pesan,
+                                        type: 'danger'
+                              });
+                            }else if(data.status=="success")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.pesan,
+                                        type: 'success'
+                              });
+                               
+                             document.getElementById("frmKartuRSYarsi").reset();
+                             $('#Modal_Karyawn_Polis').modal('hide');
+                            }
+                      },
+                     error: function(data)
+                     {
+                                     
+                     }
+                  });
+         
+      });
+    
+      $('#CekkepesertaanBPJS').hide();
+      $('#CekkepesertaanADMEDIKA').hide();
+      // Load dokter 
+      
+      $("#searchbox").keyup(function () { // Ketika user menekan tombol di keyboard
+            if (event.keyCode == 13) { // Jika user menekan tombol ENTER
+                show_data();
+            }
+      });
+      
+       $(document).on('click', '#logocetakbuktireg', function () {
+           //$('#cetakbuktireg').submit();
+        
+            // window.open("halaman/Print/print_bukti_reg.php", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            window.open('', 'TheWindow');
+            document.getElementById('TheForm').submit();
+           // location.reload();
+       });
+       $(document).on('click', '#logocetaklabelpasien', function () {
+           //$('#cetakbuktireg').submit();
+        
+            // window.open("halaman/Print/print_bukti_reg.php", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+          //  window.open('', 'TheWindow3');
+           // document.getElementById('TheForm3').submit();
+             $('#TheForm3').attr('action', 'halaman/Print/print_label_pasien2.php');
+             $('#TheForm3').submit();
+       });
+       $(document).on('click', '#logocetakbuktiloa', function () {
+           //$('#cetakbuktireg').submit();
+        
+            // window.open("halaman/Print/print_bukti_reg.php", "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            window.open('', 'TheWindow2');
+            document.getElementById('TheForm2').submit();
+            //location.reload();
+       });
+        $('#cetakbuktireg').on('submit', function (event) {
+          event.preventDefault();
+          var idreg = $('#NoRegistrasi').val();
+              window.open("halaman/Print/print_bukti_reg.php?id="+idreg, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+        });
+        
+           // PASING KODE DO
+      $(document).on('click', '#btninquiry', function () {
+           var admcardNo = $('#admcardNo').val();
+           var admcoveragetype = $('#admcoveragetype').val();
+           $.ajax({
+            data: "admcardNo=" + admcardNo + "&admcoveragetype=" + admcoveragetype,
+            url: "controller/Pendaftaran/Bridging_Admedika.php",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+             beforeSend:function(){
+                          $('#btninquiry').html('Sending...');
+                          $('#btninquiry').addClass('btn-danger');
+                          document.getElementById("btninquiry").disabled = true;
+                     },
+                success: function(data){
+                     $('#nodal_admedika').modal('show');
+
+                    // console.log(data.hasil.response.peserta.hakKelas.keterangan);
+                    if(data.output.statusCode === "00")  {
+                        $('#admpatientName').val(data.output.txnData.eligibilityResponse.eligibility.patientName);
+                        $('#admclID').val(data.output.txnData.eligibilityResponse.eligibility.clID);
+                        $('#admPayorName').val(data.output.txnData.eligibilityResponse.eligibility.PayorName);
+                        $('#admpolicyNo').val(data.output.txnData.eligibilityResponse.eligibility.policyNo);
+                        $('#admpolicyDate').val(data.output.txnData.eligibilityResponse.eligibility.policyDate);
+                        $('#admplanCode').val(data.output.txnData.eligibilityResponse.eligibility.planCode);
+                        $('#admclStatus').val(data.output.txnData.eligibilityResponse.eligibility.clStatus);
+                        $('#admclDesc').val(data.output.txnData.eligibilityResponse.eligibility.clDesc);
+                        $('#admketstatus').val(data.output.txnData.eligibilityResponse.eligibility.printOut);
+                        $('#admpasingket').val(data.output.txnData.eligibilityResponse.eligibility.printOut);
+                        $('#admpayorMemberID').val(data.output.txnData.eligibilityResponse.eligibility.payorMemberID);
+                        
+                        var D = data.output.txnData.eligibilityResponse.eligibility.printOut;
+                        var res = D.replace( "\n", "<br>");
+                        console.log(D);
+                        $('#xadmpasingketXXX').val(res);   
+                        document.getElementById("xadmpasingketXXX").innerHTML = res;   
+
+                        $('#btninquiry').removeClass('btn-danger'); 
+                        $('#btninquiry').html('INQUIRY');
+                        document.getElementById("btninquiry").disabled = false;
+
+                         var dataarray = data.output.txnData.eligibilityResponse.eligibility.entitlement.length;
+                         console.log(dataarray);
+                              for (i = 0; i < data.output.txnData.eligibilityResponse.eligibility.entitlement.length; i++) {
+                                
+                                  console.log(data.output.txnData.eligibilityResponse.eligibility.entitlement[i].benID);
+                                  console.log(data.output.txnData.eligibilityResponse.eligibility.entitlement[i].shortName);
+                                  console.log(data.output.txnData.eligibilityResponse.eligibility.entitlement[i].longName);
+                              } 
+
+                    }else  {
+                        $('#admketstatus').val(data.output.txnData.eligibilityResponse.eligibility.printOut);
+                        $('#admpasingket').val(data.output.txnData.eligibilityResponse.eligibility.printOut);
+                        var D = data.output.txnData.eligibilityResponse.eligibility.printOut;
+                        var res = D.replace( "\n", "<br>");
+                        console.log(D);
+                        $('#xadmpasingketXXX').val(res);   
+                        document.getElementById("xadmpasingketXXX").innerHTML = res;                      
+                    }
+                        $('#btninquiry').removeClass('btn-danger'); 
+                        $('#btninquiry').html('INQUIRY');
+                        document.getElementById("btninquiry").disabled = false;
+                        console.log(data.output.referenceID);               
+                },error: function () {
+                           new PNotify({
+                                      title: 'Notifikasi',
+                                      text: 'Data Tidak Ditemukan !',
+                                      type: 'danger'
+                          });
+                           $('#btninquiry').removeClass('btn-danger'); 
+                          $('#btninquiry').html('INQUIRY');
+                          document.getElementById("btninquiry").disabled = false;
+                }
+        });
+      });
+  }); 
+function poliklinikselect2active(){
+   $('#poliklinik').select2();
+}
+function dokterselect2active(){
+   $('#dokter').select2();
+}
+function grupjaminanselect2active(){
+   $('#grupJaminan').select2();
+}
+function referralselect2active(){
+   $('#referral').select2();
+}
+function ShowDataPasienPoliklinik(x){
+  var x = x;
+   $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=ShowDataPasienPoliklinik&q="+x,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){
+                //$('.js-example-basic-single').select2('destroy');
+                 
+                 
+                  //$("#id").val(data.ID);
+                  $("#PasienNoMR").val(data.NoMR);
+                  $("#PasienNama").val(data.PatientName); 
+                  $("#PasienIdJKel").val(data.Gander);
+                  $("#PasienTglLahir").val(data.Date_of_birth);
+                  $("#PasienAlamat").val(data.Address);
+                  $("#PasienNamaJKel").val(data.NamaGander);
+                  $("#PasienNIK").val(data.ID_Card_number);
+                  $("#PasienTptLahir").val(data.BirthPlace);
+                  $("#PasienPekerjaan").val(data.Ocupation);
+                  $("#pxNoReservasi").val(data.NoBooking);
+                  $("#pxNoRegistrasi").val(data.NoRegistrasi);
+                  $("#noregbatal").val(data.NoRegistrasi);
+
+                  $("#cetaklabel").val(data.NoMR);
+                  
+                  $("#cetaknoregis").val(data.NoRegistrasi);
+                  $("#cetaknoregis2").val(data.NoRegistrasi);
+                  $("#pxnoEpisode").val(data.NoEpisode);
+                  $("#pxNoSep").val(data.NoSEP);
+                  $("#pxNoAntrian").val(data.NoAntrianAll);
+
+                  $("#poliklinik").val(data.Unit); 
+                  $("#poliklinikid").val(data.Unit);
+                  console.log(data);
+                  getDokter();
+                  $("#shownamapolifix").val(data.LokasiPasien); 
+                  $("#shownamdokterfix").val(data.namadokter); 
+                  $("#dokter").val(data.Doctor1); 
+                  $("#dokterid").val(data.Doctor1); 
+                   $("#grupJaminan").val(data.PatientType);
+                   $("#grupJaminanid").val(data.PatientType); 
+                   getjaminannama2(data.PatientType);
+                  $("#namajaminan").val(data.Perusahaanid); 
+                  console.log(data.Perusahaanid);
+                   $("#namajaminanid").val(data.Perusahaanid); 
+                  $("#shownamaperusahaanfix").val(data.Perusahaan); 
+                  $("#jenisadministrasiid").val(data.idAdmin); 
+                  $("#jenisadministrasi").val(data.idAdmin); 
+                  getadministrasinilai2(data.idAdmin);
+                  $("#caramasuk").val(data.idCaraMasuk); 
+                  $("#caramasukid").val(data.idCaraMasuk); 
+                  $("#referral").val(data.idCaraMasuk2); 
+                  getreferalname2(data.idCaraMasuk2);
+                  $("#referralid").val(data.idCaraMasuk2); 
+                  $("#PasienJenisDaftar").val(data.JenisDaftar); 
+                  $('#poliklinik').select2();
+                  $('#dokter').select2();
+                  $('#grupJaminan').select2();
+                  $('#referral').select2();
+                  $("#hide_dokter").hide();
+                  $('#caramasuk').select2();
+                   if(x!=''){
+                  $("#tglregistrasi").val(data.VisitDate+"\T"+data.JamDate); 
+                  $('#tglregistrasi').prop('readonly', true);
+
+                    getdatalistadministrasi();
+                  }
+                  // $('#modalcariDatapasien').modal('hide');
+
+              }
+    });
+}
+function clearforms(){
+    document.getElementById("frmSimpanTrsRegistrasi").reset();
+                                  var selectElement = document.getElementById('dokter');
+                                  selectElement.innerHTML = '';
+                                  var selectElement2 = document.getElementById('poliklinik');
+                                  selectElement2.innerHTML = '';
+                                  var selectElement3 = document.getElementById('namajaminan');
+                                  selectElement3.innerHTML = '';
+                                  var selectElement4 = document.getElementById('grupJaminan');
+                                  selectElement4.innerHTML = '';
+                                  getDataPoliklonik();
+                                  getdatalistadministrasi();
+                                  getdataJenisJaminan();
+                                  getShift(); 
+}
+  function loadNIKKartu(RSY_Kartu_NoPeserta){
+     $.ajax({
+            data: "q=" + RSY_Kartu_NoPeserta,
+            url: "controller/HRD/Exec_Master.php?action=get_dataPegawaiPolis",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+                beforeSend:function(){
+                           
+                },
+                success: function(data){ 
+                  $("#RSY_Kartu_NamaPemegangKartu").val(data.Nama);
+                  $("#RSY_Kartu_HakKelas").val(data.HakKelasPlafonRS);
+                  $("#RSY_Kartu_PlafonRJ").val(data.Plafon_RJ);
+                  $("#RSY_PlafonRI").val(data.Plafon_RI);
+                  $("#RSY_stsPeg").val(data.Status_Aktif);
+           
+                },error: function () {
+                            
+                }
+          });
+  }
+ function loadkartujaminan(){
+
+    var noMR = $("[name='PasienNoMR']").val();
+    var NamaPasien = $("[name='PasienNama']").val();
+    var GroupJaminan = document.getElementById("grupJaminan").value;
+    var NamaJaminan = document.getElementById("namajaminan").value;
+    $("#Kartu_GroupJaminan").val(GroupJaminan);
+    $("#kartu_NoRM").val(noMR);
+    $("#Kartu_NamaJaminan").val(NamaJaminan);
+    $("#Kartu_NamaPasien").val(NamaPasien);
+    $("#Kartu_NamaPemegangKartu").val(NamaPasien);
+
+    if(NamaJaminan==='274'){
+      $("#nosep").hide();
+      $("#RSY_Kartu_NamaJaminan").val(NamaJaminan);
+      $("#RSY_Kartu_GroupJaminan").val(GroupJaminan); 
+      $('#Modal_Karyawn_Polis').modal('show');
+      $("#RSY_kartu_NoRM").val(noMR);
+      $("#RSY_Kartu_NamaPasien").val(NamaPasien);
+        $.ajax({
+            data: "noMR=" + noMR+"&GroupJaminan="+GroupJaminan+"&NamaJaminan="+NamaJaminan,
+            url: "controller/Pendaftaran/Pendaftaran.php?action=getpolis",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+                success: function(data){
+                //  $("#Kartu_GroupJaminan").val(data.KodeGroupJaminan);
+                  //$("#RSY_Kartu_GroupJaminan").val(data.TipePasien);
+                  //$("#Kartu_NamaJaminan").val(data.KodeJaminan);
+                 // $("#Kartu_NamaJaminanx").val(data.NamaPerusahaan);
+
+                  $("#RSY_Kartu_NoPeserta").val(data.NoKartu);
+                  $("#RSY_Kartu_NamaPemegangKartu").val(data.NamaPemegangKartu);
+                  
+                  $("#Kartu_ID2").val(data.ID);
+                  $("#RSY_Kartu_StatusPeserta").val(data.StatusPasien); 
+                  loadNIKKartu(data.NoKartu);
+                },
+                error: function () {
+                           new PNotify({
+                                      title: 'Notifikasi',
+                                      text: 'Data Tidak Ditemukan !',
+                                      type: 'danger'
+                          });
+                }
+        });
+    }else{
+      $("#nosep").hide();
+      $('#Notif_awal_registrasi2').modal('show');
+     console.log(noMR); 
+           $.ajax({
+            data: "noMR=" + noMR+"&GroupJaminan="+GroupJaminan+"&NamaJaminan="+NamaJaminan,
+            url: "controller/Pendaftaran/Pendaftaran.php?action=getpolis",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+                success: function(data){
+                //  $("#Kartu_GroupJaminan").val(data.KodeGroupJaminan);
+                  $("#Kartu_NamagroupJaminan").val(data.TipePasien);
+                  //$("#Kartu_NamaJaminan").val(data.KodeJaminan);
+                  $("#Kartu_NamaJaminanx").val(data.NamaPerusahaan);
+                  $("#Kartu_NoPeserta").val(data.NoKartu);
+                  $("#Kartu_NamaPemegangKartu").val(data.NamaPemegangKartu);
+                  $("#Kartu_Keterangan").val(data.Keterangan);
+                  $("#Kartu_ID").val(data.ID);
+                  $("#Kartu_HakKelas").val(data.HakKelas);
+                  $("#Kartu_StatusPeserta").val(data.StatusPasien);
+                  
+
+
+
+                },
+                error: function () {
+                           new PNotify({
+                                      title: 'Notifikasi',
+                                      text: 'Data Tidak Ditemukan !',
+                                      type: 'danger'
+                          });
+                }
+        });
+    }
+    
+
+ }
+ function getKartu_HakKelas(){
+    var xdi = "1";
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKartu_HakKelas",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#Kartu_HakKelas").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].NamaKelas+'</option';
+                                  $("#Kartu_HakKelas").append(newRow);
+
+                              } 
+                               
+                                $('.js-example-basic-single').select2();
+                              }
+      });
+ }
+ function getdatalistadministrasi(){
+    var xdi = $("#namajaminanid").val();
+     var tipepasien = $("#grupJaminanid").val();
+     //console.log(xdi,tipepasien,'asdarrrrr');
+      
+      $("#jenisadministrasi").empty();
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi+"&tipepasien=" + tipepasien,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getdatalistadministrasi",
+                dataType: "json",
+                success: function(data){ 
+                              //console.log(data,'darx');
+                              var newRow = '<option value=""></option';
+                              $("#jenisadministrasi").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].Nama_Karcis+'</option';
+                                  $("#jenisadministrasi").append(newRow);
+
+                              } 
+                                
+                                $('.js-example-basic-single').select2();
+                              }
+      });
+ }
+ function getadministrasinilai(){
+     var xdi = document.getElementById("jenisadministrasi").value;
+     $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=getadministrasinilai&q="+xdi,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){
+                  $("#jenisadminnilai").val(data.Nilai_Karcis);
+                  $("#jenisadministrasiid").val(data.ID);
+              }
+    });
+ }
+  function getadministrasinilai2(x){
+     var xdi = x;
+     $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=getadministrasinilai&q="+xdi,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){
+                  $("#jenisadminnilai").val(data.Nilai_Karcis);
+                  $("#jenisadministrasiid").val(data.ID);
+              }
+    });
+ }
+
+ function getjaminannama(){
+   var xdi = document.getElementById("grupJaminan").value;
+   console.log(xdi);
+   if(xdi==1){
+      document.getElementById("show_notif_pilih_jaminan").innerHTML = "*) Jika anda memilih Jenis Jaminan PRIBADI, silahkan masukan Nama Jaminan = UMUM pada pilihan nama jaminan (Nama Jaminan tidak boleh kosong).";
+   }else{
+       document.getElementById("show_notif_pilih_jaminan").innerHTML = "";
+   }
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getjaminannama",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#namajaminan").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].NamaPerusahaan+'</option';
+                                  $("#namajaminan").append(newRow);
+
+                              } 
+                               
+                                $('.js-example-basic-single').select2();
+                              }
+      });
+      $("#hide_jaminan").show();
+      $('#NamaJaminan').select2();
+}
+function getjaminannama2(x){
+   var xdi = x;
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getjaminannama",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#namajaminan").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].NamaPerusahaan+'</option';
+                                  $("#namajaminan").append(newRow);
+
+                              } 
+                               
+                                //$('.js-example-basic-single').select2();
+                              }
+      });
+}
+function getreferal(){
+     var xdi = document.getElementById("caramasuk").value;
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getreferal",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#referral").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].NamaCaraMasukRef+'</option';
+                                  $("#referral").append(newRow);
+                              } 
+                                $('.js-example-basic-single').select2();
+                              }
+      });
+}
+function getreferalname(){
+  var xdi = document.getElementById("referral").value;
+      const url = "controller/Pendaftaran/Pendaftaran.php?action=getreferalname";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: "kode_prop=" + xdi,
+                    dataType: "JSON",
+                    success: function (data) {
+                        // handle the response
+                            console.log(data.NamaUnit);
+                                  $("#showrefferalfix").val(data.NamaCaraMasukRef);
+                                  $("#referralid").val(data.ID);
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+                $("#hide_referal").hide();
+}
+function getreferalname2(c){
+  var xdi = c;
+      const url = "controller/Pendaftaran/Pendaftaran.php?action=getreferalname";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: "kode_prop=" + xdi,
+                    dataType: "JSON",
+                    success: function (data) {
+                        // handle the response
+                            console.log(data.NamaUnit);
+                                  $("#showrefferalfix").val(data.NamaCaraMasukRef);
+                                  $("#referralid").val(data.ID);
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+                $("#hide_referal").hide();
+}
+function getdataJenisJaminan(){
+  var xdi = "1";
+  $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getdataJenisJaminan",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#grupJaminan").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].TipePasien+'</option';
+                                  $("#grupJaminan").append(newRow);
+                              } 
+                                $('.js-example-basic-single').select2();
+                              }
+      });
+}
+
+ function show_data() {
+    var searchbox = $("[name='searchbox']").val();
+     $.ajax({
+          type: "GET",
+          url: "controller/Pendaftaran/Pendaftaran.php?action=cariRekamMedik&searchbox="+searchbox,
+              beforeSend:function(){
+                          $('#searchbox').html('Loading...');
+                          $('#searchbox').addClass('btn-danger');
+              },
+              success: function(msg){
+                  $("#xd").html(msg);
+                  $('#searchbox').removeClass('btn-danger');
+              }
+            });
+}
+function show_data_poli() {
+    var searchbox = $("[name='searchboxpoli']").val();
+     $.ajax({
+          type: "GET",
+          url: "controller/Pendaftaran/Pendaftaran.php?action=caridatapoliklinik&searchbox="+searchbox,
+              beforeSend:function(){
+                          $('#searchbox').html('Loading...');
+                          $('#searchbox').addClass('btn-danger');
+              },
+              success: function(msg){
+                  $("#xdx").html(msg);
+                  $('#searchbox').removeClass('btn-danger');
+              }
+            });
+}
+function showIDMR(x){
+  var x = x;
+   $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=showdatabyID&q="+x,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){
+                  $("#PasienNoMR").val(data.NoMR);
+                  $("#PasienNama").val(data.PatientName); 
+                  $("#PasienIdJKel").val(data.Gander);
+                  $("#PasienTglLahir").val(data.Date_of_birth);
+                  $("#PasienAlamat").val(data.Address);
+                  $("#PasienNamaJKel").val(data.NamaGander);
+                  $("#PasienNIK").val(data.ID_Card_number);
+                  $("#PasienTptLahir").val(data.BirthPlace);
+                  $("#PasienPekerjaan").val(data.Ocupation);
+                  document.getElementById("CloseMe").click();
+              }
+    });
+}
+function showIDMxR(){
+
+  var x = $("#PasienNoMR").val();
+
+   $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=getqrcode&q="+x,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){
+                  //$("#id").val(data.ID);
+                  $("#PasienNoMR").val(data.NoMR);
+                  $("#PasienNama").val(data.PatientName); 
+                  $("#PasienIdJKel").val(data.Gander);
+                  $("#PasienTglLahir").val(data.Date_of_birth);
+                  $("#PasienAlamat").val(data.Address);
+                  $("#PasienNamaJKel").val(data.NamaGander);
+                  $("#PasienNIK").val(data.ID_Card_number);
+                  $("#PasienTptLahir").val(data.BirthPlace);
+                  $("#PasienPekerjaan").val(data.Ocupation);
+                  document.getElementById("CloseMe").click();
+                 // $("#xxt").show();
+              }
+    });
+}
+function getDataPoliklonik(){
+  $('#poliklinik').select2();
+  var xdi = "1";
+  $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getPoliklinik",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#poliklinik").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].ID+'">'+data.data.datapelayanan[i].NamaUnit+'</option';
+                                  $("#poliklinik").append(newRow); 
+                              }  
+                                   
+                }
+  });
+}
+function getDataCaraMasuk(){
+   var xdi = "1";
+  $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getDataCaraMasuk",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              var newRow = '<option value=""></option';
+                              $("#caramasuk").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.datapelayanan.length;
+                              for (i = 0; i < data.data.datapelayanan.length; i++) {
+                                  var newRow = '<option value="'+data.data.datapelayanan[i].id+'">'+data.data.datapelayanan[i].NamaCaraMasuk+'</option';
+                                  $("#caramasuk").append(newRow); 
+                              }  
+                                   
+                }
+  });
+
+
+} 
+function getDoktername(){
+    var xdi = document.getElementById("dokter").value;
+     const url = "controller/Pendaftaran/Pendaftaran.php?action=getnamadoktername";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: "kode_prop=" + xdi,
+                    dataType: "JSON",
+                    success: function (data) {
+                          if(data.status=="warning")
+                              {     
+                                new PNotify({
+                                          title: 'Notifikasi',
+                                          text: data.errorname,
+                                          type: 'danger'
+                                }); 
+                                          $("#dokterid").val('');
+                                          $("#shownamdokterfix").val('');
+                              }else if(data.status=="success")
+                              {     
+                                    // handle the response
+                                    console.log(data.First_Name);
+                                    $("#shownamdokterfix").val(data.First_Name);
+                                    $("#dokterid").val(data.ID);
+                              }
+                        
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+      $("#hide_dokter").hide();
+}
+function getDoktername2(x){
+    var xdi = x;
+     const url = "controller/Pendaftaran/Pendaftaran.php?action=getnamadoktername";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: "kode_prop=" + xdi,
+                    dataType: "JSON",
+                    success: function (data) {
+                        if(data.status=="warning")
+                            {     
+                              new PNotify({
+                                        title: 'Notifikasi',
+                                        text: data.errorname,
+                                        type: 'danger'
+                              }); 
+                                        $("#dokterid").val('');
+                                        $("#shownamdokterfix").val('');
+                            }else if(data.status=="success")
+                            {     
+                                  // handle the response
+                                  console.log(data.First_Name);
+                                  $("#shownamdokterfix").val(data.First_Name);
+                                  $("#dokterid").val(data.ID);
+                            }
+                        
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+      $("#hide_dokter").hide();
+}
+// get nama poli
+function getnamapolishow(x){
+      const url = "controller/Pendaftaran/Pendaftaran.php?action=getnamapolishow";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    data: "kode_prop=" + x,
+                    dataType: "JSON",
+                    success: function (data) {
+                        // handle the response
+                            console.log(data.NamaUnit);
+                                  $("#shownamapolifix").val(data.NamaUnit);
+                                   $("#poliklinikid").val(data.ID);
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+}
+
+//Lihat Sesion Jadwal
+function getShift(){
+      const url = "controller/Pendaftaran/Pendaftaran.php?action=getsession";
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (data) {
+                        // handle the response
+                            console.log(data.NamaSesion);
+                                  $("#NamaSesionPraktek").val(data.NamaSesion);
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+}
+function getidjenisjaminan(){
+  $("#namajaminanid").val('');
+  var xdi = document.getElementById("grupJaminan").value;
+  $("#grupJaminanid").val(xdi);
+}
+function getidnamajaminan(){
+  var xdi = document.getElementById("namajaminan").value;
+  var kode_prop = document.getElementById("grupJaminan").value;
+  $("#namajaminanid").val(xdi);
+  const url = "controller/Pendaftaran/Pendaftaran.php?action=getjaminannama2&rand="+xdi+"&kode_prop="+kode_prop;
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (data) {
+                        // handle the response
+                            console.log(data.NamaPerusahaan);
+                            $("#shownamaperusahaanfix").val(data.NamaPerusahaan);
+                            $("#hide_jaminan").hide();
+                            getdatalistadministrasi();
+
+                    },
+                    error: function (xhr, status) {
+                        // handle errors
+                        console.log(response);
+                    }
+                });
+}
+function getProvinsi(){ 
+     $.ajax({
+                type: "GET", 
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getProvinsi",
+                dataType: "json",
+                success: function(data){ 
+                              //console.log(data);
+                          var newRow = '<option value="-- Pilih Provinsi --"></option';
+                              $("#Medical_Provinsi").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.getProvinsi.length;
+                                  for (i = 0; i < data.data.getProvinsi.length; i++) {
+                                      var newRow = '<option value="'+data.data.getProvinsi[i].PovinsiID+'">'+data.data.getProvinsi[i].ProvinsiNama+'</option';
+                                      $("#Medical_Provinsi").append(newRow);
+                                      $("#Medical_Provinsi").select2();
+
+                                  }   
+                }
+      });
+}
+function getKabupaten(){
+ 
+     var xdi = document.getElementById("Medical_Provinsi").value;
+     console.log(xdi,'hahha');
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKabupatenByID",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data); 
+                              var elements = $();
+                              var dataarray = data.data.getKabupaten.length;
+                                  for (i = 0; i < data.data.getKabupaten.length; i++) {
+                                      var newRow = '<option value="'+data.data.getKabupaten[i].kabupatenId+'">'+data.data.getKabupaten[i].kabupatenNama+'</option';
+                                      $("#Medrec_kabupaten").append(newRow);
+                                  }  
+                              } 
+      });
+} 
+ 
+function getKecamtan2(x){
+    var xdi = x;
+    $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKecamtanByID",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                               
+                              var elements = $();
+                              var dataarray = data.data.getKecamtan.length;
+                                  for (i = 0; i < data.data.getKecamtan.length; i++) {
+                                      var newRow = '<option value="'+data.data.getKecamtan[i].kecamatanId+'">'+data.data.getKecamtan[i].Kecamatan+'</option';
+                                      $("#Medrec_Kecamatan").append(newRow);
+                                      $("#Medrec_kabupaten").select2();
+
+                                  }  
+                              } 
+      });
+}
+function getKecamtan(){
+    var xdi = document.getElementById("Medrec_kabupaten").value; 
+    $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKecamtanByID",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                               $("#Medrec_Kecamatan").empty();
+                               var newRow = '<option value="">-- Pilih Kecamatan --</option';
+                              $("#Medrec_Kecamatan").append(newRow); 
+
+
+                              var elements = $();
+                              var dataarray = data.data.getKecamtan.length;
+                                  for (i = 0; i < data.data.getKecamtan.length; i++) {
+                                      var newRow = '<option value="'+data.data.getKecamtan[i].kecamatanId+'">'+data.data.getKecamtan[i].Kecamatan+'</option';
+                                      $("#Medrec_Kecamatan").append(newRow);
+                                      $("#Medrec_Kecamatan").select2();
+
+                                  }  
+                              }
+    });
+}
+function getKelurahan2(x){
+     var xdi = x;
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKelurahanByID",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                              
+                              var elements = $();
+                              var dataarray = data.data.getKelurahan.length;
+                                  for (i = 0; i < data.data.getKelurahan.length; i++) {
+                                      var newRow = '<option value="'+data.data.getKelurahan[i].desaId+'">'+data.data.getKelurahan[i].Kelurahan+'</option';
+                                      $("#Medrec_Kelurahan").append(newRow);
+
+                                  }  
+                              } 
+      });
+}
+function getKelurahan(){
+     var xdi = document.getElementById("Medrec_Kecamatan").value;
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKelurahanByID",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                               $("#Medrec_Kelurahan").empty();
+                              var newRow = '<option value="">-- Pilih Kelurahan --</option';
+                              $("#Medrec_Kelurahan").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.getKelurahan.length;
+                                  for (i = 0; i < data.data.getKelurahan.length; i++) {
+                                      var newRow = '<option value="'+data.data.getKelurahan[i].desaId+'">'+data.data.getKelurahan[i].Kelurahan+'</option';
+                                      $("#Medrec_Kelurahan").append(newRow);
+
+                                  }  
+                              } 
+      });
+}
+function getKodepos(){
+     var xdi = document.getElementById("Medrec_Kelurahan").value;
+     $.ajax({
+                type: "GET",
+                data: "kode_prop=" + xdi,
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getKodepos",
+                dataType: "json",
+                success: function(data){ 
+                                      $("#Medrec_Kodepos").val(data.kodepos);
+                              } 
+      });
+}
+function getStatusHubunganKeluarga(){
+     $.ajax({
+                type: "GET", 
+                url: "controller/Pendaftaran/Pendaftaran.php?action=getStatusHubunganKeluarga",
+                dataType: "json",
+                success: function(data){ 
+                              console.log(data);
+                               $("#Medrec_DaruratHub").empty();
+                              var newRow = '<option value=""></option';
+                              $("#Medrec_DaruratHub").append(newRow); 
+                              var elements = $();
+                              var dataarray = data.data.getStatusHubunganKeluarga.length;
+                                  for (i = 0; i < data.data.getStatusHubunganKeluarga.length; i++) {
+                                      var newRow = '<option value="'+data.data.getStatusHubunganKeluarga[i].CONTACT_STATUS+'">'+data.data.getStatusHubunganKeluarga[i].CONTACT_STATUS+'</option';
+                                      $("#Medrec_DaruratHub").append(newRow);
+
+                                  }  
+                              }
+      });
+}
+function show_data_reservasi() {
+    var searchbox = $("[name='searchcarireservasi']").val();
+    var tglAwalReservasi =  $("[name='tglAwalReservasi']").val();
+    var tglAkhirReservasi =  $("[name='tglAkhirReservasi']").val();
+  
+     $.ajax({
+          type: "GET",
+          url: "controller/Pendaftaran/Pendaftaran.php?action=caridataReservasi_by_daftar&searchbox="+searchbox+
+          "&tglAkhirReservasi="+tglAkhirReservasi+"&tglAwalReservasi="+tglAwalReservasi,
+              beforeSend:function(){
+                          $('#searchbox').html('Loading...');
+                          $('#searchbox').addClass('btn-danger');
+              },
+              success: function(msg){
+                  $("#LoadTabelReservasi").html(msg);
+                  
+                  $('#searchbox').removeClass('btn-danger');
+
+              }
+            });
+    
+}
+function showIDReservasi(x){
+  var x = x;
+  $.ajax({
+          url: "controller/Pendaftaran/Pendaftaran.php?action=showdatabyIDReservasi&q="+x,
+           type: "GET",
+           cache: false,
+           dataType: "JSON",
+              success: function(data){ 
+                  $("#pxNoReservasi").val(data.NoBooking);
+                  $("#PasienNoMR").val(data.NoMR); 
+                  $("#PasienNama").val(data.NamaPasien);
+                  $("#PasienAlamat").val(data.Alamat);
+                  $("#PasienTglLahir").val(data.TglLahir);
+                  $("#PasienIdJKel").val(data.JenisKelamin);
+                  $("#poliklinikid").val(data.IdPoli); 
+                  getnamapolishow(data.IdPoli);
+                  $("#dokterid").val(data.DoctorID);
+                  getDoktername2(data.DoctorID);
+                  $("#pxNoAntrian").val(data.NoAntrianAll); 
+                       if(data.MrExist == 0){
+                         $('#modalcariDataReservasi').modal('hide');
+                          $('#ModalInputMRBAru').modal('show');
+                          $("#Medrec_NamaPasien").val(data.NamaPasien);
+                          $("#Medrec_Alamat").val(data.Alamat);
+                          $("#Medrec_Tgl_Lahir").val(data.TglLahir);
+                          $("#Medical_JKel").val(data.JenisKelamin);
+                          $("#Medrec_HomePhone").val(data.Telephone);
+                          $("#Medrec_handphone").val(data.HP);
+                          $("#Medrec_Email").val(data.Email);
+                          
+                              //document.getElementById("btnCariMrx").hidden = true;
+                      }else if(data.MrExist == 1){
+                               
+                              //document.getElementById("btnCariMrx").hidden = false;
+                      }
+              }
+  });
+   $('#modalcariDataReservasi').modal('hide');
+}
+function ShowDataArsip(x){
+                      $.ajax({
+                     url: "controller/Pendaftaran/Pendaftaran.php?action=showdataArsip_Rajal&q="+x,
+           type: "GET",
+           cache: false,
+
+                        success: function(msg){
+                            $("#Load_ArsipRajal").html(msg);
+                        }
+                      });
+                      $.ajax({
+                     url: "controller/Pendaftaran/Pendaftaran.php?action=showdataArsip_Ranap&q="+x,
+           type: "GET",
+           cache: false,
+
+                        success: function(msg){
+                            $("#Load_ArsipRanap").html(msg);
+                        }
+                      });
+}
+
+function loaddatamr(){
+     var x = $("[name='searchboxpoli']").val();
+      var y ="x";
+     $('#table-load-data').dataTable({
+            "bDestroy": true
+        }).fnDestroy();
+        $('#table-load-data').DataTable({
+           "searching" : true,
+            "pagging": true,
+            "processing": true,
+             scrollY: "1000px",
+            "serverSide": true,
+            "ordering": true, // Set true agar bisa di sorting
+            "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
+            "ajax":
+            {
+                "url": "controller/Pendaftaran/Pendaftaran.php?action=loaddatamr", // URL file untuk proses select datanya
+                "type": "POST",
+                data: function ( d ) {
+                d.myKey = x;
+                d.myKey2 = y; 
+                // d.custom = $('#myInput').val();
+                // etc
+                }
+            }, "deferRender": true, 
+             "aLengthMenu": [[20, 50, 100],[ 20, 50, 100]], // Combobox Limit
+            "columns": [ 
+                { "data": "NoMR" }, 
+                { "data": "NamaPasien" },
+                { "data": "TglLahir" },  
+                { "data": "Alamat" },   
+                { "data": "TlpRumah" },     
+                { "render": function ( data, type, row ) { // Tampilkan kolom aksi
+                      var html = ""
+                       
+                        var html  = '<button class="btn btn-info"  id="buttonedit" name="buttonedit" onclick=\'showIDMR("'+row.ID+'")\' value='+row.ID+'><span class="glyphicon glyphicon-log-in"></span></button> '
+                           return html 
+                    }
+                },
+            ],
+        });
+}
+function print_kartumr() {
+  var nomr = $("#Medrec_NoMR").val();
+   url = "Halaman/Print/print_kartu_mr.php?q="+nomr;
+            var win = window.open(url, '_blank');
+            win.focus();
+}
+function getKepesertaan(){
+    var idPeserta = $('#idPesertaBPJS').val();
+    var JenisPencarian = $('#JenisPencarianBPJS').val();
+           $.ajax({
+            data: "kodePeserta=" + idPeserta + "&jenisPencarian=" + JenisPencarian,
+            url: "controller/Pendaftaran/BridgingBPJS_Cek_Kepesertaan.php",
+            type: "GET",
+            cache: false,
+            dataType: "JSON",
+             beforeSend:function(){
+                          $('#btnCekKepesertaan').html('Sending...');
+                          $('#btnCekKepesertaan').addClass('btn-danger');
+                          document.getElementById("btnCekKepesertaan").disabled = true;
+            },
+                success: function(data){
+                  console.log(data.hasil.metaData.message);
+                    // console.log(data.hasil.response.peserta.hakKelas.keterangan);
+                    if(data.hasil.metaData.code === "200")  {
+                        $('#namapesertaBPJS').val(data.hasil.response.peserta.nama); 
+                        $('#idhakKelasBPJS').val(data.hasil.response.peserta.hakKelas.kode); 
+                        $('#hakKelasBPJS').val(data.hasil.response.peserta.hakKelas.keterangan); 
+                        $('#idfaskesBPJS').val(data.hasil.response.peserta.provUmum.kdProvider); 
+                        $('#namafaskesBPJS').val(data.hasil.response.peserta.provUmum.nmProvider); 
+
+                        $('#statuspesertaBPJS').val(data.hasil.response.peserta.statusPeserta.keterangan); 
+                        $('#keteranganprbBPJS').val(data.hasil.response.peserta.informasi.prolanisPRB); 
+                        $('#cobnosuratBPJS').val(data.hasil.response.peserta.cob.noAsuransi); 
+                        $('#cobNamaAsuransiBPJS').val(data.hasil.response.peserta.cob.nmAsuransi); 
+
+                        $('#nokartubpjs').val(data.hasil.response.peserta.noKartu); 
+                        $('#nonikktpBPJS').val(data.hasil.response.peserta.nik); 
+                        $('#btnCekKepesertaan').removeClass('btn-danger'); 
+                        $('#btnCekKepesertaan').html('INQUIRY');
+                        document.getElementById("btnCekKepesertaan").disabled = false;
+                    }else {  
+                             swal({
+                                title: "Warning",
+                                text: data.hasil.metaData.message,
+                                icon: "warning", 
+                                dangerMode: true,
+                              });
+                            $('#btnCekKepesertaan').removeClass('btn-danger'); 
+                            $('#btnCekKepesertaan').html('INQUIRY');
+                            document.getElementById("btnCekKepesertaan").disabled = false;
+                    }
+                      $('#btnCekKepesertaan').removeClass('btn-danger'); 
+                      $('#btnCekKepesertaan').html('INQUIRY');
+                      document.getElementById("btnCekKepesertaan").disabled = false;
+                                    
+                },error: function () {
+                          
+                }
+        });
+}
+function good(){
+  var xx = document.getElementById("isDiagnosaawalBPJS").value;
+  console.log(xx);
+  $('#kdDiagnosaawalBPJSChoose').val(xx); 
+
+  var href = $.attr(this, 'href');
+
+
+}
+</script>
