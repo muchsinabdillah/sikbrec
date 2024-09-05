@@ -2088,10 +2088,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         $file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $source =   $file_name;
@@ -2380,10 +2380,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -2433,10 +2433,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -2575,10 +2575,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -2717,10 +2717,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -2852,10 +2852,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -3000,10 +3000,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
@@ -3095,10 +3095,10 @@ ORDER BY a.id DESC");
             'version' => 'latest',
             'region'  => 'ap-southeast-1',
             'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => AWS_KEY,
-                'secret' => AWS_SECRET
-            ]
+            // 'credentials' => [
+            //     'key'    => AWS_KEY,
+            //     'secret' => AWS_SECRET
+            // ]
         ]);
         //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
         $file_name = $_SERVER['DOCUMENT_ROOT'] . 'SIKBREC/public/tmp/' . $nama_file;
