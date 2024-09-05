@@ -2,3 +2,4 @@ app/config/
 app/core/
 app/library/
 public/upload/
+app/models/B_List_Registrasi_Pasien_Model.php
