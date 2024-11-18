@@ -3116,7 +3116,10 @@ public function goGetDatabyNoSEP($data)
         $ws_query["data"]["payor_cd"] =  $payor_cd;
         $ws_query["data"]["cob_cd"] =  $cob_cd;
         $ws_query["data"]["coder_nik"] =  $coder_nik;
-
+        $ws_query["data"]["dializer_single_use"] = '0';
+        $ws_query["data"]["kantong_darah"] = '0';
+        $ws_query["data"]["sistole"] = '120';
+        $ws_query["data"]["diastole"] = '87';
         $json_request = json_encode($ws_query);
         // data yang akan dikirimkan dengan method POST adalah encrypted:
 

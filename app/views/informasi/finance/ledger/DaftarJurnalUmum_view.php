@@ -43,7 +43,7 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                 <div class="form-group gut">
                                     <label for="inputEmail3" class="col-sm-2 control-label">No. Jurnal</label>
                                     <div class="col-sm-3">
-                                        <input type="text" value="<?= $data['id'] ?>" class="form-control" name="Nojurnal" id="Nojurnal" placeholder="Masukkan No.Jurnal">
+                                        <input type="text" value="<?= $data['id'] ?>" class="form-control" readonly name="Nojurnal" id="Nojurnal" placeholder="Masukkan No.Jurnal">
                                     </div>
                                     <label for="inputEmail3" class="col-sm-2 control-label">Nama Rekening</label>
                                     <div class="col-sm-3">
@@ -81,9 +81,15 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                         <select name="NamaUnit" id="NamaUnit" class="form-control"></select>
                                     </div>
                                 </div>
-
                                 <div class="form-group gut">
-                                    <label for="inputEmail3" class="col-sm-2 control-label">Nominal Jurnal</label>
+                                    <label for="inputEmail3" class="col-sm-2 control-label"></label>
+                                    <div class="col-sm-3"> 
+                                        <button type="button" class="btn btn-success btn-animated btn-wide " id="btnNewjurnal" name="btnNewjurnal"><span class="visible-content">New Jurnal</span><span class="hidden-content"></span></button>
+                                    </div> 
+                                </div>
+                                <hr>    <br>
+                                <div class="form-group gut">
+                                    <label for="inputEmail3" class="col-sm-2 control-label">Masukan Nominal Jurnal</label>
                                     <div class="col-sm-3">
                                         <input type="text" class="form-control" name="NominalJurnal" id="NominalJurnal" placeholder="Ketik Nominal Jurnal">
                                         <div class="row" style="margin-bottom:3px;">
@@ -100,21 +106,10 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                 <input class="form-control input-sm " id="PassLedgerPNanamBank" name="PassLedgerPNanamBank" type="hidden" placeholder="Ketik Ket Ledger">
                                             </div>
                                         </div>
-                                    </div>
-
-
+                                    </div> 
                                 </div>
 
-                                <button type="button" class="btn btn-success btn-animated btn-wide " id="btnNewjurnal" name="btnNewjurnal"><span class="visible-content">New Jurnal</span><span class="hidden-content"></span></button>
-                                <!-- <a type="button" class="btn btn-success btn-animated btn-wide " id="btnSave" name="btnSave"><span class="visible-content">Simpan</span><span class="hidden-content"></span></a> -->
-                                <button type="button" class="btn btn-primary waves-effect" id="savetrs" name="savetrs">Simpan</button>
-                                <button type="button" class="btn btn-danger" id="btnbatal" name="btnbatal">
-                                    Batal</button>
-                                <!-- <a type="button" class="btn btn-success btn-animated btn-wide " id="btnbatal" name="btnbatal"><span class="visible-content">Batal</span><span class="hidden-content"></span></a> -->
-                                <!-- <a type="button" class="btn btn-success btn-animated btn-wide " id="btnClose" name="btnClose"><span class="visible-content">Close</span><span class="hidden-content"></span></a> -->
-
-
-                                <hr>
+                           
                                 <div class="table-responsive" style="margin-top: 70px;">
                                     <table id="examplex" class="display" width="100%">
                                         <thead>
@@ -144,7 +139,11 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                     </table>
                                 </div>
                             </form>
+                            <button type="button" class="btn btn-primary waves-effect" id="savetrs" name="savetrs">Simpan</button>
+                                <button type="button" class="btn btn-danger" id="btnbatal" name="btnbatal">
+                                    Batal</button>
                         </div>
+                        
                     </div>
                 </div>
                 <!-- /.col-md-12 -->

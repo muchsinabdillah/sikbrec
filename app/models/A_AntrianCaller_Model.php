@@ -187,4 +187,128 @@ class A_AntrianCaller_Model
             die($e->getMessage());
         }
     }
+    public function gocallantrianFarmasi($data){
+        try {
+           //return Utils::get_client_ip(); 
+            $idunit = $data['idunit'];
+            $noreg = $data['noreg'];
+            $nama = $data['nama'];
+            $noantrian = $data['noantrian'];
+         
+                $methodAntrian = "POST";
+                $URLAntrian = "genToken";
+                $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $methodAntrian, $URLAntrian);
+                $session = SessionManager::getCurrentSession();
+                $userid = $session->username;
+    
+                // 2. add Data Group Barang   "UserCreate" : "'. $userid .'" 
+                $postSatuanDataAntrian = '{
+                        "IDUnitFarmasi": "'.$idunit.'",
+                        "NoRegistrasi": "'.$noreg.'",
+                        "name": "'.$nama.'",
+                        "no_antrean_poli": "'.$noantrian.'"
+                    }';
+                $method_getsatuanAntrian = "POST";
+                $urlAddSatuanAntrian = "api-farmasi-called-outside";
+                $addSatuanx = $this->curl_request_Antrian_rsyarsi(GenerateTokenRS::headers_api_token_antrian_RSyarsi(), $method_getsatuanAntrian, $postSatuanDataAntrian, $urlAddSatuanAntrian); 
+                return $addSatuanx;
+                
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function UpdateAntrianFarmasi($data){
+        try {
+            $NoResep = $data['NoResep'];
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $StatusResep = $data['StatusResep'];
+         
+            // 1. Gen Token
+            $method = "POST";
+            $URL = "genToken";
+            $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+
+            // 2. add Data Group Barang 
+            $method_getgroup = "POST";
+            // 2. add Data Golongan
+            $postData = '
+            {
+                "NoResep": "'.$NoResep.'",
+                "NoRegistrasi": "'.$NoRegistrasi.'",
+                "StatusResep": "'.$StatusResep.'"
+            }
+            
+            ';
+            $urlAddKelompok = "Antrian/Farmasi/UpdateAntrian";
+            $addSatuan = $this->curl_request(GenerateTokenRS::headers_api_token($token['access_token']), $method_getgroup, 
+                                            $postData, $urlAddKelompok);
+            return $addSatuan;
+                
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    
+    public function UpdateDataVerifikasi($data){
+        try {
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $NoResep = $data['NoResep'];
+            
+            $session = SessionManager::getCurrentSession();
+            $Username = $session->username;
+            $Nama = $session->name;
+            $StatusVerifikasi = $data['StatusVerifikasi'];
+            $TanggalVerifikasi = Utils::seCurrentDateTime();
+         
+            // 1. Gen Token
+            $method = "POST";
+            $URL = "genToken";
+            $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+
+            // 2. add Data Group Barang 
+            $method_getgroup = "POST";
+            // 2. add Data Golongan
+            $postData = '
+            {
+                "NoRegistrasi": "'.$NoRegistrasi.'",
+                "NoResep": "'.$NoResep.'",
+                "Username": "'.$Username.'",
+                "Nama": "'.$Nama.'",
+                "StatusVerifikasi": "'.$StatusVerifikasi.'",
+                "TanggalVerifikasi": "'.$TanggalVerifikasi.'"
+            }
+            
+            ';
+            $urlAddKelompok = "Antrian/Farmasi/UpdateDataVerifikasiV2";
+            $addSatuan = $this->curl_request(GenerateTokenRS::headers_api_token($token['access_token']), $method_getgroup, 
+                                            $postData, $urlAddKelompok);
+            return $addSatuan;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function getStatusAntrian($data){
+        try {
+             $NoResep = $data['No_Order'];
+           
+             $this->db->query("SELECT DateProcessed FROM [Apotik_V1.1SQL].dbo.AntrianObatFarmasi WHERE NoResep=:NoResep"); 
+             $this->db->bind('NoResep', $NoResep); 
+             $key =  $this->db->single();
+                                $pasing['DateProcessed'] = $key['DateProcessed'];   
+                                 
+
+                            $callback = array(
+                                'message' => "success",  
+                                'data' => $pasing
+                            );
+                            return $callback;
+
+                
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
 }

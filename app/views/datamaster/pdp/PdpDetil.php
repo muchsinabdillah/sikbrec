@@ -50,6 +50,20 @@
                                      <div class="col-sm-4">
                                          <input type="text" class="form-control" name="KodeTipePdp" id="KodeTipePdp">
                                      </div>
+                                     <label for=" inputEmail3" class="col-sm-2 control-label"> Nama PDP Detil <sup class="color-danger">*</sup></label>
+                                     <div class="col-sm-4">
+                                         <input type="text" class="form-control" name="NamaPDP" id="NamaPDP">
+                                     </div>
+                                 </div>
+                                 <div class="form-group">
+                                     <label for="inputEmail3" class="col-sm-2 control-label"> Show Jasa Dokter<sup class="color-danger">*</sup></label>
+                                     <div class="col-sm-4">
+                                        <select class="form-control" name="ShowJasa" id="ShowJasa">
+                                            <option value="">-- Pilih --</option>
+                                            <option value="0">Tidak</option>
+                                            <option value="1">Ya</option>
+                                        </select>
+                                     </div>
                                      <label for=" inputEmail3" class="col-sm-2 control-label"> Nilai Prosen <sup class="color-danger">*</sup></label>
                                      <div class="col-sm-4">
                                          <input type="text" class="form-control" name="NilaiProsenPdp" id="NilaiProsenPdp">

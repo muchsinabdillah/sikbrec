@@ -91,11 +91,20 @@ class B_Reservasi_Model
                                        a.ID_JadwalPraktek,
                                        a.ID_Penjamin,
                                        d.NamaPerusahaan,
-                                       a.Company
+                                       a.Company,
+                                       case when datepart(dw,a.ApmDate)='1' then Minggu_Awal
+									   when datepart(dw,a.ApmDate)='2' then Senin_Awal
+									   when datepart(dw,a.ApmDate)='3' then Selasa_Awal
+									   when datepart(dw,a.ApmDate)='4' then Rabu_Awal
+									   when datepart(dw,a.ApmDate)='5' then Kamis_Awal
+									   when datepart(dw,a.ApmDate)='6' then Jumat_Awal
+									   when datepart(dw,a.ApmDate)='7' then Sabtu_Awal
+									   end as JamAwalPraktek, e.Open_Assesment_Senin,e.Open_Assesment_Selasa,e.Open_Assesment_Rabu,e.Open_Assesment_Kamis,e.Open_Assesment_Jumat,e.Open_Assesment_Sabtu,e.Open_Assesment_Minggu
                                     from  PerawatanSQL.dbo.Apointment a
                                     inner join MasterdataSQL.dbo.MstrUnitPerwatan b on a.IdPoli = b.ID
                                     inner join MasterdataSQL.dbo.Doctors c on c.ID = a.DoctorID
                                     left join MasterdataSQL.dbo.MstrPerusahaanJPK d on a.ID_Penjamin=d.ID
+									inner join MasterdataSQL.dbo.JadwalPraktek e on a.ID_JadwalPraktek=e.ID
                                     WHERE A.ID=:idReservasi and a.JenisPembayaran<>'ASURANSI'
                                     UNION ALL
                                     SELECT  a.NoAntrianAll, a.MrExist, a.JenisKelamin,a.id,a.NoUrut,a.NoBooking,a.NoMR,a.NamaPasien,a.Alamat,
@@ -123,16 +132,26 @@ class B_Reservasi_Model
                                        a.ID_JadwalPraktek,
                                        a.ID_Penjamin,
                                        d.NamaPerusahaan,
-                                       a.Company
+                                       a.Company,
+									   case when datepart(dw,a.ApmDate)='1' then Minggu_Awal
+									   when datepart(dw,a.ApmDate)='2' then Senin_Awal
+									   when datepart(dw,a.ApmDate)='3' then Selasa_Awal
+									   when datepart(dw,a.ApmDate)='4' then Rabu_Awal
+									   when datepart(dw,a.ApmDate)='5' then Kamis_Awal
+									   when datepart(dw,a.ApmDate)='6' then Jumat_Awal
+									   when datepart(dw,a.ApmDate)='7' then Sabtu_Awal
+									   end as JamAwalPraktek, e.Open_Assesment_Senin,e.Open_Assesment_Selasa,e.Open_Assesment_Rabu,e.Open_Assesment_Kamis,e.Open_Assesment_Jumat,e.Open_Assesment_Sabtu,e.Open_Assesment_Minggu
                                     from  PerawatanSQL.dbo.Apointment a
                                     inner join MasterdataSQL.dbo.MstrUnitPerwatan b on a.IdPoli = b.ID
                                     inner join MasterdataSQL.dbo.Doctors c on c.ID = a.DoctorID
                                     left join MasterdataSQL.dbo.MstrPerusahaanAsuransi d on a.ID_Penjamin=d.ID
+									inner join MasterdataSQL.dbo.JadwalPraktek e on a.ID_JadwalPraktek=e.ID
                                     WHERE A.ID=:idReservasi2 and a.JenisPembayaran='ASURANSI'
                                     ");
             $this->db->bind('idReservasi', $idReservasi);
             $this->db->bind('idReservasi2', $idReservasi);
             $data =  $this->db->single();
+            
             $callback = array(
                 'status' => 'success', // Set array status dengan success
                 'ID' => $data['id'], // Set array status dengan success
@@ -180,6 +199,15 @@ class B_Reservasi_Model
                 'ID_Penjamin' => $data['ID_Penjamin'],
                 'NamaPerusahaan' => $data['NamaPerusahaan'],
                 'Company' => $data['Company'],
+                'JamAwalPraktek' => $data['JamAwalPraktek'],
+                'Open_Assesment_Senin' => $data['Open_Assesment_Senin'],
+                'Open_Assesment_Selasa' => $data['Open_Assesment_Selasa'],
+                'Open_Assesment_Rabu' => $data['Open_Assesment_Rabu'],
+                'Open_Assesment_Kamis' => $data['Open_Assesment_Kamis'],
+                'Open_Assesment_Jumat' => $data['Open_Assesment_Jumat'],
+                'Open_Assesment_Sabtu' => $data['Open_Assesment_Sabtu'],
+                'Open_Assesment_Minggu' => $data['Open_Assesment_Minggu'],
+
             );
             return $callback;
         } catch (PDOException $e) {

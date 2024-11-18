@@ -15,33 +15,19 @@
                              <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
                                  <thead>
                                      <tr>
-                                         <th align='center'>
-                                             <font size="1">No Transaksi
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">No Sales Code
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">Tgl Transaksi
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">Nama Unit Order
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">No Resep
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">Total Qty
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">Notes
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">User Create
-                                         </th>
-                                         <th align='center'>
-                                             <font size="1">Action
-                                         </th>
+                                         <th align='center'><font size="1">No Transaksi</th>
+                                         <!-- <th align='center'><font size="1">No Sales Code</th> -->
+                                         <th align='center'><font size="1">Tgl Transaksi</th>
+                                         <th align='center'><font size="1">No Registrasi</th>
+                                         <th align='center'><font size="1">No MR</th>
+                                         <th align='center'><font size="1">Nama Pasien</th>
+                                         <th align='center'><font size="1">Jenis Pasien</th>
+                                         <th align='center'><font size="1">Nama Unit Order</th>
+                                         <!-- <th align='center'><font size="1">No Resep</th> -->
+                                         <th align='center'><font size="1">Total Qty</th>
+                                         <th align='center'><font size="1">Notes</th>
+                                         <th align='center'><font size="1">User Create</th>
+                                         <th align='center'><font size="1">Action</th>
                                      </tr>
                                  </thead>
                                  <tbody>

@@ -6,7 +6,7 @@ class InventoryCharged extends Controller
     {
         $session = SessionManager::getCurrentSession(); 
         $data['notrs'] =  Utils::setDecode($notrs);
-        $data['judul'] = 'Form Penjualan Dengan Resep';
+        $data['judul'] = 'Form Data Consumable Charged';
         $data['judul_child'] = 'Input';
         $data['session'] = $session;
         $this->View('templates/header', $session);
@@ -60,7 +60,11 @@ class InventoryCharged extends Controller
     }
     public function getNoregistrasibyNoreg(){
         echo json_encode($this->model('B_Farmasi')->getNoregistrasibyNoreg($_POST));
-    } 
+    }
+    // public function viewInventoryChargedbyDatePeriode()
+    // {
+    //     echo json_encode($this->model('B_Farmasi')->viewOrderResepbyDatePeriode($_POST));
+    // }
     public function viewInventoryChargedbyDatePeriode()
     {
         echo json_encode($this->model('B_Farmasi')->viewInventoryChargedbyDatePeriode($_POST));

@@ -43,7 +43,7 @@ class B_Order_Laboratorium_Model
             $this->db->bind('Lab_Daignosa', $data['Lab_Daignosa']);
             $this->db->bind('Lab_Keterangan_Klinik', $data['Lab_Keterangan_Klinik']);
             $this->db->bind('BIASA', $BIASA);
-            $this->db->bind('datatigax', $datatigax);
+            $this->db->bind('datatiga', $datatigax);
             $this->db->bind('datatiga2', $datatiga);
             $this->db->bind('datasatu', $operator);
             $this->db->execute(); 

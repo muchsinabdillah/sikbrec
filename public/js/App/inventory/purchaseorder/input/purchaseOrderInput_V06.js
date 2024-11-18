@@ -1014,9 +1014,9 @@ function showDataDetil_PR(TransasctionCode) {
                 newRow.html(`<td><font size='1'>${total_items}</td>
                             <td><font size='1'>${val.ProductCode}<input type='hidden' name='hidden_kode_barang[]' 
                                 id='hidden_kode_barang${total_items}' class='hidden_kode_barang${total_items}' 
-                                value='${val.ProductCode}' ><input type='text'  name='hidden_Satuan_Konversi_[]' 
+                                value='${val.ProductCode}' ><input type='hidden'  name='hidden_Satuan_Konversi_[]' 
                                 id='hidden_Satuan_Konversi_${total_items}' 
-                                value='${val.Satuan_Konversi}' ><input type='text'  name='hidden_KonversiQty_[]' 
+                                value='${val.Satuan_Konversi}' ><input type='hidden'  name='hidden_KonversiQty_[]' 
                                 id='hidden_KonversiQty_${total_items}' 
                                 value='${val.KonversiQty}' ></font>
                             </td> 
@@ -1147,11 +1147,11 @@ function calculateAllDetail(){
 
                 $("#hidden_discrpttl_barang_" + i).val(number_to_price(totaldiskonrp));
                 $("#hidden_discrp_barang_" + i).val(number_to_price(hargamindiskon));
-                $("#hidden_subtotal_" + i).val(number_to_price(hargamindiskonQty));
+                $("#hidden_subtotal_" + i).val(number_to_price(Math.round(hargamindiskonQty)));
                 $("#grandtotalqty" + i).val(number_to_price(qtytotal));
                 $("#hidden_taxrp_" + i).val(number_to_price(taxrp));
                 $("#hidden_taxrp2_" + i).val(number_to_price(taxrp_stn));
-                $("#hidden_grandtotal_" + i).val(number_to_price(grandtotalPurchase));
+                $("#hidden_grandtotal_" + i).val(number_to_price(Math.round(grandtotalPurchase)));
                 $("#hidden_harga_barang_" + i).val(number_to_price_input(harga));
 
             }
@@ -1165,18 +1165,18 @@ function calculateAllDetail(){
 
         }
     }
-    console.log(grandtotaldiskonrp,'aaaaaaaa');
+    //console.log(grandtotaldiskonrp,'aaaaaaaa');
     $("#diskonxRp").val(number_to_price(grandtotaldiskonrp));
     $("#grandtotalqty").val(number_to_price(qtytotal));
-    $("#subtotalttlrp").val(number_to_price(totalSubtotalAfterDiskon));
+    $("#subtotalttlrp").val(number_to_price(Math.round(totalSubtotalAfterDiskon)));
     $("#taxxRp").val(number_to_price(grandtotaltax));
-    $("#grandtotalxl").val(number_to_price(grantotalxloop));
+    $("#grandtotalxl").val(number_to_price(Math.round(grantotalxloop)));
 
     $("#diskonxRp_tmp").text(number_to_price(grandtotaldiskonrp));
     $("#grandtotalqty_tmp").text(number_to_price(qtytotal));
-    $("#subtotalttlrp_tmp").text(number_to_price(totalSubtotalAfterDiskon));
+    $("#subtotalttlrp_tmp").text(number_to_price(Math.round(totalSubtotalAfterDiskon)));
     $("#taxxRp_tmp").text(number_to_price(grandtotaltax));
-    $("#grandtotalxl_tmp").text(number_to_price(grantotalxloop));
+    $("#grandtotalxl_tmp").text(number_to_price(Math.round(grantotalxloop)));
 }
 //GET DTL PO
 function showDataDetil_PO(TransasctionCode) {
@@ -1214,8 +1214,8 @@ function showDataDetil_PO(TransasctionCode) {
                 var newRow = $("<tr id='row_'" + total_items + "'>");
                 newRow.html("<td><font size='1'>" + total_items + "</td><td>" + val.ProductCode +
                     "<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'" + total_items + "' value='" + val.ProductCode +
-                    "' ><input type='text' name='hidden_Satuan_Konversi_[]' id='hidden_Satuan_Konversi_'" + total_items + "' class='hidden_Satuan_Konversi_'" + total_items + "' value='" + val.Satuan_Konversi +
-                    "' ><input type='text' name='hidden_KonversiQty_[]' id='hidden_KonversiQty_'" + total_items + "' class='hidden_KonversiQty_'" + total_items + "' value='" + val.KonversiQty +
+                    "' ><input type='hidden' name='hidden_Satuan_Konversi_[]' id='hidden_Satuan_Konversi_'" + total_items + "' class='hidden_Satuan_Konversi_'" + total_items + "' value='" + val.Satuan_Konversi +
+                    "' ><input type='hidden' name='hidden_KonversiQty_[]' id='hidden_KonversiQty_'" + total_items + "' class='hidden_KonversiQty_'" + total_items + "' value='" + val.KonversiQty +
                     "' ></font></td><td><font size='1'>" + val.ProductName + "<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.ProductName +
                     "' ></font></td> <td><span class='label label-success pointer' style='cursor: pointer;' onclick=\'showmodalkonversi(" + val.ProductCode + ", " + val.ProductSatuan  + ", " + val.ID  + ", " + val.QtyPurchase  + ")\'>'" + val.ProductSatuan + "'</span><input type='hidden' name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items +
                     "' value='" + val.ProductSatuan + "' ></td> <td>" + parseFloat(val.QtyPR) + "<input type='hidden'  name='hidden_min_barang_[]' id='hidden_min_barang_" + total_items +

@@ -822,7 +822,8 @@ class I_ReturJual_Model
                     $pasing['ProductSatuan'] = $hidden_satuan_barang_[$x];
                     $pasing['Satuan_Konversi'] = $hidden_satuan_barang_[$x];
                     $pasing['KonversiQty'] = $KonversiQty[$x];
-                    $pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x]*$KonversiQty[$x];
+                    //$pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x]*$KonversiQty[$x];
+                    $pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x];
                     $pasing['ProductName'] = $hidden_nama_barang_[$x];
                     $pasing['QtySales'] = $hidden_min_barang_[$x];
                     $pasing['QtyReturJual'] = $hidden_qty_barang_[$x];
@@ -1207,7 +1208,8 @@ class I_ReturJual_Model
 
             $TransactionCode = $data['NoOrderTransaksi'];
 
-            $hidden_id_detail = $data['hidden_id_detail'];
+            $hidden_salescode = $data['hidden_salescode'];
+            //$hidden_id_detail = $data['hidden_id_detail'];
             $hidden_kode_barang =$data['hidden_kode_barang'];
             $hidden_nama_barang_ = $data['hidden_nama_barang_'];
             $hidden_satuan_barang_ = $data['hidden_satuan_barang_'];
@@ -1248,12 +1250,14 @@ class I_ReturJual_Model
                     $qtytotal += $hidden_qty_barang_[$x];
                     $hargatotal += $hidden_harga_barang_[$x];
                     
-                    $pasing['IDDetail'] =  $hidden_id_detail[$x];
+                    //$pasing['IDDetail'] =  $hidden_id_detail[$x];
+                    $pasing['SalesCode'] =  $hidden_salescode[$x];
                     $pasing['ProductCode'] =  $hidden_kode_barang[$x];
                     $pasing['ProductSatuan'] = $hidden_satuan_barang_[$x];
                     $pasing['Satuan_Konversi'] = $hidden_satuan_barang_[$x];
                     $pasing['KonversiQty'] = $KonversiQty[$x];
-                    $pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x]*$KonversiQty[$x];
+                    //$pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x]*$KonversiQty[$x];
+                    $pasing['Konversi_QtyTotal'] =  $hidden_qty_barang_[$x];
                     $pasing['ProductName'] = $hidden_nama_barang_[$x];
                     $pasing['QtySales'] = $hidden_min_barang_[$x];
                     $pasing['QtyReturJual'] = $hidden_qty_barang_[$x];
@@ -1307,6 +1311,63 @@ class I_ReturJual_Model
 
             );
             return $callback;
+        }
+    }
+
+    public function voidReturJualPerRegister($data)
+    {
+        try {
+            $No_Transaksi = $data['NoOrderTransaksi'];
+            $UnitCodex = $data['UnitCode'];
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $AlasanBatal = $data['AlasanBatal'];
+            
+            if ($No_Transaksi == "") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'No Transaksi Kosong !',
+                );
+                return $callback;
+                exit;
+            }
+
+            if ($UnitCodex == "") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'Lokasi Kosong !',
+                );
+                return $callback;
+                exit;
+            }
+
+            $session = SessionManager::getCurrentSession();
+            $UserCreate = $session->username;
+            $datenowcreate = Utils::seCurrentDateTime();
+            // 1. Gen Token
+            $method = "POST";
+            $URL = "genToken";
+            $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+
+            // 2. add Data Group Barang 
+            $method_getgroup = "POST";
+            // 2. add Data Golongan
+            $postData = '
+            {
+                "TransactionCode" : "'.$No_Transaksi.'",
+                "NoRegistrasi" : "'.$NoRegistrasi.'" ,
+                "UnitCode" : "'.$UnitCodex.'" ,
+                "DateVoid" : "'.$datenowcreate.'",
+                "UserVoid" : "'.$UserCreate.'",
+                "Void" : "1" ,
+                "ReasonVoid" : "'.$AlasanBatal.'"
+            }
+            ';
+            $urlAddKelompok = "transaction/returjual/voidReturJualPerRegister/";
+            $addSatuan = $this->curl_request(GenerateTokenRS::headers_api_token($token['access_token']), $method_getgroup, 
+                                            $postData, $urlAddKelompok);
+            return $addSatuan;
+        } catch (PDOException $e) {
+            die($e->getMessage());
         }
     }
     

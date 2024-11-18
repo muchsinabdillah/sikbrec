@@ -135,8 +135,8 @@ class I_PurchaseRequisition_Model
             $SatuanBarang_Konversi = $data['SatuanBarang_Konversi'];
             $Konversi_Satuan = $data['Konversi_Satuan'];
             // non aktifin bentar
-            // $Konversi_QtyTotal = $Konversi_Satuan * $QtyPR;
-            $Konversi_QtyTotal =  $QtyPR;
+            $Konversi_QtyTotal = $Konversi_Satuan * $QtyPR;
+            // $Konversi_QtyTotal =  $QtyPR;
             if ($TransasctionCode == "") {
                 $callback = array(
                     'status' => 'warning',
@@ -219,7 +219,7 @@ class I_PurchaseRequisition_Model
                 "QtyStok" : "0",
                 "QtyPR" : "' . $QtyPR . '",
                 "UserAdd" : "' . $UserCreate . '",
-                "Satuan": "' . $SatuanBarang_Konversi . '",
+                "Satuan": "' . $SatuanBarang . '",
                 "Satuan_Konversi": "' . $SatuanBarang_Konversi . '",
                 "KonversiQty": "' . $Konversi_Satuan . '",
                 "Konversi_QtyTotal": "' . $Konversi_QtyTotal . '"

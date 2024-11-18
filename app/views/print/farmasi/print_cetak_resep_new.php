@@ -188,7 +188,7 @@ class PDF extends FPDF
     $this->Cell(10, $h, 'Alergi', 0, 0);
     $this->Cell(15, $h, '', 0, 0);
     $this->Cell(2, $h, ':', 0, 0);
-    $this->Cell(40, $h, $GLOBALS['identitas_pasien']['Alergi'] == null ? '-' : $GLOBALS['identitas_pasien']['Alergi'], 0, 0);
+    $this->CellFitScale(40, $h, $GLOBALS['identitas_pasien']['Alergi'] == null ? '-' : $GLOBALS['identitas_pasien']['Alergi'], 0, 0);
     //row 2 (right)
     $this->Cell(10, $h, 'Jaminan', 0, 0);
     $this->Cell(15, $h, '', 0, 0);
@@ -488,8 +488,8 @@ $pdf->Cell(35, 4, 'Medication Review Oleh', 0, 1);
 $pdf->Cell(0, 1, '', 0, 1);
 $pdf->Cell(35, 4, 'By', 0, 0);
 $pdf->Cell(2, 4, ':', 0, 0);
-//$pdf->Cell(0, 4, $data['hdr']['data']['Apoteker'], 0, 1);
-$pdf->Cell(0, 4, '', 0, 1);
+$pdf->Cell(0, 4, $data['hdr']['data']['Apoteker'], 0, 1);
+//$pdf->Cell(0, 4, '', 0, 1);
 
 $pdf->Cell(0, 1, '', 0, 1);
 $pdf->Cell(35, 4, 'Summary', 0, 0);

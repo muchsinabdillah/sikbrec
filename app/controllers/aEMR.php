@@ -166,7 +166,50 @@ class aEMR extends Controller
             $this->View('templates/footer_login');
         }
     }
-
+    public function PrintSuratKeteranganMata($NoRegistrasi = '')
+    {
+        try {
+            $session = SessionManager::getCurrentSession();
+            $data['NoRegistrasi'] = $NoRegistrasi; 
+            $data['dataPasien'] = $this->model('B_EMR_Model')->getDataPasien($data);
+            $data['dataSurat'] = $this->model('B_EMR_Model')->getSuratKeteranganMata($data);
+            $this->View('print/emr/suratketeranganmata/print_suratketeranganmata', $data);
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+    public function PrintSuratKeteranganSehat($NoRegistrasi = '')
+    {
+        try {
+            $session = SessionManager::getCurrentSession();
+            $data['NoRegistrasi'] = $NoRegistrasi;
+            $datanoreg = $data['NoRegistrasi'];
+            $data['listdataheader'] = $this->model('B_EMR_Model')->getDataPasien($data);
+            $data['listdatadetail'] = $this->model('B_EMR_Model')->getSuratKeteranganSehat($data);
+            $this->View('print/emr/suratsehat/print_suratsehat', $data);
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+    public function PrintResepKacamata($NoRegistrasi = '')
+    {
+        try {
+            $session = SessionManager::getCurrentSession();
+            $data['NoRegistrasi'] = $NoRegistrasi;
+            $datanoreg = $data['NoRegistrasi'];
+            $data['listdataheader'] = $this->model('B_EMR_Model')->getDataPasien($data);
+            $data['listdatadetail'] = $this->model('B_EMR_Model')->getResepKacamata($datanoreg);
+            $this->View('print/emr/resepkacamata/print_resepkacamata', $data);
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
     public function setFormEdukasi()
     {
         echo json_encode($this->model('B_EMR_Model')->setFormEdukasi($_POST));

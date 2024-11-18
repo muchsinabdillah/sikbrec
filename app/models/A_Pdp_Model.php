@@ -150,7 +150,7 @@ class A_Pdp_Model
     public function getAllPdpDetil()
     {
         try {
-            $this->db->query("SELECT ID,KD_PDP,KD_TIPE_PDP,NILAI_PROSEN,NILAI_FIX
+            $this->db->query("SELECT ID,KD_PDP,KD_TIPE_PDP,NILAI_PROSEN,NILAI_FIX,SHOW_JASA,NM_TIPE_PDP
                             FROM Keuangan.DBO.BO_M_PDP2
                             ORDER BY KD_PDP DESC");
             $data =  $this->db->resultSet();
@@ -162,6 +162,8 @@ class A_Pdp_Model
                 $pasing['KD_TIPE_PDP'] = $key['KD_TIPE_PDP'];
                 $pasing['NILAI_PROSEN'] = $key['NILAI_PROSEN'];
                 $pasing['NILAI_FIX'] = $key['NILAI_FIX'];
+                $pasing['SHOW_JASA'] = $key['SHOW_JASA'];
+                $pasing['NM_TIPE_PDP'] = $key['NM_TIPE_PDP'];
                 $rows[] = $pasing;
             }
             return $rows;
@@ -216,6 +218,22 @@ class A_Pdp_Model
                 return $callback;
                 exit;
             }
+            if ($data['NamaPDP'] == "") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'Silahkan Input Nama Pdp !',
+                );
+                return $callback;
+                exit;
+            }
+            if ($data['ShowJasa'] == "") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'Silahkan Pilih Show Jasa !',
+                );
+                return $callback;
+                exit;
+            }
             if ($data['NilaiProsenPdp'] == "") {
                 $callback = array(
                     'status' => 'warning',
@@ -252,6 +270,8 @@ class A_Pdp_Model
             $KodeTipePdp = $data['KodeTipePdp'];
             $KodePdp = $data['KodePdp'];
             $KodeTipePdp = $data['KodeTipePdp'];
+            $NamaPDP = $data['NamaPDP'];
+            $ShowJasa = $data['ShowJasa'];
             $NilaiProsenPdp = $data['NilaiProsenPdp'];
             $NilaiFixPdp = $data['NilaiFixPdp'];
             $KodeRekeningPendapatan = $data['KodeRekeningPendapatan'];
@@ -277,22 +297,26 @@ class A_Pdp_Model
                 } else {
                     $this->db->query("INSERT INTO Keuangan.DBO.BO_M_PDP2
                             (KD_PDP,KD_TIPE_PDP,NILAI_PROSEN,
-                            NILAI_FIX,KD_POSTING,KD_POSTING_DISC)
+                            NILAI_FIX,KD_POSTING,KD_POSTING_DISC,NM_TIPE_PDP,SHOW_JASA)
                             values
                             ( :KodePdp,:KodeTipePdp,:NilaiProsenPdp
-                            ,:NilaiFixPdp,:KodeRekeningPendapatan,:KodeRekeningDiskon)");
+                            ,:NilaiFixPdp,:KodeRekeningPendapatan,:KodeRekeningDiskon,:NamaPDP,:ShowJasa)");
                     $this->db->bind('KodePdp', $KodePdp);
                     $this->db->bind('KodeTipePdp', $KodeTipePdp);
                     $this->db->bind('NilaiProsenPdp', $NilaiProsenPdp);
                     $this->db->bind('NilaiFixPdp', $NilaiFixPdp); 
                     $this->db->bind('KodeRekeningPendapatan', $KodeRekeningPendapatan);
                     $this->db->bind('KodeRekeningDiskon', $KodeRekeningDiskon);
+                    $this->db->bind('NamaPDP', $NamaPDP);
+                    $this->db->bind('ShowJasa', $ShowJasa);
                 }
             } else {
                 $this->db->query("UPDATE Keuangan.DBO.BO_M_PDP2 set  
-                            KD_PDP=:KodePdp,KD_TIPE_PDP=:KodeTipePdp 
-                            ,NILAI_PROSEN=:NilaiProsenPdp ,NILAI_FIX=:NilaiFixPdp 
-                            ,KD_POSTING=:KodeRekeningPendapatan ,KD_POSTING_DISC=:KodeRekeningDiskon 
+                            KD_PDP=:KodePdp,KD_TIPE_PDP=:KodeTipePdp,
+                            NILAI_PROSEN=:NilaiProsenPdp ,NILAI_FIX=:NilaiFixPdp,
+                            KD_POSTING=:KodeRekeningPendapatan,
+                            KD_POSTING_DISC=:KodeRekeningDiskon,
+                            NM_TIPE_PDP=:NamaPDP,SHOW_JASA=:ShowJasa
                             WHERE ID=:IdAuto");
                 $this->db->bind('KodePdp', $KodePdp);
                 $this->db->bind('KodeTipePdp', $KodeTipePdp);
@@ -303,6 +327,8 @@ class A_Pdp_Model
                 $this->db->bind('KodeRekeningPendapatan', $KodeRekeningPendapatan);
                 $this->db->bind('KodeRekeningDiskon', $KodeRekeningDiskon); 
                 $this->db->bind('IdAuto', $IdAuto);
+                $this->db->bind('NamaPDP', $NamaPDP);
+                $this->db->bind('ShowJasa', $ShowJasa);
             }
             $this->db->execute();
             $this->db->commit();
@@ -325,7 +351,7 @@ class A_Pdp_Model
     {
         try {    
             $this->db->query('SELECT ID,KD_PDP,KD_TIPE_PDP,NILAI_PROSEN,
-                            NILAI_FIX,KD_POSTING,KD_POSTING_DISC
+                            NILAI_FIX,KD_POSTING,KD_POSTING_DISC,SHOW_JASA,NM_TIPE_PDP
                             FROM Keuangan.DBO.BO_M_PDP2
                             WHERE ID=:id');
             $this->db->bind('id', $id);
@@ -337,6 +363,8 @@ class A_Pdp_Model
             $pasing['NILAI_FIX'] = $data['NILAI_FIX'];
             $pasing['KD_POSTING'] = $data['KD_POSTING'];
             $pasing['KD_POSTING_DISC'] = $data['KD_POSTING_DISC'];
+            $pasing['SHOW_JASA'] = $data['SHOW_JASA'];
+            $pasing['NM_TIPE_PDP'] = $data['NM_TIPE_PDP'];
             $callback = array(
                 'message' => "success", // Set array nama 
                 'data' => $pasing

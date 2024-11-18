@@ -63,7 +63,7 @@ class B_ReservasiNonWalkin_Model
                 b.NamaUnit,c.First_Name,a.Description,a.HP,a.Datang,
                 case when a.JenisPembayaran = 'ASURANSI' THEN d.NamaPerusahaan
                 else e.NamaPerusahaan end as 'NamaPerusahaan',
-                A.NoRujukanBPJS, A.NoKartuBPJS, A.NoSuratKontrolBPJS,A.NoSEP,a.IdPoli,f.[First Name] as PetugasInput
+                A.NoRujukanBPJS, A.NoKartuBPJS, A.NoSuratKontrolBPJS,A.NoSEP,a.IdPoli,f.[First Name] as PetugasInput,estimasi_waktu_dilayani
                 from  PerawatanSQL.dbo.Apointment a
                 inner join MasterdataSQL.dbo.MstrUnitPerwatan b on a.IdPoli = b.ID
                 inner join MasterdataSQL.dbo.Doctors c on c.ID = a.DoctorID
@@ -84,7 +84,7 @@ class B_ReservasiNonWalkin_Model
                 b.NamaUnit,c.First_Name,a.Description,a.HP,a.Datang,
                 case when a.JenisPembayaran = 'ASURANSI' THEN d.NamaPerusahaan
                 else e.NamaPerusahaan end as 'NamaPerusahaan',
-                A.NoRujukanBPJS, A.NoKartuBPJS, A.NoSuratKontrolBPJS,A.NoSEP,a.IdPoli,f.[First Name] as PetugasInput
+                A.NoRujukanBPJS, A.NoKartuBPJS, A.NoSuratKontrolBPJS,A.NoSEP,a.IdPoli,f.[First Name] as PetugasInput,estimasi_waktu_dilayani
                 from  PerawatanSQL.dbo.Apointment a
                 inner join MasterdataSQL.dbo.MstrUnitPerwatan b on a.IdPoli = b.ID
                 inner join MasterdataSQL.dbo.Doctors c on c.ID = a.DoctorID
@@ -127,7 +127,7 @@ class B_ReservasiNonWalkin_Model
                 $pasing['NoSEP'] = $key['NoSEP'];
                 $pasing['IdPoli'] = $key['IdPoli'];
                 $pasing['PetugasInput'] = $key['PetugasInput'];
-                //$rows[] = $pasing;
+                $pasing['estimasi_waktu_dilayani'] = $key['estimasi_waktu_dilayani'];
                 $rows[] = $pasing;
             }
             // var_dump($rows);
@@ -526,7 +526,9 @@ EOT;
                     isnull(Senin_Max,0) as Senin_Max,isnull(Selasa_Max,0) as Selasa_Max,
                     isnull(Rabu_Max,0) as Rabu_Max,isnull(Kamis_Max,0) as Kamis_Max,
                     isnull(Jumat_Max,0) as Jumat_Max,isnull(Sabtu_Max,0) as Sabtu_Max,isnull(Minggu_Max,0) as Minggu_Max
-                    ,Senin_Akhir,Selasa_Akhir,Rabu_Akhir,Kamis_akhir,Jumat_Akhir,Sabtu_Akhir,Minggu_Akhir
+                    ,Senin_Akhir,Selasa_Akhir,Rabu_Akhir,Kamis_akhir,Jumat_Akhir,Sabtu_Akhir,Minggu_Akhir,
+                    Senin_Awal,Senin_Akhir,Selasa_Awal,Selasa_Akhir,Rabu_Awal,Rabu_Akhir,Kamis_Awal,Kamis_akhir,Jumat_Awal,Jumat_Akhir,Sabtu_Awal,Sabtu_Akhir,Minggu_Awal,Minggu_Akhir,Close_Schedule_Senin, Close_Schedule_Selasa, Close_Schedule_Rabu, Close_Schedule_Kamis, Close_Schedule_Jumat, Close_Schedule_Sabtu, 
+                    Close_Schedule_Minggu
                     FROM MasterdataSQL.DBO.JadwalPraktek WHERE ID=:IDJadwal");
         $this->db->bind('IDJadwal', $jampraktek);
         $dtjdwl =  $this->db->single();
@@ -537,42 +539,63 @@ EOT;
             $Max_NonJKN = $dtjdwl['Minggu_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Minggu_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Minggu_Akhir'];
+            $waktu_awal = $dtjdwl['Minggu_Awal'];
+            $waktu_akhir = $dtjdwl['Minggu_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Minggu'];
         } elseif ($datename == "Monday") {
             $jampraktekx = $dtjdwl['Senin_Waktu'];
             $MaxHari = $dtjdwl['Senin_Max'];
             $Max_NonJKN = $dtjdwl['Senin_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Senin_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Senin_Akhir'];
+            $waktu_awal = $dtjdwl['Senin_Awal'];
+            $waktu_akhir = $dtjdwl['Senin_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Senin'];
         } elseif ($datename == "Tuesday") {
             $jampraktekx = $dtjdwl['Selasa_Waktu'];
             $MaxHari = $dtjdwl['Selasa_Max'];
             $Max_NonJKN = $dtjdwl['Selasa_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Selasa_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Selasa_Akhir'];
+            $waktu_awal = $dtjdwl['Selasa_Awal'];
+            $waktu_akhir = $dtjdwl['Selasa_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Selasa'];
         } elseif ($datename == "Wednesday") {
             $jampraktekx = $dtjdwl['Rabu_Waktu'];
             $MaxHari = $dtjdwl['Rabu_Max'];
             $Max_NonJKN = $dtjdwl['Rabu_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Rabu_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Rabu_Akhir'];
+            $waktu_awal = $dtjdwl['Rabu_Awal'];
+            $waktu_akhir = $dtjdwl['Rabu_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Rabu'];
         } elseif ($datename == "Thursday") {
             $jampraktekx = $dtjdwl['Kamis_Waktu'];
             $MaxHari = $dtjdwl['Kamis_Max'];
             $Max_NonJKN = $dtjdwl['Kamis_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Kamis_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Kamis_akhir'];
+            $waktu_awal = $dtjdwl['Kamis_Awal'];
+            $waktu_akhir = $dtjdwl['Kamis_akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Kamis'];
         } elseif ($datename == "Friday") {
             $jampraktekx = $dtjdwl['Jumat_Waktu'];
             $MaxHari = $dtjdwl['Jumat_Max'];
             $Max_NonJKN = $dtjdwl['Jumat_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Jumat_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Jumat_Akhir'];
+            $waktu_awal = $dtjdwl['Jumat_Awal'];
+            $waktu_akhir = $dtjdwl['Jumat_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Jumat'];
         } elseif ($datename == "Saturday") {
             $jampraktekx = $dtjdwl['Sabtu_Waktu'];
             $MaxHari = $dtjdwl['Sabtu_Max'];
             $Max_NonJKN = $dtjdwl['Sabtu_Max_NonJKN'];
             $Max_JKN = $dtjdwl['Sabtu_Max_JKN'];
             $JamPraktekAkhir = $dtjdwl['Sabtu_Akhir'];
+            $waktu_awal = $dtjdwl['Sabtu_Awal'];
+            $waktu_akhir = $dtjdwl['Sabtu_Akhir'];
+            $close_schedule = $dtjdwl['Close_Schedule_Sabtu'];
         }
 
         if ($MaxHari == '0') {
@@ -580,6 +603,15 @@ EOT;
                 'statusmessage' => "warning",
                 'errorname' => "Kuota Hari Tersebut Masih Kosong, Silahkan Dicek Terlebih Dahulu !",
                 //'errormessage' => $dataidregfieedback,    
+            );
+            return self::JsonDecode(200, $callback, "warning");
+        }
+
+        if ($close_schedule == '1') {
+            $callback = array(
+                'statusmessage' => "warning",
+                'errorname' => "Maaf, Jadwal Poliklinik Dokter Sudah Tutup !",
+                'errormessage'=> ""
             );
             return self::JsonDecode(200, $callback, "warning");
         }
@@ -985,6 +1017,48 @@ EOT;
                         $this->db->bind('id2', $data['ID_KontrolUlangEMR']);
                         $this->db->execute();
                     }
+                      //hitung estimasi waktu pelayanan
+                      $estimasi_waktu_pelayanan = 0;
+                      //if ($JenisBayar == '5' && $penjamin == '313') {
+              
+                                  if ($waktu_awal == '' || $waktu_awal == null){
+                                      $callback = array(
+                                          'statusmessage' => 'warning',
+                                          'errorname' => "Waktu Awal Masih Kosong !",
+                                          'errormessage' => '',
+                                          // 'nama' => $data['nama'], // Set array nama dengan isi kolom nama pada tabel siswa    
+                                      );
+                                      return self::JsonDecode(200, $callback, "warning");
+                                  }
+                                  
+                                  if ($waktu_akhir == '' || $waktu_akhir == null){
+                                      $callback = array(
+                                          'statusmessage' => 'warning',
+                                          'errorname' => "Waktu Akhir Masih Kosong !",
+                                          'errormessage' => '',
+                                          // 'nama' => $data['nama'], // Set array nama dengan isi kolom nama pada tabel siswa    
+                                      );
+                                      return self::JsonDecode(200, $callback, "warning");
+                                  }
+              
+                                  $waktu_awal_convert = strtotime($waktu_awal);
+                                  $waktu_akhir_convert = strtotime($waktu_akhir);
+                                  $timediff_in_minutes = round(abs($waktu_awal_convert - $waktu_akhir_convert) / 60);
+                                  $lama_praktek_perpasien_in_minutes = round($timediff_in_minutes / $MaxHari) ;
+                                  $lama_menit_dilayani = $lama_praktek_perpasien_in_minutes * $idno_urutantrian;
+                                  $estimasi_waktu_pelayanan = date("H:i", strtotime('+'.(int)$lama_menit_dilayani.' minutes', $waktu_awal_convert));
+                                  $waktu_sebelum_waktu_pelayanan = date("H:i", strtotime('- 60 minutes', strtotime($estimasi_waktu_pelayanan)));
+                              //     var_dump($waktu_awal,
+                              //     $waktu_akhir,
+                              //     $timediff_in_minutes,
+                              //     $lama_praktek_perpasien_in_minutes,
+                              //     $lama_menit_dilayani,
+                              //     $estimasi_waktu_pelayanan,
+                              //    $Max_JKN,
+                              //    $waktu_sebelum_waktu_pelayanan);exit;
+                                  //#END hitung esitmasi waktu pelayanan
+                              //}
+
                     if ($MrExist == 1) {
                         $bookingnomor = "SELECT NoBooking
                                 FROM PerawatanSQl.dbo.Apointment 
@@ -1062,7 +1136,9 @@ EOT;
                                        NoRujukanBPJS,
                                        NoKartuBPJS,
                                        NoSEP,
-                                       NoSuratKontrolBPJS
+                                       NoSuratKontrolBPJS,
+                                       estimasi_waktu_pelayanan,
+                                       estimasi_waktu_dilayani
                                        ) VALUES ( 
                                        :idbooking,
                                        '1',
@@ -1115,7 +1191,9 @@ EOT;
                                        :BPJS_xNorujukan,
                                        :BPJS_NoKartu,
                                        :BPJS_NoSEP,
-                                       :BPJS_NoRencKontrol
+                                       :BPJS_NoRencKontrol 
+                                       :lama_praktek_perpasien_in_minutes,
+                                       :estimasi_waktu_pelayanan
                                        
                                        )";
 
@@ -1170,6 +1248,9 @@ EOT;
                             $this->db->bind('BPJS_NoKartu', $BPJS_NoKartu);
                             $this->db->bind('BPJS_NoSEP', $BPJS_NoSEP);
                             $this->db->bind('BPJS_NoRencKontrol', $BPJS_NoRencKontrol);
+                            
+                            $this->db->bind('estimasi_waktu_pelayanan', $estimasi_waktu_pelayanan);
+                            $this->db->bind('lama_praktek_perpasien_in_minutes', $lama_praktek_perpasien_in_minutes);
 
                             $this->db->execute();
                             $antianpasienwalkin = "INSERT INTO perawatanSQL.dbo.AntrianPasien (
@@ -1314,7 +1395,9 @@ EOT;
                             NoRujukanBPJS,
                             NoKartuBPJS,
                             NoSEP,
-                            NoSuratKontrolBPJS
+                            NoSuratKontrolBPJS,
+                            estimasi_waktu_pelayanan,
+                            estimasi_waktu_dilayani
                             ) 
                             VALUES 
                             ( 
@@ -1367,7 +1450,9 @@ EOT;
                                 :BPJS_xNorujukan,
                                 :BPJS_NoKartu,
                                 :BPJS_NoSEP,
-                                :BPJS_NoRencKontrol
+                                :BPJS_NoRencKontrol,
+                                :lama_praktek_perpasien_in_minutes,
+                                :estimasi_waktu_pelayanan
                             )";
                         $this->db->query($insertbookingmr0);
                         $this->db->bind('idbooking', $idbooking);
@@ -1418,6 +1503,8 @@ EOT;
                         $this->db->bind('BPJS_NoKartu', $BPJS_NoKartu);
                         $this->db->bind('BPJS_NoSEP', $BPJS_NoSEP);
                         $this->db->bind('BPJS_NoRencKontrol', $BPJS_NoRencKontrol);
+                        $this->db->bind('estimasi_waktu_pelayanan', $estimasi_waktu_pelayanan);
+                        $this->db->bind('lama_praktek_perpasien_in_minutes', $lama_praktek_perpasien_in_minutes);
                         $this->db->execute();
                         $sqlantrianmr0 = "INSERT INTO perawatanSQL.dbo.AntrianPasien 
                         (

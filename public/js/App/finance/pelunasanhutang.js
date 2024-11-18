@@ -83,7 +83,7 @@ function updateUIdatagoFinishBatal(data) {
 function goVoidHeader2(param) {
     var NoPelunasan = document.getElementById("NoPelunasan").value;  
     // console.log(param);return false;
-    var url2 = "/ESIRYARSI/public/Hutang/goVoidPelunasanHutang";
+    var url2 = "/SIKBREC/public/Hutang/goVoidPelunasanHutang";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -124,7 +124,7 @@ async function go_save(){
 }
 function MyBack() {
     const base_url = window.location.origin;
-    window.location = base_url + "/ESIRYARSI/public/Hutang/ListPelunasanHutang";
+    window.location = base_url + "/SIKBREC/public/Hutang/ListPelunasanHutang";
 }
 function updatego_save_final(data) {
     if (data.status == "success") {
@@ -144,7 +144,7 @@ function go_save_final() {
     var NoOrder = document.getElementById("NoOrder").value;   
     var NoPelunasan = document.getElementById("NoPelunasan").value;   
     
-    var url2 = "/ESIRYARSI/public/Hutang/goVerifikasiPelunasanHutangFinish";
+    var url2 = "/SIKBREC/public/Hutang/goVerifikasiPelunasanHutangFinish";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -200,7 +200,7 @@ function goEditHutangDetailPelunasan() {
     var JM_NIlaiSisa = document.getElementById("JM_NIlaiSisa").value;  
     var JM_NilaiVerif = document.getElementById("JM_NilaiVerif").value;   
     
-    var url2 = "/ESIRYARSI/public/Hutang/goEditHutangDetailPelunasan";
+    var url2 = "/SIKBREC/public/Hutang/goEditHutangDetailPelunasan";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -251,7 +251,7 @@ function updategetDetailPelunasan(data){
 }
 function getDetailPelunasan(row_id) {
     var NoTrs = row_id;
-    var url2 = "/ESIRYARSI/public/hutang/getPelunasanHutanfDetailbyID";
+    var url2 = "/SIKBREC/public/hutang/getPelunasanHutanfDetailbyID";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -291,7 +291,7 @@ function getOrderHutangDetailbyIdOrder(row_id) {
               "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
             
              "ajax": {
-              "url": "/ESIRYARSI/public/hutang/getOrderHutangDetailbyIdOrder",
+              "url": "/SIKBREC/public/hutang/getOrderHutangDetailbyIdOrder",
               "type": "POST",
                   data: function ( d ) { 
                   d.NoTrs = row_id; 
@@ -359,7 +359,7 @@ async function ShowOrderHutangbyId(row_id) {
 
 function getOrderHutangbyId(row_id) {
     var NoTrs = row_id;
-    var url2 = "/ESIRYARSI/public/hutang/getOrderHutangbyId";
+    var url2 = "/SIKBREC/public/hutang/getOrderHutangbyId";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -420,7 +420,7 @@ function updatedatagoCreatePelunasanHutang(nohutang){
 function loaddetailPelunasan(notransaksi){  
     var base_url = window.location.origin;
     const NoPelunasan = $("#NoPelunasan").val();
-    let url = base_url + '/ESIRYARSI/public/hutang/loadDetilPelunasanHutang';
+    let url = base_url + '/SIKBREC/public/hutang/loadDetilPelunasanHutang';
     $('#table-pelunasan-hutang').dataTable({
         "bDestroy": true
     }).fnDestroy();
@@ -508,7 +508,7 @@ function goCreatePelunasanHutang() {
     var KodeSupplier = document.getElementById("KodeSupplier").value;  
     var NoPelunasan = document.getElementById("NoPelunasan").value;  
     
-    var url2 = "/ESIRYARSI/public/Hutang/createPelunasanHUtangHeader";
+    var url2 = "/SIKBREC/public/Hutang/createPelunasanHUtangHeader";
     var base_url = window.location.origin;
     let url = base_url + url2;
     return fetch(url, {
@@ -574,7 +574,7 @@ function updateUIdatagetSuppliers(responseApi) {
 }
 function getSuppliers() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aPurchaseOrder/getSuppliers';
+    let url = base_url + '/SIKBREC/public/aPurchaseOrder/getSuppliers';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -614,7 +614,7 @@ function updateUIdatagetRekening(responseApi) {
 }
 function getRekening() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/Rekening/getRekeningAllAktif';
+    let url = base_url + '/SIKBREC/public/Rekening/getRekeningAllAktif';
     return fetch(url, {
         method: 'GET',
         headers: {
@@ -651,7 +651,7 @@ function getDatOrderHutang() {
               "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
             
              "ajax": {
-              "url": "/ESIRYARSI/public/hutang/getListOrderHutangJatuhTempo",
+              "url": "/SIKBREC/public/hutang/getListOrderHutangJatuhTempo",
               "type": "POST",
                   data: function ( d ) { 
                   d.Periode = tglperiodex; 
@@ -837,7 +837,7 @@ function updateUIdata(params) {
 function gosaveCheckedBox() {
     const form = $("#form_table").serialize();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/hutang/goEditHutangDetailPelunasanChecklist';
+    let url = base_url + '/SIKBREC/public/hutang/goEditHutangDetailPelunasanChecklist';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -888,7 +888,7 @@ function updateUIdatagetTukarFakturHeader(params) {
 async function getTukarFakturHeader() {
     const NoPelunasan = $("#NoPelunasan").val();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/hutang/getTukarFakturHeader';
+    let url = base_url + '/SIKBREC/public/hutang/getTukarFakturHeader';
     return fetch(url, {
         method: 'POST',
         headers: {

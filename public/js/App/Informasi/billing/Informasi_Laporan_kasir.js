@@ -7,7 +7,11 @@ $(document).ready(function () {
         //checking before get data
         CheckVar();
     });
-   
+    $('#btn_infokasir_pdf').attr('disabled', false);
+    $(document).on('click', '#btn_infokasir_pdf', function () {
+        //checking before get data
+        CheckVarPdf();
+    });
 });
 
 
@@ -137,6 +141,8 @@ function CheckVar (){
 
     getDataLaporan();
 }
+
+// 25/08/2024
 function getDataLaporan() { 
     let PeriodeAwal ,PeriodeAkhir,kasir,jenispasien,tipepembayaran,tipeinfo;
     PeriodeAwal = $("#PeriodeAwal").val();
@@ -246,6 +252,8 @@ function getDataLaporan() {
              { "data": "Cash" ,render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
              { "data": "Debit" ,render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
              { "data": "Kredit" ,render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
+             { "data": "Piutang" ,render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
+             { "data": "Qris" ,render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
             //  { "data": "Nominal_Bayar" ,  render: $.fn.dataTable.render.number( '.', ',', 0,'')},  
                    
            ],
@@ -260,9 +268,73 @@ function getDataLaporan() {
         $("#datatable2").hide();
         toast('Error! Data Not Found!',"error")
     }
-
-    
 }  
+// 25/08/2024
+
+// 06/09/2024
+function CheckVarPdf (){
+    //if not in creteria return false
+    // if ($("#PeriodeAwal").val() == ''){
+    //     toast ('Isi Periode Awal', "warning");
+    //     return false;
+    // }
+    // if ($("#PeriodeAkhir").val() == ''){
+    //     toast ('Isi Periode Akhir', "warning");
+    //     return false;
+    // }
+
+    // if ($("#kasir").val() == ''){
+    //     toast ('Pilih Nama Kasir', "warning");
+    //     return false;
+    // }
+
+    // if ($("#jenispasien").val() == ''){
+    //     toast ('Pilih Jenis Pasien', "warning");
+    //     return false;
+    // }
+
+    // if ($("#tipeinfo").val() == ''){
+    //     toast ('Pilih Tipe Info', "warning");
+    //     return false;
+    // }
+
+    getDataLaporanPdf();
+}
+
+
+async function getDataLaporanPdf(base_url) {
+    var base_url = window.location.origin;
+    // var notrs = $("#NoRegistrasi").val();
+    var TglAwal = $("#PeriodeAwal").val();
+    var TglAkhir = $("#PeriodeAkhir").val();
+    var kasir = $("#kasir").val();
+    //kasir=kasir.replace(" ","_");
+    var jenispasien = $("#jenispasien").val();
+    var tipeinfo = $("#tipeinfo").val();
+    var tipepembayaran = $("#tipepembayaran").val();
+    // var kodereg = $("#NoRegistrasi").val().slice(0,2);
+    // var lang = $("#idkuitansi").val();
+    const obj = JSON.parse(`
+        {
+        "TglAwal":"${TglAwal}", 
+        "TglAkhir":"${TglAkhir}", 
+        "kasir":"${kasir}",
+        "jenispasien":"${jenispasien}",
+        "tipeinfo":"${tipeinfo}",
+        "tipepembayaran":"${tipepembayaran}"
+        }
+        `);
+    var mybj = JSON.stringify(obj);
+    var mybj = btoa(mybj);
+
+    // window.open(base_url + "/SIKBREC/public/InfoLaporanKasir/PrintLaporanKasir"+"/"+TglAwal+"/"+TglAkhir+"/"+kasir+"/"+jenispasien+"/"+tipeinfo+"/"+tipepembayaran, "_blank",
+    // "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    window.open(base_url + "/SIKBREC/public/InfoLaporanKasir/PrintLaporanKasir"+"/"+mybj, "_blank",
+    "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    
+}
+
+// 06/09/2024
 
 // Primary function always
 function toast(data, status) {

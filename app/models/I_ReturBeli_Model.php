@@ -750,7 +750,7 @@ class I_ReturBeli_Model
                     $pasing['TransactionCode'] =   $hidden_kode_barang[$x];
                     $pasing['ProductCode'] =    $hidden_kode_barang[$x];
                     $pasing['ProductName'] = $hidden_nama_barang_[$x];
-                    $pasing['ProductSatuan'] = $hidden_satuan_barang_[$x];
+                    $pasing['ProductSatuan'] = $Satuan_Konversi[$x];
                     $pasing['HargaRetur'] = $hidden_harga_barang_[$x];
                     $pasing['HargaBeli'] =    $hidden_harga_barang_[$x];
                     $pasing['QtyDeliveryRemain'] =   $hidden_min_barang_[$x];

@@ -1373,7 +1373,66 @@ async function showIDReservasi(params) {
     try {
         $(".preloader").fadeIn();
         const dataGoshowIDReservasi = await GoshowIDReservasi(params);
+        //cek satu jam sebelum jam praktek
+        var daynow =  new Date(dataGoshowIDReservasi.ApmDate).getDay()
+        switch (daynow) {
+        case 0:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Minggu
+            break;
+        case 1:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Senin
+            break;
+        case 2:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Selasa
+            break;
+        case 3:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Rabu
+            break;
+        case 4:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Kamis
+            break;
+        case 5:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Jumat
+            break;
+        case 6:
+            var whereday = dataGoshowIDReservasi.Open_Assesment_Sabtu
+        }
+
+        if (dataGoshowIDReservasi.JenisPembayaran == '5' && dataGoshowIDReservasi.ID_Penjamin == '313'
+        && whereday == '0'
+        ){
+            arrbulan =["1","2","3","4","5","6","7","8","9","10","11","12"];
+            var jammulaidokter = dataGoshowIDReservasi.JamAwalPraktek;
+            apmdate = new Date(dataGoshowIDReservasi.ApmDate);
+            tanggal_apmdate = apmdate.getDate();
+            bulans_apmdate = apmdate.getMonth();
+            bulan_apmdate = arrbulan[bulans_apmdate];
+            tahun_apmdate = apmdate.getFullYear();
+
+            date = new Date();
+            tanggal = date.getDate();
+            bulans = date.getMonth();
+            bulan = arrbulan[bulans];
+            tahun = date.getFullYear();
+            menit = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+            jam = (date.getHours() < 10 ? '0' : '') + date.getHours();
+            jamsaatini = jam + ':' + menit ;
+            jamkunjungan = bulan + '-' + tanggal + '-' + tahun + ' ' + jamsaatini;
+            jamknmulaipraktek = bulan_apmdate + '-' + tanggal_apmdate + '-' + tahun_apmdate + ' ' + jammulaidokter;
+            const d1 = new Date(jamkunjungan).getTime();
+            const d2 = new Date(jamknmulaipraktek).getTime();
+            hasilCegat = Math.round((d2 - d1) / 60000);
+
+            if(hasilCegat > 60){
+                swal("Maaf", "Check In Hanya Bisa Dilakukan 1 Jam Sebelum Jam Praktek Dimulai! Jam Praktek Dokter : "+jammulaidokter, "error");
+                return false;
+            }
+        }
+        //#END cek satu jam sebelum jam praktek
+
         updateUIdataGoshowIDReservasi(dataGoshowIDReservasi);
+        
+
         console.log(dataGoshowIDReservasi);
         const dataGetNamaPoli = await getNamaPoliShow(dataGoshowIDReservasi.IdPoli);
         updateUIgetNamaPoliShow(dataGetNamaPoli);
@@ -1387,6 +1446,7 @@ async function showIDReservasi(params) {
 }
 async function updateUIdataGoshowIDReservasi(params) {
     let data = params;
+
     $("#pxNoReservasi").val(data.NoBooking);
     $("#PasienNoMR").val(data.NoMR);
     $("#PasienNama").val(data.NamaPasien);
@@ -2022,8 +2082,8 @@ async function updateUIGetMedicalRecordbyId(dataGetMedicalRecordbyId) {
     $("#Medrec_Ibu_Kandung").val(data.NoMR_IBU);
     $("#Medrec_Kodepos").val(data.kodepos);
     $("#Medrec_DaruratNama").val(data.Contact_Name);
-    $("#Medrec_DaruratAlamat").val(data.CONTACT_PHONE);
-    $("#Medrec_DaruratTlp").val(data.Contact_Address);
+    $("#Medrec_DaruratAlamat").val(data.Contact_Address);
+    $("#Medrec_DaruratTlp").val(data.CONTACT_PHONE);
     $("#Medrec_DaruratHub").val(data.CONTACT_STATUS);
     $("#Medrec_PerusahaanNama").val(data.Office_Name);
     $("#Medrec_PerusahaanAlamat").val(data.Office_Address);

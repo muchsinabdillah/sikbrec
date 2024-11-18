@@ -1,11 +1,28 @@
 $(document).ready(function () {
     onloadForm();
+    $('#example').DataTable({})
+
+    $('#btnSearching').click(function () {
+        showdatatabel();
+    });
 });
 async function onloadForm() {
     await getHakAksesByForm(18);
-    await showdatatabel();
+    //await showdatatabel();
 }
 function showdatatabel() {
+    var tglawal = $("#tglawal").val();
+    var tglakhir = $("#tglakhir").val();
+
+    if (tglawal == '') {
+        toast('Silahkan Isi Periode Awal !', 'warning')
+        return false;
+    }
+
+    if (tglakhir == '') {
+        toast('Silahkan Isi Periode Akhir !', 'warning')
+        return false;
+    }
     const base_url = window.location.origin;
     $(".preloader").fadeOut();
     $('#example').dataTable({
@@ -13,8 +30,14 @@ function showdatatabel() {
     }).fnDestroy();
     $('#example').DataTable({
         "ordering": true,
+        "order": [[ 1, 'desc' ]],
         "ajax": {
-            "url": base_url + "/SIKBREC/public/aPenjualanTanpaResep/getSalesbyDateUser",
+            "url": base_url + "/SIKBREC/public/aPenjualanTanpaResep/getSalesbyPeriodeTanpaResep",
+            "type":"POST",
+            "data": {
+                tglawal: tglawal,
+                tglakhir: tglakhir
+            },
             "dataSrc": "",
             "deferRender": true,
         },
@@ -26,13 +49,13 @@ function showdatatabel() {
                     return html
                 }
             },
-            {
-                "render": function (data, type, row) { // Tampilkan kolom aksi
-                    var html = ""
-                    var html = '<font size="1"> ' + row.NoResep + ' </font>  ';
-                    return html
-                }
-            },
+            // {
+            //     "render": function (data, type, row) { // Tampilkan kolom aksi
+            //         var html = ""
+            //         var html = '<font size="1"> ' + row.NoResep + ' </font>  ';
+            //         return html
+            //     }
+            // },
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
@@ -44,7 +67,7 @@ function showdatatabel() {
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
-                    var html = '<font size="1"> ' + row.NoRegistrasi + ' </font>  ';
+                    var html = '<font size="1"> ' + row.NamaPembeli + ' </font>  ';
                     return html
                 }
             },
@@ -52,6 +75,13 @@ function showdatatabel() {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
                     var html = '<font size="1"> ' + row.Notes + ' </font>  ';
+                    return html
+                }
+            },
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.JenisPasien + ' </font>  ';
                     return html
                 }
             },

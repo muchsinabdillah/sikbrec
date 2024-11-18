@@ -44,7 +44,6 @@ class aBillingPasien extends Controller
         }
     }
 
-
     public function BillingClose($id = null, $pkuitansi_notrs = null, $pkuitansi_jeniscetakan = null, $pkuitansi_lang = null)
     {
         try {
@@ -65,7 +64,6 @@ class aBillingPasien extends Controller
             $this->View('templates/footer_login');
         }
     }
-
 
     public function BillingDeposit($id = null, $pkuitansi_notrs = null, $pkuitansi_jeniscetakan = null, $pkuitansi_lang = null)
     {
@@ -118,6 +116,11 @@ class aBillingPasien extends Controller
         $this->View('templates/footer');
     }
 
+    // Penjualan Obat Bebas
+    public function ApprovePenjualanBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->ApprovePenjualanBebas($_POST));
+    }
     public function listbebas()
     {
         $session = SessionManager::getCurrentSession();
@@ -127,6 +130,177 @@ class aBillingPasien extends Controller
         $this->View('billing/list/BillingBebasList', $data);
         $this->View('templates/footer');
     }
+    public function getDataListBillingBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataListBillingBebas($_POST));
+    }
+
+    public function getDataListBillingBebas_Arsip()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataListBillingBebas_Arsip($_POST));
+    }
+
+    public function viewbebas($id = null, $pkuitansi_notrs = null, $pkuitansi_jeniscetakan = null, $pkuitansi_lang = null)
+    {
+        try {
+            // var_dump('testttttt');
+            // exit;
+            $session = SessionManager::getCurrentSession();
+            $data['id'] =  Utils::setDecode($id);
+            $data['judul'] = 'Billing';
+            $data['pkuitansi_notrs'] = $pkuitansi_notrs;
+            $data['pkuitansi_jeniscetakan'] = $pkuitansi_jeniscetakan;
+            $data['pkuitansi_lang'] = $pkuitansi_lang;
+            // $data['judul_child'] = 'Data Pasien';
+            $data['session'] = $session;
+            $this->View('templates/header', $session);
+            $this->View('billing/input/Billing_Bebas', $data);
+            $this->View('templates/footer');
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+
+    public function getDataPasienBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataPasienBebas($_POST));
+    }
+
+    public function getDataApproveFarmasiBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataApproveFarmasiBebas($_POST));
+    }
+
+    public function PrintRincianAllTS($notrs = '')
+    {
+        try {
+            // var_dump($lang);
+            // exit;
+            $session = SessionManager::getCurrentSession();
+            $data['notrs'] = $notrs;
+            $kodereg = substr($notrs, 0, 2);
+            $data['kodereg'] = $kodereg;
+            // $data['lang'] = $lang;
+            $data['periode_awal'] = '';
+            $data['periode_akhir'] = '';
+            $data['listdataheader'] = $this->model('B_Billing_Model')->PrintRincianHeaderbyRegAllBebas($data);
+            $data['listdetail_pay'] = $this->model('B_Billing_Model')->PrintRincianpaybyRegidtrsALLBebas($data);
+            // var_dump($data['listdetail_pay']);
+            // exit;
+            $data['listdata_payment'] = $this->model('B_Billing_Model')->PrintKuitansiDetailbyRegidtrsAll($data);
+            // var_dump($data['listdata_payment']);
+            // exit;
+            // get sign user
+            $data['id_employee'] = $session->IDEmployee;
+            $data['listdatasign'] = $this->model('B_Billing_Model')->GetSignUser($data);
+            //get uuid4
+            $data['uuid4'] = Utils::uuid4str();
+            //return view
+            $this->View('print/billing/rincianbiaya/print_rincianbiayadetail_rj', $data);
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+
+    public function billingpembayaranbebas($id = null)
+    {
+        try {
+            $session = SessionManager::getCurrentSession();
+            $data['id'] =  Utils::setDecode($id);
+            $data['judul'] = 'TRANSAKSI PEMBAYARAN KASIR';
+            // $data['judul_child'] = 'Data Pasien';
+            $data['session'] = $session;
+            $this->View('templates/header', $session);
+            $this->View('billing/input/Billing_Pembayaran_Bebas', $data);
+            $this->View('templates/footer');
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+
+    public function SaveTrsPayment_closing_Bebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->SaveTrsPayment_closing_Bebas($_POST));
+    }
+
+    public function PrintKuitansiAllBebas($kodereg = '', $notrs = '')
+    {
+        try {
+
+            $session = SessionManager::getCurrentSession();
+
+            $data['notrs'] = $notrs;
+            $data['kodereg'] = $kodereg;
+            // $data['lang'] = $lang;
+
+            // var_dump($data['kodereg']);
+            // exit;
+
+            if ($kodereg == 'RJ') {
+                $judul = 'KUITANSI RAWAT JALAN';
+                $judul_eng = 'OUTPATIENT RECEIPT';
+            } elseif ($kodereg == 'RI') {
+                $judul = 'KUITANSI RAWAT INAP';
+                $judul_eng = 'INPATIENT RECEIPT';
+            } elseif ($kodereg == 'TS') {
+                $judul = 'KUITANSI PEMBELIAN OBAT BEBAS';
+                $judul_eng = 'RECIPE RECEIPT';
+            } else {
+                $judul = 'KUITANSI';
+                $judul_eng = 'RECEIPT';
+            }
+            $data['judul'] = $judul;
+            $data['judul_eng'] = $judul_eng;
+
+
+            // update cetakan ke
+            //$this->model('B_Billing_Model')->goUpdateCetakanbyID($data);
+            // get data header and detail
+            $data['listdataheader'] = $this->model('B_Billing_Model')->PrintKuitansiHeaderbyAllBebas($data);
+            $data['listdatadetail'] = $this->model('B_Billing_Model')->PrintKuitansiDetailbyAllBebas($data);
+            $total = 0;
+            $total = $data['listdataheader']['TotalPaid'];
+
+            // if ($data['lang'] == 'EN') {
+            //     $data['terbilang'] = $this->model('B_Billing_Model')->terbilang_eng($total);
+            // } else {
+            //     $data['terbilang'] = $this->model('B_Billing_Model')->terbilang($total);
+            // }
+            $data['terbilang'] = $this->model('B_Billing_Model')->terbilang($total);
+            // var_dump($data['terbilang']);
+            // exit;
+
+            // get sign user
+            // $data['id_employee'] = $data['listdataheader']['Id_Kasir'];
+
+            $data['id_employee'] = $session->IDEmployee;
+            // $data['nama_employe'] = $session->name;
+            $data['listdatasign'] = $this->model('B_Billing_Model')->GetSignUser($data);
+            //get uuid4
+            $data['uuid4'] = Utils::uuid4str();
+            //return view
+            $this->View('print/billing/kuitansi/print_kuitansidetail', $data);
+        } catch (exception $exception) {
+            $this->View('templates/header_login');
+            $this->View('login/index');
+            $this->View('templates/footer_login');
+        }
+    }
+    public function SetSaveBatalRiwayatPembayaranBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->SetSaveBatalRiwayatPembayaranBebas($_POST));
+    }
+    public function setSaveCloseOrOpenBillBebas()
+    {
+        echo json_encode($this->model('B_Billing_Model')->setSaveCloseOrOpenBillBebas($_POST));
+    }
+    // Penjualan Obat Bebas
 
     public function listvoucher()
     {
@@ -166,16 +340,6 @@ class aBillingPasien extends Controller
     public function getDataListBillingRanap_Arsip()
     {
         echo json_encode($this->model('B_Billing_Model')->getDataListBillingRanap_Arsip($_POST));
-    }
-
-    public function getDataListBillingBebas()
-    {
-        echo json_encode($this->model('B_Billing_Model')->getDataListBillingBebas($_POST));
-    }
-
-    public function getDataListBillingBebas_Arsip()
-    {
-        echo json_encode($this->model('B_Billing_Model')->getDataListBillingBebas_Arsip($_POST));
     }
 
     public function getDataPasien()
@@ -695,7 +859,7 @@ class aBillingPasien extends Controller
         }
     }
 
-    public function SaveKuitansi()
+    public function SaveKuitansixx()
     {
         $data['notrs'] = $_POST['notrs'];
         $data['kodereg'] = $_POST['kodereg'];
@@ -1488,127 +1652,132 @@ class aBillingPasien extends Controller
     {
         echo json_encode($this->model('B_Billing_Model')->getPaymentTypeREKENING($_POST));
     }
-    
-    public function goPaymentFromAPI()
+
+    // 20/08/2024
+    public function setSaveCloseOrOpenBill()
     {
-        $data = $_POST;
-        $data['notrs'] = $_POST['Lab_NORegistrasi'];
-        if ($data['JenisTrs'] == 'LAB'){
-            $getdatatrs = $this->model('B_Billing_Model')->PrintRincianLabbyRegOnly($data);
-            $total = 0;
-            foreach ($getdatatrs as $key){
-                $total += $key['Tarif'];
-            }
-            $data['PendapatanPoli'] = 0;
-            $data['PendapatanApotik'] = 0;
-            $data['PendapatanRadiologi'] = 0;
-            $data['PendapatanLab'] = $total;
-        }else if($data['JenisTrs'] == 'RADIOLOGI'){
-            $data['PendapatanPoli'] = 0;
-            $data['PendapatanApotik'] = 0;
-            $data['PendapatanRadiologi'] = $_POST['Rad_Nilai'];
-            $data['PendapatanLab'] = 0;
-            $data['Lab_NORegistrasi'] = $_POST['Lab_NORegistrasi'];
-            $data['Lab_NoEpisode'] = $_POST['Rad_NoEpisode'];
-            $data['Lab_NamaPasien'] = $_POST['Rad_NamaPasien'];
+        echo json_encode($this->model('B_Billing_Model')->setSaveCloseOrOpenBill($_POST));
+    }
+    // 20/08/2024
 
-        }else if ($data['JenisTrs'] == 'FARMASI'){
+    // 22/08/2024
+    public function SetSaveBatalRiwayatPembayaran()
+    {
+        echo json_encode($this->model('B_Billing_Model')->SetSaveBatalRiwayatPembayaran($_POST));
+    }
+    // 22/08/2024
 
-        }else{
-            $data['PendapatanPoli'] = 0;
-            $data['PendapatanApotik'] = 0;
-            $data['PendapatanRadiologi'] = 0;
-            $data['PendapatanLab'] = 0;
+    public function getDataDocumentPDF()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataDocumentPDF($_POST));
+    }
+
+    public function cekEmateraibyNoTRS()
+    {
+        echo json_encode($this->model('B_Billing_Model')->cekEmateraibyNoTRS($_POST));
+    }
+
+    //bridging materai
+    public function SaveKuitansi()
+    {
+        $data['notrs'] = $_POST['notrs'];
+        $data['kodereg'] = $_POST['kodereg'];
+        // var_dump($data['kodereg']);
+        // exit;
+        $data['lang'] = $_POST['lang'];
+        // var_dump('notrs',$data['notrs'],'kodereg',$data['kodereg'],'lang',$data['lang']);exit;
+        if ($data['kodereg'] == 'RJ') {
+            $judul = 'KUITANSI RAWAT JALAN';
+            $judul_eng = 'OUTPATIENT RECEIPT';
+        } elseif ($data['kodereg'] == 'RI') {
+            $judul = 'KUITANSI RAWAT INAP';
+            $judul_eng = 'INPATIENT RECEIPT';
+        } elseif ($data['kodereg'] == 'PB') {
+            $judul = 'KUITANSI PEMBELIAN OBAT BEBAS';
+            $judul_eng = 'RECIPE RECEIPT';
+        } else {
+            $judul = 'KUITANSI';
+            $judul_eng = 'RECEIPT';
         }
-        echo json_encode($this->model('B_Billing_Model')->goPaymentFromAPI($data));
-    }
+        $data['judul'] = $judul;
+        $data['judul_eng'] = $judul_eng;
+        $data['GrupTransaksi'] = $_POST['jeniscetakan'];
+        $data['NoRegistrasi'] = $_POST['NoRegistrasi'];
+        $data['Alasan_Cetak'] = $_POST['Alasan_Cetak'];
 
-    public function PrintRincianRJOld($lang = '', $notrs = '', $periode_awal = '', $periode_akhir = '')
+
+
+        $data['listdataheader'] = $this->model('B_Billing_Model')->GenerateEmateraiHeaderbyIDX($data);
+        $data['listdatadetail'] = $this->model('B_Billing_Model')->GenerateEmateraiDetailbyIDX($data);
+        // get sign user
+        $data['id_employee'] = $data['listdataheader']['Id_Kasir'];
+        $data['listdatasign'] = $this->model('B_Billing_Model')->GetSignUser($data);
+        //get uuid4
+        $data['uuid4'] = Utils::uuid4str();
+        //cetakan ke
+        $data['jeniscetakan'] = 'KUITANSI';
+        $data['cetakanke'] = $this->model('B_Billing_Model')->GetCetakanKe($data);
+        //$data['filename'] = $this->View('print/billing/kuitansi/save_kuitansi', $data);
+        $data['filedoc'] = 'print/billing/kuitansi/print_kuitansidetaill';
+        $data['filename'] = $this->SaveFile($data);
+        echo json_encode($this->model('B_Billing_Model')->uploadAWS($data));
+        // echo json_encode($this->model('B_Billing_Model')->goEmateraiAPI($data));
+
+    }
+    public function CreateEmaterai()
     {
-        try {
-            $session = SessionManager::getCurrentSession();
-            $data['notrs'] = $notrs;
-            $kodereg = substr($notrs, 0, 2);
-            $data['kodereg'] = $kodereg;
-            $data['lang'] = $lang;
-            $data['periode_awal'] = $periode_awal;
-            $data['periode_akhir'] = $periode_akhir;
-            //$data['judul_eng'] = $judul_eng;
-            // get data header and detail
-            $data['listdataheader'] = $this->model('B_Billing_Model')->PrintRincianHeaderbyReg($data);
-            $data['listdetail_pay'] = $this->model('B_Billing_Model')->PrintRincianpaybyReg($data);
+        $data['notrs'] = $_POST['notrs'];
+        $data['jeniscetakan'] = $_POST['jeniscetakan'];
+        $data['noregistrasi'] = $_POST['noregistrasi'];
+        $data['judul'] = $_POST['judul'];
+        $data['email_send'] = $_POST['email'];
+        $data['aws_url'] = $_POST['aws_url'];
+        $data['uuid4'] = Utils::uuid4str();
 
-            $data['listdetail_klinik'] = $this->model('B_Billing_Model')->PrintRincianKlinikbyReg($data);
-            $data['listdetail_operasi'] = $this->model('B_Billing_Model')->PrintRincianOperasibyReg($data);
-            $data['listdetail_lab'] = $this->model('B_Billing_Model')->PrintRincianLabbyRegOnly($data);
-            $data['listdetail_radiologi'] = $this->model('B_Billing_Model')->PrintRincianRadiologibyRegOnly($data);
-            $data['listdetail_mcu'] = $this->model('B_Billing_Model')->PrintRincianMCUbyReg($data);
-            $data['listdetail_bhp'] = $this->model('B_Billing_Model')->PrintRincianBhpbyReg($data);
-            $data['listdetail_obat'] = $this->model('B_Billing_Model')->PrintRincianObatbyReg($data);
-            $data['listdetail_retur'] = $this->model('B_Billing_Model')->PrintRincianReturbyReg($data);
+        // var_dump($data);
+        // exit;
 
-            $data['listdata_payment'] = $this->model('B_Billing_Model')->PrintKuitansiDetailbyReg($data);
-            // get sign user
-            $data['id_employee'] = $session->IDEmployee;
-            $data['listdatasign'] = $this->model('B_Billing_Model')->GetSignUser($data);
-            //get uuid4
-            $data['uuid4'] = Utils::uuid4str();
-            //cetakan ke
-            $data['jeniscetakan'] = 'RINCIANBIAYA_RJ';
-            $data['cetakanke'] = $this->model('B_Billing_Model')->GetCetakanKe($data);
-            //return view
-            $this->View('print/billing/rincianbiaya/print_rincianbiaya_rj', $data);
-        } catch (exception $exception) {
-            $this->View('templates/header_login');
-            $this->View('login/index');
-            $this->View('templates/footer_login');
-        }
+        $session = SessionManager::getCurrentSession();
+        //$this->model('B_Billing_Model')->AddCountCetak($data);
+        // $data['listdata1'] = $this->model('B_Billing_Model')->getAWSURL($data);
+        // $data['aws_url'] = $data['listdata1']['AwsUrlDocuments'];
+        //$data['filename'] = $this->View('print/billing/rincianbiaya/sendmail_rincianbiaya', $data);
+        // echo json_encode($this->SendMailPHPMailer($data));
+        echo json_encode($this->model('B_Billing_Model')->goEmateraiAPI($data));
     }
-
-    public function SaveRincianRJOld()
+    public function SendEmailEmaterai()
     {
-        try {
-            $session = SessionManager::getCurrentSession();
-            $data['notrs'] = $_POST['notrs'];
-            $kodereg = substr($_POST['notrs'], 0, 2);
-            $data['kodereg'] = $_POST['kodereg'];
-            $data['lang'] = $_POST['lang'];
-            $data['periode_awal'] = $_POST['periode_awal'];
-            $data['periode_akhir'] = $_POST['periode_akhir'];
-            //$data['judul_eng'] = $judul_eng;
-            // get data header and detail
-            $data['listdataheader'] = $this->model('B_Billing_Model')->PrintRincianHeaderbyReg($data);
-            $data['listdetail_klinik'] = $this->model('B_Billing_Model')->PrintRincianKlinikbyReg($data);
-            $data['listdetail_operasi'] = $this->model('B_Billing_Model')->PrintRincianOperasibyReg($data);
-            $data['listdetail_lab'] = $this->model('B_Billing_Model')->PrintRincianLabbyRegOnly($data);
-            $data['listdetail_radiologi'] = $this->model('B_Billing_Model')->PrintRincianRadiologibyRegOnly($data);
-            $data['listdetail_mcu'] = $this->model('B_Billing_Model')->PrintRincianMCUbyReg($data);
-            $data['listdetail_bhp'] = $this->model('B_Billing_Model')->PrintRincianBhpbyReg($data);
-            $data['listdetail_obat'] = $this->model('B_Billing_Model')->PrintRincianObatbyReg($data);
-            $data['listdetail_retur'] = $this->model('B_Billing_Model')->PrintRincianReturbyReg($data);
-            $data['listdata_payment'] = $this->model('B_Billing_Model')->PrintKuitansiDetailbyReg($data);
-            // get sign user
-            $data['id_employee'] = $session->IDEmployee;
-            $data['listdatasign'] = $this->model('B_Billing_Model')->GetSignUser($data);
-            //return view
-            $data['GrupTransaksi'] = $_POST['jeniscetakan'];
-            //get uuid4
-            $data['uuid4'] = Utils::uuid4str();
-            //cetakan ke
-            $data['jeniscetakan'] = 'RINCIANBIAYA_RJ';
-            $data['cetakanke'] = $this->model('B_Billing_Model')->GetCetakanKe($data);
-            //$data['filename'] = $this->View('print/billing/rincianbiaya/save_rincianbiaya_rj', $data);
-            $data['filedoc'] = 'print/billing/rincianbiaya/hdr_rincianbiaya_rjx';
-            $data['filename'] = $this->SaveFile($data);
-            echo json_encode($this->model('B_Billing_Model')->uploadAWS($data));
-        } catch (exception $exception) {
-            $this->View('templates/header_login');
-            $this->View('login/index');
-            $this->View('templates/footer_login');
-        }
+        $data['notrs'] = $_POST['notrs'];
+        $data['email_send'] = $_POST['email_send'];
+        $data['judul'] = 'Kuitansi';
+        $data['aws_url'] = $_POST['materai_url'];
+        // var_dump($data['aws_url']);
+        // exit;
+        // $data['cetakanke'] = $this->model('B_Billing_Model')->GetCetakanKe($data);
+
+        $session = SessionManager::getCurrentSession();
+        echo json_encode($this->SendMailPHPMailer($data));
     }
-    public function GetregistrasiRajalbyNoRegistrasiDigital()
+    public function UpdateAlasanSendEmail()
     {
-        echo json_encode($this->model('B_create_Registrasi_Rajal')->GetregistrasiRajalbyNoRegistrasiDigital($_POST['NoRegistrasi']));
+        // $data['uuid4'] = Utils::uuid4str();
+
+        $data['notrs'] = $_POST['notrs'];
+        $data['jeniscetakan'] = $_POST['jeniscetakan'];
+        $data['NoRegistrasi'] = $_POST['NoRegistrasi'];
+        $data['kodereg'] = $_POST['kodereg'];
+
+        // var_dump($data);
+        // exit;
+        // $data['listdataheader'] = $this->model('B_Billing_Model')->GenerateEmateraiHeaderbyIDX($data);
+
+        // $data['cetakanke'] = $this->model('B_Billing_Model')->GetCetakanKe($data);
+
+        echo json_encode($this->model('B_Billing_Model')->UpdateAlasanSendEmail($_POST));
     }
+    public function getDataCetakDocumentPDF()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataCetakDocumentPDF($_POST));
+    }
+    //bridging materai
 }

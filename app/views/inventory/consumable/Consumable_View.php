@@ -56,6 +56,9 @@
                                     <div class="col-sm-3">
                                     <textarea class="form-control input-sm " id="Notes" name="Notes" placeholder="Ketik Keterangan Disini"></textarea>
                                     </div>
+                                    
+                                    <input type="hidden" class="form-control" autocomplete="off" name="GroupJaminan" id="GroupJaminan" readonly>
+                                        <input type="hidden" class="form-control" autocomplete="off" name="IDKelas" id="IDKelas" readonly>
                                 </div>
                             </form>
                             <button type="button" class="btn btn-maroon  waves-effect btn-rounded" id="btnNewPurchase" name="btnNewPurchase"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Transaction</button>
@@ -89,13 +92,13 @@
                                         <input type="text" class="form-control" autocomplete="off" name="QtyStok" id="QtyStok" maxlength="25" readonly  >
                                     </div>
                                     <div class="form-group col-md-1">
+                                        <label for="inputEmail3">HPP</label>
+                                        <input type="text" class="form-control" autocomplete="off" name="hpp_add" id="hpp_add" maxlength="25" readonly>
+                                    </div>
+                                    <div class="form-group col-md-1">
                                         <label for="inputEmail3">Qty</label>
                                         <input type="text" class="form-control" autocomplete="off" name="QtyOrder" id="QtyOrder" maxlength="25">
                                     </div>
-                                    <!-- <div class="form-group col-md-1">
-                                        <label for="inputEmail3">HPP</label>
-                                        <input type="hidden" class="form-control" autocomplete="off" name="hpp_add" id="hpp_add" maxlength="25">
-                                    </div> -->
                                     <div class="orm-group col-md-2">
                                         <label for="inputEmail3" class="color-white">-</label>
                                         <button class="btn btn-maroon btn-rounded waves-effect" id="btnAdd" name="btnAdd"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add</button>
@@ -231,8 +234,8 @@
                           <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-maroon waves-effect btn-rounded" id="btnSave" name="btnSave" disabled><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Simpan</button>
                                 <button type="button" class="btn btn-gold btn-rounded" id="btn_batal" name="btn_batal" disabled><i class="fa fa-trash" aria-hidden="true"></i>Hapus</button>
-                                <button class="btn btn-black btn-rounded " id="btnprint" name="btnprint" data-toggle='modal'>
-                                    <i class="fa fa-print"></i>PRINT</button>
+                                <!-- <button class="btn btn-black btn-rounded " id="btnprint" name="btnprint" data-toggle='modal'>
+                                    <i class="fa fa-print"></i>PRINT</button> -->
                                 <button type="button" class="btn btn-grey btn-rounded" id="btn_kembali" name="btn_kembali" onclick="MyBack()"><i class="fa fa-home" aria-hidden="true"></i>Kembali</button>
                             </div>
 
@@ -250,7 +253,7 @@
 
 <div class="modal fade" id="btnSearching_modal" tabindex="-1" role="dialog">
 
-<div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg" style="width:80%">
     <!-- Modal content-->
     <div class="modal-content">
         <div class="modal-header">
@@ -550,7 +553,7 @@
         </div>
         <div class="modal-footer">
         <button type="button" class="btn btn-maroon  waves-effect btn-rounded" id="btnPaketPilih" name="btnPaketPilih"> Pilih Paket</button>
-            <a data-dismiss="modal" class="btn btn-default" href="#" id="CloseMe" name="CloseMe">Close</a>
+            <a  class="btn btn-default"  id="CloseMex" name="CloseMex">Close</a>
         </div>
 
         <!--#END Modal Approve--------------------------------------------->

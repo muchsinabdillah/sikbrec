@@ -36,6 +36,13 @@ $(document).ready(function () {
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
+                    var html = '<font size="1"> ' + row.NM_TIPE_PDP + ' </font>  ';
+                    return html
+                }
+            },
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
                     var html = '<font size="1"> ' + row.NILAI_PROSEN + ' </font>  ';
                     return html
                 }

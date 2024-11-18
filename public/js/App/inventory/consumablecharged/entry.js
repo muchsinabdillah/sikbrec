@@ -136,7 +136,7 @@ $(document).ready(function () {
             });
     });
     $("#btnAdd").click(function () { 
-        AddRow();
+        //AddRow();
         if($("#xNamaBarang").val() == ''){
             $("#xNamaBarang").focus();
             toast("Nama Barang Kosong !", 'warning');
@@ -151,10 +151,13 @@ $(document).ready(function () {
 
           if($('#totalrow').val()==0){
             var count =0;
+            var countid =0;
           }else{
             var count = parseFloat($('#totalrow').val());
+            var countid = parseFloat($('#datatable_prdetail >tbody >tr:last').attr('id'));
           }
           count = count + 1;
+          countid = countid + 1;
           total_items = count;
           //document.getElementById('grantotalOrder').innerHTML = count;
           $('#totalrow').val(count);
@@ -170,13 +173,13 @@ $(document).ready(function () {
           hidden_hpp_barang_ = 5;
           hidden_total_barang_ = 5;
           hidden_signa_terjemahan = $('#SignaTerjemahan').val();
-          harga = $('#HargaProduct').val();
+          harga = $('#HargaProduct').val().replace(".", ",");
           UangR = 0;
           Embalase = 0;
 
           var totalitem = $("#totalrow").val();
             for (i = 1; i <= totalitem; i++) { 
-                if (hidden_kode_barang == $("#hidden_kode_barang"+i).val() ){
+                if (hidden_kode_barang == $("#hidden_kode_barang"+$('#datatable_prdetail tr').eq(i).attr('id')).val() ){
                     swal({
                         title: "Warning",
                         text: hidden_nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
@@ -204,47 +207,56 @@ $(document).ready(function () {
             Harga:harga,
             UangR:UangR,
             Embalase:Embalase,
+            Racik:'0',
+            Header:'0',
             }
-            console.log(number_to_price((val.QryOrder)),'dd');
-          var newRow = $("<tr id='row_'" + total_items + "'>");
-            /*1*/  newRow.html("<td><font size='1'>" + total_items + "<input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ></td>'"+
-            /*3*/"'<td><font size='1'>" + val.Satuan_Konversi + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Konversi +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font></td>'"+
-            /*2*/ "'<td>" + val.KodeBarang +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' value='" + val.KodeBarang +"' ></td> '"+
-            /*3*/"'<td><font size='2'>" + val.NamaBarang +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.NamaBarang +"' ></font></td>'"+
-            /*3*/"'<td><font size='2'>" + val.Signa +"<input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'" + total_items + "' value='" + val.Signa +"' ></font></td>'"+
-            /*3*/"'<td><font size='2'><input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value='" + val.SignaTerjemahan +"'></font></td>'"+
-            /*4*/"' <td>" + val.QryOrder + "<input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + val.QryOrder +"' ></td> '"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + val.QryOrder +"' ></td> '"+
-            /*5*/"' <td>" + number_to_price(val.Harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(val.Harga) + "' ></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+val.UangR+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+val.Embalase+"'></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
-            // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
-                "  </tr>")
-                ;
 
-            // output = '<tr id="row_closing_' + count + '">';
-            // output += '<td>' + hidden_kode_barang+ ' <input type="hidden" name="hidden_kode_barang[]" id="first_name' + count +'" class="hidden_kode_barang" value="' + hidden_kode_barang+ '" /></td>';
-            // output += '<td>' + hidden_nama_barang_+ ' <input type="hidden" name="hidden_nama_barang_[]" id="first_name' + count +'" class="hidden_kode_barang" value="' + hidden_nama_barang_+ '" /></td>';
-            // output += '<td>' + hidden_satuan_barang_+ ' <input type="hidden" name="hidden_satuan_barang_[]" id="first_name' + count +'" class="hidden_kode_barang" value="' + hidden_satuan_barang_+ '" /></td>';
-            // output += '<td>' + hidden_min_barang_ + ' <input type="hidden" name="hidden_min_barang_[]" id="first_name' + count +'" class="hidden_nama_barang" value="' + hidden_min_barang_ + '" /></td>';
-            // output += '<td>' + hidden_qty_barang_+ ' <input type="hidden" name="hidden_qty_barang_[]" id="first_name' + count +'" class="hidden_nama_barang" value="' + hidden_qty_barang_+ '" /></td>';
-            // output += '<td>' + hidden_hpp_barang_+ ' <input type="hidden" name="hidden_hpp_barang_[]" id="first_name' + count +'" class="hidden_qty_barang" value="' + hidden_hpp_barang_+ '" /></td>';
-            //  output += '<td>' + hidden_total_barang_+ ' <input type="hidden" name="hidden_total_barang_[]" id="first_name' + count +'" class="hidden_qty_barang" value="' + hidden_total_barang_+ '" /></td>';
-            // output += '<td><button type="button" title="Hapus" name="remove_details_closing" class="btn btn-danger btn-sm remove_details_closing" id="' +
-            //   count + '"><span class="glyphicon glyphicon-remove"></span></button></td>';
-            // output += '</tr>';
+
+            var newRow = `
+            <tr id='${countid}'>
+                <td><input type='hidden'  name='hidden_racik_[]' id='hidden_racik_${countid}' value='${val.Racik}' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_${countid}' value='${val.Header}' ><font size='1'>${val.Satuan_Konversi}<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_${countid}' value='${val.Satuan_Konversi}' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'${countid}' value='${val.Satuan_Konversi}' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'${countid}' value='${val.Konversi_satuan}' ></font><input type='hidden'  name='hidden_ID_[]' id='hidden_ID_${countid}' value='${val.ID}'></td>
+                <td>${val.KodeBarang}<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang${countid}' value='${val.KodeBarang}' ></td>
+                <td><font size='2'><input type='hidden'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan${countid }' value='${val.SignaTerjemahan }'></font><font size='2'><input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_${countid }' value='${val.Signa }' ></font><font size='2'>${val.NamaBarang }<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_${countid }' value='${val.NamaBarang }' ></font></td>
+                <td><input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_${countid }' value='${val.QryOrder }' ><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_${countid}' value='${val.QryOrder }' ></td>
+                <td>${number_to_price(val.Harga) }<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_${countid }' value='${parseFloat(val.Harga) }' ></td>
+                <td><font size='1'><input type='text' style="width: 75px;" name='hidden_subtotal_[]' id='hidden_subtotal_${countid}' readonly></font></td>
+                <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_${countid }' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_${countid }' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_${countid }' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_${countid }' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr${countid }' value='${val.UangR}'><input  size='2'  type='hidden'  name='embalase[]' id='embalase${countid }' value='${val.Embalase}'></td>
+                <td><font size='1'><input type='text' style="width: 75px;" name='hidden_grandtotal_[]' id='hidden_grandtotal_${countid}' readonly></font></td>
+                <td><button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${countid}' ><i class="fa fa-close"></i> Delete</Hapus></td>
+            </td>
+            `;
+            
+        //   var newRow = $("<tr id='row_'" + total_items + "'>");
+        //     /*1*/  newRow.html("<td><font size='1'>" + total_items + "<input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ></td>'"+
+        //     /*3*/"'<td><input type='hidden'  name='hidden_racik_[]' id='hidden_racik_'" + total_items + "' value='"+val.Racik+"' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_'" + total_items + "' value='"+val.Header+"' ><font size='1'>" + val.Satuan_Konversi + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Konversi +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font></td>'"+
+        //     /*2*/ "'<td>" + val.KodeBarang +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' value='" + val.KodeBarang +"' ></td> '"+
+        //     /*3*/"'<td><font size='2'><input type='hidden'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value='" + val.SignaTerjemahan +"'></font><font size='2'><input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'" + total_items + "' value='" + val.Signa +"' ></font><font size='2'>" + val.NamaBarang +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.NamaBarang +"' ></font></td>'"+
+        //     // /*3*/"'<td></td>'"+
+        //     // /*3*/"'<td></td>'"+
+        //     // /*4*/"' <td></td> '"+
+        //     /*6*/"' <td><input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + val.QryOrder +"' ><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + val.QryOrder +"' ></td> '"+
+        //     /*5*/"' <td>" + number_to_price(val.Harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(val.Harga) + "' ></td> '"+
+        //     /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
+        //     /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+val.UangR+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+val.Embalase+"'></td> '"+
+        //     /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+        //     // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
+        //         "  </tr>")
+        //         ;
+
             $('#user_data').append(newRow);
             
             calculateAllDetail();
             
-            //$("#nama_Barang").select2('destroy');
-            $("#xIdBarang").val("");
-            $("#xNamaBarang").val("");
-            $("#Satuan").val("");
-            $("#Qty").val('');
-            $("#nama_Barang").val('');
-            $("#SignaTerjemahan").val('');
+            $('#nama_Barang').val('');
+            $('#xNamaBarang').val('');
+            $('#xIdBarang').val('');
+            $('#Qty').val('');
+            $('#SatuanBarang').val('');
+            $('#Satuan_Konversi').val('');
+            $('#Konversi_Satuan').val('');
+            $('#QtyStok').val('');
+            $('#HargaProduct').val('');
+            $('#SignaTerjemahan').val('');
             $("#nama_Barang").focus();
             
     });
@@ -585,6 +597,7 @@ function getDataListBillingRanap(tglawal,tglakhir) {
        });
 } 
 async function showID(noreg){  
+    $(".preloader").fadeIn();
     const data = await getNoregistrasibyNoreg(noreg);
     updategetNoregistrasibyNoreg(data);
 }
@@ -614,14 +627,17 @@ function updategetNoregistrasibyNoreg(params){
         $("#Dokter").val(params.data[0].NamaDokter);
         $("#Alamat").val(params.data[0].Address);
         $("#Unit").val(params.data[0].IdUnit).trigger('change');
-        $("#Unit_Farmasi").val(params.data[0].IdUnit).trigger('change');
+        //$("#Unit_Farmasi").val(params.data[0].IdUnit).trigger('change');
         $("#Jaminan").val(params.data[0].NamaJaminan);
         $("#KodeJaminan").val(params.data[0].KodeJaminan);
         $("#TipePasien").val(params.data[0].TipePasien);
         $("#KodeKelas").val(params.data[0].KodeKelas); 
         $("#No_Episode").val(params.data[0].NoEpisode); 
-        $("#Unit").prop("disabled", true);
-        $("#Unit_Farmasi").prop("disabled", true);
+        // $("#Unit").prop("disabled", true);
+        // $("#Unit_Farmasi").prop("disabled", true);
+        
+    $('#Unit option:not(:selected)').prop('disabled', true);
+    //$('#Unit_Farmasi option:not(:selected)').prop('disabled', true);
          
         $("#GroupJaminan").val(params.data[0].KodeJaminan); 
         if(params.data[0].NamaJaminan == "Bpjs Kesehatan"){
@@ -691,11 +707,14 @@ async function onloadForm() {
 
     var id = $("#No_Transaksi").val();
     disableAll();
-    $(".preloader").fadeOut();
+    //$(".preloader").fadeOut();
     if (id != ""){
         const data = await getSalesbyID();  
         updateUIdatagetSalesbyID(data);
         enableAll();
+    }else{
+        const dataunitbyIP = await getUnitbyIP();
+        updateUIdataunitbyIP(dataunitbyIP);
     }
 }
 
@@ -738,7 +757,7 @@ async function updateUIdatagetSalesbyID(dataResponse) {
 
     $("#btnNewTransaksi").attr('disabled', true);
 
-    showdatatabel(dataResponse.data[0].TransactionCode);
+    //showdatatabel(dataResponse.data[0].TransactionCode);
 }
 async function getSalesbyID() {
     var base_url = window.location.origin;
@@ -860,7 +879,7 @@ function showdatatabel(OrderID) {
     total_items = 0;
     var No_Transaksi = $("#No_Transaksi").val(); 
     var dataHandler = $("#user_data");
-    dataHandler.html("");
+    //dataHandler.html("");
 
     var base_url = window.location.origin;
     var url2 = "/SIKBREC/public/InventoryCharged/viewInventoryChargeddetail";
@@ -873,24 +892,24 @@ function showdatatabel(OrderID) {
             //console.log(result);
             var resultObj = JSON.parse(result);
             $.each(resultObj, function (key, val) {
-                
               
                 total_items = total_items + 1;
                 $("#totalrow").val(total_items);
 
-                 console.log(val.ProductName);
+                 //console.log(val.ProductName);
 
                 // document.getElementById('totalrow').innerHTML = total_items;
-                var newRow = $("<tr id='row_'" + total_items + "'>");
-            /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+ 
-            /*3*/"'<td><font size='1'>" + val.Satuan_Beli + "<input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ><input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan_Beli +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Beli +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.KonversiQty +"' ></font></td>'"+
-            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ></font></td> '"+
-            /*3*/"'<td><font size='2'>" + val.ProductName +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + parseFloat(val.Qty) +"' ></td> '"+
+                var newRow = $("<tr id='" + total_items + "'>");
+            /*1*/  newRow.html(""+ 
+            /*3*/"'<td><font size='2'><input type='hidden'  name='hidden_racik_[]' id='hidden_racik_" + total_items + "' value='0' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_" + total_items + "' value='0' ><font size='1'>" + val.Satuan + "<input type='hidden'  name='hidden_ID_[]' id='hidden_ID_" + total_items + "' value='" + val.ID +"' ><input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_" + total_items + "' value='" + val.KonversiQty +"' ></font></td>'"+
+            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ></font></td> '"+
+            /*3*/"'<td><font size='2'><input type='hidden'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan" + total_items + "' value=''></font><font size='2'><input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_" + total_items + "' value='' ></font><font size='2'>" + val.ProductName +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
+            /*6*/"' <td><input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + val.Qty +"' ><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + parseFloat(val.Qty) +"' ></td> '"+
             /*5*/"' <td>" + number_to_price(val.Harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(val.Harga) + "' ></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
+            /*3*/"'<td><font size='1'><input type='text' style='width: 75px;' name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
             /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+val.UangR+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+val.Embalase+"'></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+            /*3*/"'<td><font size='1'><input type='text' style='width: 75px;' name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+            `<td> <button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${total_items}' ><i class="fa fa-close"></i> Delete</Hapus></td>`+
             // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
                 "  </tr>")
                 ;
@@ -962,7 +981,7 @@ function updateUIdatacreateHeader(params) {
 
 }
 function unlockBtnCreate() {
-    console.log("xxx",$("#No_Transaksi").val());
+    //console.log("xxx",$("#No_Transaksi").val());
     if ($("#No_Transaksi").val() == '') {
         $("#btnNewTransaksi").attr('disabled', false);
         $("#btnSimpan").attr('disabled', true);
@@ -975,7 +994,7 @@ function unlockBtnCreate() {
         $("#Nama").prop('readonly',false)
         $("#Alamat").prop('readonly',false)
         $("#Tgl_Penjualan").prop('readonly',false)
-        $("#Unit_Select").prop('disabled',false)
+        //$("#Unit_Select").prop('disabled',false)
         $("#Notes").prop('readonly',false)
         $("#TipePasien").prop('readonly',false)
         $("#KodeJaminan_Select").prop('disabled',false)
@@ -995,7 +1014,7 @@ function unlockBtnCreate() {
         $("#Nama").prop('readonly',true)
         $("#Alamat").prop('readonly',true)
         $("#Tgl_Penjualan").prop('readonly',true)
-        $("#Unit_Select").prop('disabled',true)
+        //$("#Unit_Select").prop('disabled',true)
         $("#Notes").prop('readonly',true)
         $("#TipePasien").attr('readonly',true)
         $("#KodeJaminan_Select").prop('disabled',true)
@@ -1099,7 +1118,7 @@ function updateUIdataHeader(params) {
         // $('#Tgl_Penjualan').val(d.toISOString().substring(0,d.toISOString().length-1));
 
         //if (params.data[0].TransactionCode != null){
-        showdatatabel(params.data[0].OrderID);
+        //showdatatabel(params.data[0].OrderID);
         //}
         
         unlockBtnCreate();
@@ -1184,8 +1203,8 @@ function GetLayanan() {
             return response
         })
         .finally(() => {
-            $("#Unit").select2();
-            $("#Unit_Farmasi").select2();
+            // $("#Unit").select2();
+            // $("#Unit_Farmasi").select2();
         })
 }
 
@@ -1331,26 +1350,28 @@ function calculateAllDetail(){
     var total_items = $('#totalrow').val();
     //console.log($("#hidden_qty_barang_2").val());return false; 
     for (i = 1; i <= total_items; i++) {
+        var idx = $('#datatable_prdetail tr').eq(i).attr('id');
        
         //var qtyx = document.getElementById("hidden_qty_barang_" + i);
 
-        var qty = parseFloat(price_to_number($("#hidden_qtyreal_barang_" + i).val()));
-        var qtymr = parseFloat(price_to_number($("#hidden_qty_barang_" + i).val()));
-        var disconprosen = parseFloat(price_to_number($("#hidden_discpros_barang_" + i).val()));
+        var qty = parseFloat(price_to_number($("#hidden_qtyreal_barang_" + idx).val()));
+        var qtymr = parseFloat(price_to_number($("#hidden_qty_barang_" + idx).val()));
+        var disconprosen = parseFloat(price_to_number($("#hidden_discpros_barang_" + idx).val()));
         //var disconprosen = 0;
-        var harga = parseFloat(price_to_number($("#hidden_harga_barang_" + i).val()));
-        var taxprosen = parseFloat(price_to_number($("#hidden_taxprosen_" + i).val()));
+        var harga = parseFloat(price_to_number($("#hidden_harga_barang_" + idx).val()));
+        var taxprosen = parseFloat(price_to_number($("#hidden_taxprosen_" + idx).val()));
         //var taxprosen = 0;
 
 
         // if (typeof qtyx === 'undefined' || qtyx === null) {
-        //     alert("No such item - " + "hidden_qty_barang_" + i); 
+        //     alert("No such item - " + "hidden_qty_barang_" + idx); 
         // } else {
-            if (qty > qtymr) {
-                toast('Qty Order Lebih Besar daripada Qty Real !', 'warning'); 
-                $("#hidden_qtyreal_barang_"+i).val(0);
-                return false;
-            } else  { 
+            // if (qty > qtymr) {
+            //     toast('Qty Order Lebih Besar daripada Qty Real !', 'warning'); 
+            //     $("#hidden_qtyreal_barang_"+i).val(0);
+            //     return false;
+            // } 
+            //else  { 
                 subtotal = parseFloat(harga) * qty;
                 hargamindiskon = (parseFloat(disconprosen) * parseFloat(harga)) / 100; 
                 hargamindiskonQty = (parseFloat(harga) - hargamindiskon) * qty;
@@ -1374,15 +1395,15 @@ function calculateAllDetail(){
                 taxrp_stn = (parseFloat(taxprosen)*hargamindiskonTok)/100;
                 subtotal_all = subtotal_all + subtotal;
                 
-            }
-            $("#hidden_discrpttl_barang_" + i).val(number_to_price(totaldiskonrp));
-            $("#hidden_discrp_barang_" + i).val(number_to_price(hargamindiskon));
-            $("#hidden_subtotal_" + i).val(number_to_price(subtotal));
-            $("#grandtotalqty" + i).val(number_to_price(qtytotal));
-            $("#hidden_taxrp_" + i).val(number_to_price(taxrp));
-            $("#hidden_taxrp2_" + i).val(number_to_price(taxrp_stn));
-            $("#hidden_grandtotal_" + i).val(number_to_price(grandtotalPurchase));
-            $("#hidden_harga_barang_" + i).val(number_to_price(harga));
+            //}
+            $("#hidden_discrpttl_barang_" + idx).val(number_to_price(totaldiskonrp));
+            $("#hidden_discrp_barang_" + idx).val(number_to_price(hargamindiskon));
+            $("#hidden_subtotal_" + idx).val(number_to_price(subtotal));
+            $("#grandtotalqty" + idx).val(number_to_price(qtytotal));
+            $("#hidden_taxrp_" + idx).val(number_to_price(taxrp));
+            $("#hidden_taxrp2_" + idx).val(number_to_price(taxrp_stn));
+            $("#hidden_grandtotal_" + idx).val(number_to_price(grandtotalPurchase));
+            $("#hidden_harga_barang_" + idx).val(number_to_price(harga));
  
 
         //}
@@ -1533,8 +1554,8 @@ function updateUIdatagoFinish2(data) {
             text: data.message,
             icon: 'success',
         }).then(function() {
-            //MyBack();
-            $("#notif_Cetak").modal('show');
+            MyBack();
+            //$("#notif_Cetak").modal('show');
             
         });
     } else {
@@ -1623,7 +1644,7 @@ async function VoidSales(param) {
 
 function goVoidSales(param) {
     var No_Transaksi = document.getElementById("No_Transaksi").value;
-    var Unit = document.getElementById("Unit").value;
+    var Unit = document.getElementById("Unit_Farmasi").value;
     var url2 = "/SIKBREC/public/aPenjualanDenganResep/voidSales";
     var base_url = window.location.origin;
     let url = base_url + url2;
@@ -1684,3 +1705,105 @@ function MyBack() {
     window.location = base_url + "/SIKBREC/public/InventoryCharged/list";
     //location.reload();
 }
+
+$(document).on('click', '.remove_details', function () {
+    var row_id = $(this).attr("id");
+    swal({
+        title: "Are you sure?",
+        text: "Apakah anda yakin Ingin hapus data ini ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+            //$('#row_' + row_id + '').remove();
+            $(this).closest("tr").remove();
+            var count = $('#totalrow').val();
+            count = count - 1 ;
+            //document.getElementById('grantotalOrder').innerHTML = count;
+            $('#totalrow').val(count);
+            toast('Berhasil Hapus !', "success")
+            calculateAllDetail();
+        } else {
+          //swal("Your imaginary file is safe!");
+        }
+      });
+
+    });
+    
+    function CetakLabelPdf(index){
+        const code = $("#hidden_kode_barang"+index).val()
+        const signa = $("#hidden_signa_terjemahan"+index).val()
+        const qty = $("#hidden_qtyreal_barang_"+index).val()
+        const NoMR = '-'
+        const PatientName = $("#Nama").val() 
+        const NoRegistrasi = $("#NoRegistrasi").val() 
+        const dob = $("#Tgl_Lahir").val() 
+        const TglResep = $("#Tgl_Penjualan").val() 
+        const notrs = '-'
+            const obj = JSON.parse(`
+                {
+                "productcode":"${code}", 
+                "signa":"${signa}", 
+                "qty":"${qty}",
+                "NoMR":"${NoMR}",
+                "PatientName":"${PatientName}",
+                "NoRegistrasi":"${NoRegistrasi}",
+                "dob":"${dob}",
+                "TglResep":"${TglResep}",
+                "notrs":"${notrs}"
+                }
+                `);
+            var mybj = JSON.stringify(obj);
+            var mybj = btoa(mybj);
+            var base_url = window.location.origin;
+            window.open(base_url + "/SIKBREC/public/aPenjualanDenganResep/CetakLabelPdf/" + mybj , "_blank",
+                "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    }
+
+    function updateUIdataunitbyIP(dataResponse) {
+        if (dataResponse.status == true){
+            $("#Unit_Farmasi").val(dataResponse.data[0].UnitCode).trigger('change');
+            $('#Unit_Farmasi option:not(:selected)').prop('disabled', true);
+        }else{
+            swal("IP komputer ini belum disetting / dimapping di master unit ! Silahkan cek dan tambahkan IP ini di Master IP Unit Farmasi !",{
+                closeOnClickOutside: false,
+                closeOnEsc: false
+            }).then(function() {
+                MyBack();
+            });
+            $("#Unit_Select").prop('disabled',true)
+        }
+    }
+    
+    async function getUnitbyIP() {
+        var base_url = window.location.origin;
+        let url = base_url + '/SIKBREC/public/aPenjualanTanpaResep/getUnitbyIP/';
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+            body: 'TransasctionCode=' + $("#No_Transaksi").val()
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText)
+                }
+                return response.json();
+            })
+            .then(response => {
+                if (response.status === "error") {
+                    throw new Error(response.message.errorInfo[2]);
+                    // console.log("ok " + response.message.errorInfo[2])
+                } else if (response.status === "warning") {
+                    throw new Error(response.errorname);
+                    // console.log("ok " + response.message.errorInfo[2])
+                }
+                return response
+            })
+            .finally(() => {
+                $(".preloader").fadeOut();
+            })
+    }

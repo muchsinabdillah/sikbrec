@@ -29,19 +29,21 @@
                                 <div class="form-group gut">
                                     <label for=" inputEmail3" class="col-sm-2 control-label"> Jenis Awal Order <sup class="color-danger">*</sup></label>
                                     <div class="col-sm-3">
-                                    <select name="jenistransaksi" id="jenistransaksi" class="form-control">
+                                        <input type="text" class="form-control" name="jenistransaksi" id="jenistransaksi"  readonly>
+                                    <!-- <select name="jenistransaksi" id="jenistransaksi" class="form-control">
                                                             <option value="">-- PILIH --</option>
                                                             <option value="REGULER">REGULER</option>
                                                             <option value="CITO">CITO</option>
-                                                        </select>
+                                                        </select> -->
                                     </div>
                                     <label for=" inputEmail3" class="col-sm-2 control-label"> Jenis Stok <sup class="color-danger">*</sup></label>
                                     <div class="col-sm-3">
-                                    <select name="JenisStok" id="JenisStok" class="form-control">
+                                        <input type="text" class="form-control" name="JenisStok" id="JenisStok"  readonly>
+                                    <!-- <select name="JenisStok" id="JenisStok" class="form-control">
                                                             <option value="">-- PILIH --</option>
                                                             <option value="STOK">STOK</option>
                                                             <option value="NON STOK">NON STOK</option>
-                                                        </select>
+                                                        </select> -->
                                     </div>
                                 </div>
                                 <div class="form-group gut">

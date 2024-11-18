@@ -84,8 +84,16 @@ class  B_EMR_Model
             $namauserx = $session->name;
             // var_dump($data, 'ddddd');
             $noregistrasi = $data['NoRegistrasi'];
-            $this->db->query("SELECT a.ID, a.NoMR, b.PatientName, replace(CONVERT(VARCHAR(11), b.Date_of_birth, 111), '/','-') as Date_of_birth, b.[Mobile Phone] AS No_Phone, 
-                        b.Nik, b.Ocupation, b.Address, b.Religion, b.Gander, a.NoRegistrasi, replace(CONVERT(VARCHAR(11), a.TglKunjungan, 111), '/','-') as TglKunjungan,
+            // CEK DIAGNOSA UTAMA
+            $this->db->query("SELECT B.DESCRIPTION FROM MasterdataSQL.DBO.ICDX_Transactions A
+                            INNER JOIN MasterdataSQL.DBO.ICDX B
+                            ON A.id_icd = B.ID 
+                            WHERE A.header='1' AND A.NoRegistrasi= :noregx");
+            $this->db->bind('noregx', $noregistrasi);
+            $keyDIAGNOSA =  $this->db->single();
+
+            $this->db->query("SELECT a.ID, a.NoMR, b.PatientName,b.Tipe_Idcard, replace(CONVERT(VARCHAR(11), b.Date_of_birth, 111), '/','-') as Date_of_birth, b.[Mobile Phone] AS No_Phone, 
+                        b.ID_Card_number as Nik, b.Ocupation, b.Address, b.Religion, b.Gander, a.NoRegistrasi, replace(CONVERT(VARCHAR(11), a.TglKunjungan, 111), '/','-') as TglKunjungan,
                         a.NoEpisode, c.First_Name, d.NamaUnit, d.ID AS IDUNIT,a.Doctor_1 as idDokter,
                         a.PatientType,
                         datediff(month, b.Date_of_birth, getdate()) /12 TAHUN, datediff(month, b.Date_of_birth, getdate()) %12 BULAN ,
@@ -111,6 +119,7 @@ class  B_EMR_Model
             $pasing['Date_of_birth'] = $key['Date_of_birth'];
             $pasing['No_Phone'] = $key['No_Phone'];
             $pasing['Nik'] = $key['Nik'];
+            $pasing['Tipe_Idcard'] = $key['Tipe_Idcard'];
             $pasing['Pekerjaan'] = $key['Ocupation'];
             $pasing['Address'] = $key['Address'];
             $pasing['Religion'] = $key['Religion'];
@@ -122,13 +131,14 @@ class  B_EMR_Model
             $pasing['idDokter'] = $key['idDokter'];
             $pasing['NamaUnit'] = $key['NamaUnit'];
             $pasing['IDUNIT'] = $key['IDUNIT'];
+         
             $pasing['IdUser'] = $userid;
             $pasing['IdEmploye'] = $idemployee;
             $pasing['NamaUser'] = $namauserx;
 
             $pasing['as_year'] = $key['TAHUN'] . ' ' . 'Tahun' . ' ' . $key['BULAN'] . ' ' . 'Bulan';
 
-
+            $pasing['diagnosautama'] = $keyDIAGNOSA['DESCRIPTION'];
 
             $callback = array(
                 'message' => "success", // Set array nama 
@@ -2443,14 +2453,19 @@ Influenza = :checkbox_emr_influenza10b
             $this->db->bind('noreg1', $noregistrasi);
             $key =  $this->db->single();
             $pasing['ID'] = $key['ID'];
+            // $pasing['Tanggal_Istirahat'] = date('d-m-Y', strtotime($key['Tanggal_Istirahat']));
             $pasing['Tanggal_Istirahat'] = $key['Tanggal_Istirahat'];
             $pasing['Diagnosa'] = $key['Diagnosa'];
-            $pasing['Tanggal_Kontrol'] = $key['Tanggal_Kontrol'];
-            $pasing['Tanggal_Sekarang'] = $key['Tanggal_Sekarang'];
+            $pasing['Tanggal_Kontrol'] =  $key['Tanggal_Kontrol'];
+            $pasing['Tanggal_Sekarang'] =  $key['Tanggal_Sekarang'];
+            // $pasing['Tanggal_Kontrol'] =  date('d-m-Y', strtotime($key['Tanggal_Kontrol']));
+            // $pasing['Tanggal_Sekarang'] =  date('d-m-Y', strtotime($key['Tanggal_Sekarang']));
             $pasing['Dokter'] = $key['Dokter'];
             $pasing['No_RM'] = $key['No_RM'];
             $pasing['No_Registrasi'] = $key['No_Registrasi'];
             $pasing['User_Input'] = $key['User_Input'];
+            $pasing['NoSurat'] = $key['NoSurat'];
+            $pasing['totalhariistrahat'] = date_diff(date_create($key['Tanggal_Istirahat']),date_create($key['Tanggal_Kontrol']))->d;
 
             $callback = array(
                 'message' => "success", // Set array nama 
@@ -2461,7 +2476,103 @@ Influenza = :checkbox_emr_influenza10b
             die($e->getMessage());
         }
     }
+    public function getSuratKeteranganSehat($data)
+    {
+        try {
+            $noregistrasi = $data['NoRegistrasi'];
+            $this->db->query("SELECT * FROM EMR.dbo.OutpatientSuratKeteranganSehat WHERE No_Registrasi = :noreg1");
+            $this->db->bind('noreg1', $noregistrasi);
+            $key =  $this->db->single();
+            $pasing['ID'] = $key['ID'];
+            $pasing['Dokter'] = $key['Dokter'];
+            $pasing['No_RM'] = $key['No_RM'];
+            $pasing['No_Registrasi'] = $key['No_Registrasi'];
+            $pasing['Usia'] = $key['Usia'];
+            $pasing['Tanggal_Lahir'] = $key['Tanggal_Lahir']; 
+            $pasing['Pekerjaan'] = $key['Pekerjaan']; 
+            $pasing['Alamat'] = $key['Alamat']; 
+            $pasing['Tinggi_badan'] = $key['Tinggi_badan']; 
+            $pasing['Berat_Badan'] = $key['Berat_Badan']; 
+            $pasing['Tekanan_Darah'] = $key['Tekanan_Darah']; 
+            $pasing['Visus'] = $key['Visus']; 
+            $pasing['Pendengaran'] = $key['Pendengaran']; 
+            $pasing['HasilLaboratorium'] = $key['HasilLaboratorium']; 
+            $pasing['Keperluan'] = $key['Keperluan']; 
+            $pasing['Tanggal_Sekarang'] =     date('d-m-Y', strtotime($key['Tanggal_Sekarang']));
+            $pasing['ButaWarna'] = $key['ButaWarna'];  
+            $pasing['NoSurat'] = $key['NoSurat'];  
 
+            $callback = array(
+                'message' => "success", // Set array nama 
+                'data' => $pasing
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+    public function getSuratKeteranganMata($data)
+    {
+        try {
+            $noregistrasi = $data['NoRegistrasi'];
+            $this->db->query("SELECT * FROM EMR.dbo.OutputSuratKeteranganMata WHERE No_Registrasi = :noreg1");
+            $this->db->bind('noreg1', $noregistrasi);
+            $key =  $this->db->single();
+                
+
+            $callback = array(
+                'message' => "success", // Set array nama 
+                'data' => $key
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+    public function getResepKacamata($data)
+    {
+        try {
+            $noregistrasi = $data['NoRegistrasi'];
+           
+            $this->db->query("SELECT * FROM EMR.dbo.MR_ResepKacamata WHERE NoRegistrasi = :noreg1");
+            $this->db->bind('noreg1', $noregistrasi);
+         
+            $key =  $this->db->single(); 
+            $pasing['ID'] = $key['id']; 
+            $pasing['tgl_resep'] =  $key['tgl_resep'];
+            $pasing['Dokter_name'] = $key['Dokter_name'];
+            $pasing['NoRegistrasi'] = $key['NoRegistrasi'];
+            $pasing['NoMR'] = $key['NoMR'];
+            $pasing['NamaPasien'] = $key['NamaPasien'];
+            $pasing['Umur'] = $key['Umur'];
+            $pasing['Tanggal_Lahir'] = $key['Tanggal_Lahir'];
+            $pasing['Pekerjaan'] = $key['Pekerjaan'];
+            $pasing['Alamat'] = $key['Alamat'];
+            $pasing['ket_resep_dekat_jauh'] = $key['ket_resep_dekat_jauh'];
+            $pasing['OD_Sferis'] = $key['OD_Sferis'];
+            $pasing['OD_Cilinder'] = $key['OD_Cilinder'];
+            $pasing['OD_Axis'] = $key['OD_Axis'];
+            $pasing['OD_Prisma'] = $key['OD_Prisma'];
+            $pasing['OS_Sferis'] = $key['OS_Sferis'];
+            $pasing['OS_Cilinder'] = $key['OS_Cilinder'];
+            $pasing['OS_Axis'] = $key['OS_Axis'];
+            $pasing['OS_Prisma'] = $key['OS_Prisma'];
+            $pasing['Addisi'] = $key['Addisi'];
+            $pasing['PupilDistance_1'] = $key['PupilDistance_1'];
+            $pasing['PupilDistance_2'] = $key['PupilDistance_2'];
+            $pasing['Kryptok'] = $key['Kryptok'];
+            $pasing['Flattop'] = $key['Flattop'];
+            $pasing['Progressive'] = $key['Progressive']; 
+
+            $callback = array(
+                'message' => "success . ", // Set array nama 
+                'data' => $pasing
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
     //FORM EDUKASI
     public function setFormEdukasi($data)
     {

@@ -184,7 +184,7 @@ class  B_InformationInfoLedger_Model
                         inner join Keuangan.dbo.TA_JURNAL_HDR b
                         on a.FS_KD_JURNAL= b.FS_KD_JURNAL
                         where substring(replace(CONVERT(VARCHAR(11),  b.FD_TGL_JURNAL, 111), '/','-'),1,7) =:Periodeawal
-                        and  B.FS_KD_PETUGAS_VOID = ''
+                        and  B.FS_KD_PETUGAS_VOID = '' and b. b.FD_TGL_VOID='3000-01-01 00:00:00.000'
                         group by a.FS_REK");
             $this->db->bind('Periodeawal', $PeriodeAwal); 
             $this->db->execute();

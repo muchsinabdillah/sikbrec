@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(".preloader").fadeOut();
+    //$(".preloader").fadeOut();
     convertNumberToRp();
     asyncShowMain();
     $('#btnNewPurchase').click(function () {
@@ -107,32 +107,56 @@ $(document).ready(function () {
         AddRow();
     });
 
-    $(document).on('click', '.remove_details_closing', function () {
-        var row_id = $(this).attr("id");
-        console.log(row_id);
-        swal({
-            title: "Are you sure?",
-            text: "Apakah anda yakin Ingin hapus data ini ?",
-            icon: "warning",
-            buttons: true,
-            dangerMode: true,
-          })
-          .then((willDelete) => {
-            if (willDelete) {
-                $('#row_closing_' + row_id + '').remove();
+    // $(document).on('click', '.remove_details_closing', function () {
+    //     var row_id = $(this).attr("id");
+    //     console.log(row_id);
+    //     swal({
+    //         title: "Are you sure?",
+    //         text: "Apakah anda yakin Ingin hapus data ini ?",
+    //         icon: "warning",
+    //         buttons: true,
+    //         dangerMode: true,
+    //       })
+    //       .then((willDelete) => {
+    //         if (willDelete) {
+    //             $('#row_closing_' + row_id + '').remove();
             
-                var count = $('#totalrow_closing').val();
-                //console.log(count);
-                count = count - 1 ;
-                document.getElementById('grantotalOrder_closing').innerHTML = count;
-                $('#totalrow_closing').val(count);
-                toast('Berhasil Hapus !', "success")
-                CalculateALL()
-            } else {
-              //swal("Your imaginary file is safe!");
-            }
-          });
+    //             var count = $('#totalrow_closing').val();
+    //             //console.log(count);
+    //             count = count - 1 ;
+    //             document.getElementById('grantotalOrder_closing').innerHTML = count;
+    //             $('#totalrow_closing').val(count);
+    //             toast('Berhasil Hapus !', "success")
+    //             CalculateALL()
+    //         } else {
+    //           //swal("Your imaginary file is safe!");
+    //         }
+    //       });
     
+    //     });
+
+        $(document).on('click', '.remove_details_closing', function () {
+            swal({
+                title: "Are you sure?",
+                text: "Apakah anda yakin Ingin hapus data ini ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+              })
+              .then((willDelete) => {
+                if (willDelete) {
+                    //$('#row_' + row_id + '').remove();
+                    $(this).closest("tr").remove();
+                    var count = $('#totalrow_closing').val();
+                    count = count - 1 ;
+                    //document.getElementById('grantotalOrder').innerHTML = count;
+                    $('#totalrow_closing').val(count);
+                    toast('Berhasil Hapus !', "success")
+                    CalculateALL();
+                } else {
+                  //swal("Your imaginary file is safe!");
+                }
+              });
         });
 
         $('#btnSave').click(function () {
@@ -241,6 +265,8 @@ function AddRow(){
     satuan_konversi_ = $('#Satuan_Konversi').val();
     satuan_qty_ = $('#Konversi_satuan').val();
     hpp_barang_ = $("#hpp_add").val();
+    BatchAdd = $("#BatchAdd").val();
+    ExpiredDateAdd = $("#ExpiredDateAdd").val();
     if(qty_stok_barang_ > qty_barang_){
         qty_adj_barang_ = qty_barang_-qty_stok_barang_;
     }else if(qty_stok_barang_ < qty_barang_){
@@ -251,9 +277,9 @@ function AddRow(){
     xqty_barang_ = qty_barang_;
     total_barang_ = qty_adj_barang_*hpp_barang_;
     var totalitem = $("#totalrow_closing").val();
-    console.log(totalitem);
+    //console.log(totalitem);
     for (i = 1; i <= totalitem; i++) { 
-        if (kode_barang == $("#kode_barang"+i).val() ){
+        if (kode_barang == $("#kode_barang"+$('#tbl_aktif tr').eq(i).attr('id')).val() ){
             swal({
                 title: "Warning",
                 text: nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
@@ -266,26 +292,29 @@ function AddRow(){
 
       if($('#totalrow_closing').val()==0){
         var count =0;
+        var countid =0;
       }else{
         var count = parseFloat($('#totalrow_closing').val());
+        var countid = parseFloat($('#tbl_aktif >tbody >tr:last').attr('id'));
       }
       count = count + 1;
+      countid = countid + 1;
       document.getElementById('grantotalOrder_closing').innerHTML = count;
       $('#totalrow_closing').val(count);
 
-        var newRow = $("<tr id='row_'" + count + "'>");
-            //*1*/  newRow.html("<td><font size='1'>" + count + "</td>'"+
-            /*2*/ newRow.html("'<td>" + kode_barang +"<input type='hidden' name='kode_barang[]' id='kode_barang" + count + "' class='kode_barang'"+count + "' value='" + kode_barang +"' ></font></td> '"+
-            /*3*/"'<td><font size='1'>" + nama_barang_ + "<input type='hidden'  name='nama_barang_[]' id='nama_barang_" + count + "' value='" + nama_barang_ +"' ></font></td>'"+
-            /*4*/"' <td>" + satuan_barang_ + "<input type='hidden' name='satuan_barang_[]' id='satuan_barang_" + count +"' value='" + satuan_barang_ +"' ></td> '"+
-            /*6*/"' <td>"+ number_to_price(qty_stok_barang_)+"<input  size='2'  type='hidden'  name='qty_stok_barang_[]' id='qty_stok_barang_" + count + "' value='" + qty_stok_barang_ +"' ></td> '"+
-             /*7*/"' <td>"+ qty_adj_barang_+"<input size='1'  value='" + xqty_adj_barang_ + "' type='hidden' name='qty_adj_barang_[]'   id='qty_adj_barang_" + count +"' ></td>'"+
-             /*7*/"'<td>"+ number_to_price(qty_barang_) +"<input size='1'  value='" + xqty_barang_ + "' type='hidden' name='qty_barang_[]'   id='qty_barang_" + count +"' ></td>'"+
-            /*8*/"' <td>"+ number_to_price(hpp_barang_) +"<input size='5' readonly  type='hidden' name='hpp_barang_[]'   id='hpp_barang_" + count + "' class='harga'  value='" + hpp_barang_ + "' ></td> '"+
-            /*9*/"' <td>" + number_to_price(total_barang_) + "<input size='1' readonly value='" + total_barang_ + "' type='hidden' name='total_barang_[]'   id='total_barang_" + count +"' >"+
-               /*9*/"' <td><input size='1'   value='' type='text' name='batch_number_[]'   id='batch_number_" + count +"' >"+
-            /*9*/"' <td><input size='1'   value='' type='date' name='expired_[]'   id='expired_" + count +"' >"+
-            /*10*/"<td> <button type='button'   name='remove_details_closing' class='btn btn-warning btn-xs remove_details_closing' id='" + count + "' >Delete</Hapus> " +
+        var newRow = $("<tr id='" + countid + "'>");
+            //*1*/  newRow.html("<td><font size='1'>" + countid + "</td>'"+
+            /*2*/ newRow.html("'<td>" + kode_barang +"<input type='hidden' name='kode_barang[]' id='kode_barang" + countid + "' class='kode_barang'"+countid + "' value='" + kode_barang +"' ></font></td> '"+
+            /*3*/"'<td><font size='1'>" + nama_barang_ + "<input type='hidden'  name='nama_barang_[]' id='nama_barang_" + countid + "' value='" + nama_barang_ +"' ></font></td>'"+
+            /*4*/"' <td>" + satuan_barang_ + "<input type='hidden' name='satuan_barang_[]' id='satuan_barang_" + countid +"' value='" + satuan_barang_ +"' ></td> '"+
+            /*6*/"' <td>"+ number_to_price(qty_stok_barang_)+"<input  size='2'  type='hidden'  name='qty_stok_barang_[]' id='qty_stok_barang_" + countid + "' value='" + qty_stok_barang_ +"' ></td> '"+
+             /*7*/"' <td>"+ qty_adj_barang_+"<input size='1'  value='" + xqty_adj_barang_ + "' type='hidden' name='qty_adj_barang_[]'   id='qty_adj_barang_" + countid +"' ></td>'"+
+             /*7*/"'<td>"+ number_to_price(qty_barang_) +"<input size='1'  value='" + xqty_barang_ + "' type='hidden' name='qty_barang_[]'   id='qty_barang_" + countid +"' ></td>'"+
+            /*8*/"' <td>"+ number_to_price(hpp_barang_) +"<input size='5' readonly  type='hidden' name='hpp_barang_[]'   id='hpp_barang_" + countid + "' class='harga'  value='" + hpp_barang_ + "' ></td> "+
+            /*9*/"' <td>" + number_to_price(total_barang_) + "<input size='1' readonly value='" + total_barang_ + "' type='hidden' name='total_barang_[]'   id='total_barang_" + countid +"' ></td>"+
+               /*9*/"' <td><input size='1'   value='"+BatchAdd+"' type='text' name='batch_number_[]'   id='batch_number_" + countid +"' ></td>"+
+            /*9*/"' <td><input size='1'   value='"+ExpiredDateAdd+"' type='date' name='expired_[]'   id='expired_" + countid +"' ></td>"+
+            /*10*/"<td> <button type='button'   name='remove_details_closing' class='btn btn-warning btn-xs remove_details_closing' id='" + countid + "' >Delete</Hapus> " +
                 "</td>  </tr>")
                 ;
 
@@ -300,6 +329,8 @@ function AddRow(){
         $("#QtyAdj").val('');
         $("#hpp_add").val('');
         $("#nama_Barang").val('');
+        $("#BatchAdd").val('');
+        $("#ExpiredDateAdd").val('');
         $("#nama_Barang").focus();
         //$("#nama_Barang").empty();
         //$("#nama_Barang").select2('open');
@@ -314,15 +345,16 @@ function CalculateALL() {
     var totalitem = $("#totalrow_closing").val()
 
     for (i = 1; i <= totalitem; i++) {
+        var idx = $('#tbl_aktif tr').eq(i).attr('id');
 
-        itemID = document.getElementById("qty_barang_" + i);
-        var qty = $("#qty_barang_" + i).val(); 
-        var persediaan = $("#total_barang_" + i).val(); 
+        itemID = document.getElementById("qty_barang_" + idx);
+        var qty = $("#qty_barang_" + idx).val(); 
+        var persediaan = $("#total_barang_" + idx).val(); 
 
         
         //console.log(total_items);
-        //var Hpp = $("#hidden_hpp_barang_" + i).val();
-       // var Subtotal = $("#hidden_total_barang_" + i).val();
+        //var Hpp = $("#hidden_hpp_barang_" + idx).val();
+       // var Subtotal = $("#hidden_total_barang_" + idx).val();
 
             //var subtotalx = qty * parseFloat(Hpp);
             
@@ -333,11 +365,11 @@ function CalculateALL() {
             // var totalsubtotal = totalsubtotal + subtotalx;
             
 
+    }
     //FOOTER
     $("#ttl_qtyAkhir").val(number_to_price(totalqty)); 
-    $("#grandtotalxl").val(number_to_price(persediaan)); 
-    $("#TotalRows").val(number_to_price(i)); 
-    }
+    $("#grandtotalxl").val(number_to_price(totalhpp)); 
+    $("#TotalRows").val(number_to_price(totalitem)); 
     
 
 }
@@ -395,6 +427,10 @@ function updateUIdataGocreateHdr(dataResponse) {
     $("#btnNewPurchase").attr('disabled', true);
     enableAll();
     toast(dataResponse.message,'success')
+    
+    // $("#TglTransaksi").attr('readonly', true);
+    // $("#Notes").attr('readonly', true);
+    $("#Unit_Select").attr('disabled', true);
     }else{
         toast(dataResponse.message,'error')
     }
@@ -441,13 +477,13 @@ async function asyncShowMain() {
         updateUIdataGetLayanan(dataGetLayanan);
         var id = $("#No_Transaksi").val();
         //disableAll();
-        // if (id != ""){
-        //     const data = await getDatabyID();  
-        //     updateUIgetDatabyID(data);
-        //     //showDataDetil();
-        //     enableAll() ;
-        //     $("#btnNewPurchase").attr('disabled', true);
-        // }
+        if (id != ""){
+            const data = await getDatabyID();  
+            updateUIgetDatabyID(data);
+        }else{
+            disableAll();
+        }
+        $(".preloader").fadeOut();
        
     } catch (err) {
         toast(err, "error")
@@ -466,10 +502,10 @@ function updateUIdataGetLayanan(updateUIdataGetLayanan) {
     let responseApi = updateUIdataGetLayanan;
     if (responseApi !== null && responseApi !== undefined) {
         var newRow = '<option value="">-- PILIH --</option';
-        $("#Unit").append(newRow);
+        $("#Unit_Select").append(newRow);
         for (i = 0; i < responseApi.length; i++) {
             var newRow = '<option value="' + responseApi[i].ID + '">' + responseApi[i].NamaUnit + '</option>';
-            $("#Unit").append(newRow);
+            $("#Unit_Select").append(newRow);
         }
     }
 }
@@ -500,7 +536,7 @@ function GetLayanan() {
             return response
         })
         .finally(() => {
-            $("#Unit").select2();
+            $("#Unit_Select").select2();
         })
 }
 function disableAll() { 
@@ -535,4 +571,106 @@ function toast(data, status) {
         "hideMethod": "fadeOut"
     }
     toastr[status](data);
+}
+
+function updateUIgetDatabyID(dataResponse) {
+    var tgltrs = dataResponse[0].TransactionDate;
+    var d = new Date(tgltrs);
+    d = new Date(d.getTime() - d.getTimezoneOffset()*60000);
+    $('#TglTransaksi').val(d.toISOString().substring(0,d.toISOString().length-1));
+    $("#Unit_Select").val(dataResponse[0].UnitCode).trigger('change');
+    $("#Notes").val(dataResponse[0].Notes);
+
+    // $("#btnSave").attr('disabled', true)
+    // $("#btnAdd").attr('disabled', true);
+    // $("#nama_Barang").attr('disabled', true);
+    disableAll();
+    $("#btnNewPurchase").attr('disabled', true);
+    $("#TglTransaksi").attr('readonly', true);
+    $("#Notes").attr('readonly', true);
+    $("#Unit_Select").attr('disabled', true);
+    
+    showDataDetil_View(dataResponse[0].TransactionCode);
+}
+function getDatabyID() {
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/aAdjusment/getAdjusmentbyID/';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'TransasctionCode=' + $("#No_Transaksi").val()
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            //$(".preloader").fadeOut();
+        })
+}
+
+function showDataDetil_View(TransasctionCode) {
+    var TransasctionCode = $("#No_Transaksi").val()
+    total_items = 0;
+    var dataHandler = $("#user_data");
+    //dataHandler.html("");
+
+     //var TransasctionCode = "TCS050220230004"; 
+    var base_url = window.location.origin;
+    var url2 = "/SIKBREC/public/aAdjusment/getAdjusmentDetailbyID/";
+
+    $.ajax({
+        type: "POST",
+        data: "TransasctionCode=" + TransasctionCode,
+        url: base_url + url2,
+        success: function (result) {
+            var resultObj = JSON.parse(result);
+            $.each(resultObj, function (key, val) {
+                console.log();
+                total_items = total_items + 1;
+                //$("#totalrow").val(total_items);
+                // document.getElementById('totalrow').innerHTML = total_items;
+                var newRow = `<tr id='${total_items}'>
+                <td>${val.ProductCode }<input type='hidden' name='kode_barang[]' id='kode_barang${total_items }'  value='${val.ProductCode  }' ></font></td> 
+            <td><font size='1'>${val.ProductName }<input type='hidden'  name='nama_barang_[]' id='nama_barang_${total_items }' value='${val.ProductName }' ></font></td>
+             <td>${val.Satuan }<input type='hidden' name='satuan_barang_[]' id='satuan_barang_${total_items }' value='${val.Satuan }' ></td> 
+             <td>${number_to_price(val.QtyStok)}<input  size='2'  type='hidden'  name='qty_stok_barang_[]' id='qty_stok_barang_${total_items }' value='${val.QtyStok }' ></td> 
+              <td>${val.QtyAdjusment}<input size='1'  value='${val.QtyAdjusment }' type='hidden' name='qty_adj_barang_[]'   id='qty_adj_barang_${total_items }' ></td>
+             <td>${number_to_price(val.QtyAkhir) }<input size='1'  value='${val.QtyAkhir }' type='hidden' name='qty_barang_[]'   id='qty_barang_${total_items }' ></td>
+             <td>${number_to_price(val.Hpp) }<input size='5' readonly  type='hidden' name='hpp_barang_[]'   id='hpp_barang_${total_items }' class='harga'  value='${val.Hpp }' ></td> 
+             <td>${number_to_price(val.Total) }<input size='1' readonly value='${val.Total }' type='hidden' name='total_barang_[]'   id='total_barang_${total_items }' ></td> 
+                <td><input size='1'   value='' type='text' name='batch_number_[]'   id='batch_number_${total_items }' ></td> 
+             <td><input size='1'   value='' type='date' name='expired_[]'   id='expired_${total_items }' ></td> 
+            <td> <button type='button' disabled  name='remove_details_closing' class='btn btn-warning btn-xs remove_details_closing' id='${total_items }' >Delete</Hapus></td>  
+            </tr>)`
+                ;
+
+
+                dataHandler.append(newRow);
+            });
+            $("#totalrow_closing").val(total_items);
+            CalculateALL();
+
+        }
+    });
+
+    $(".preloader").fadeOut();
+}
+
+function getIDUnit(e){
+    $("#Unit").val(e.value);
 }

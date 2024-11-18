@@ -13,13 +13,14 @@ function showdatatabel() {
     }).fnDestroy();
     $('#example').DataTable({
         "ordering": true,
+        "order": ['2','desc'],
         "ajax": {
             "url": base_url + "/SIKBREC/public/ReturJual/getReturJualbyDateUser",
             "dataSrc": "",
             "deferRender": true,
         },
         "columns": [
-            {
+             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
                     var html = '<font size="1"> ' + row.TransactionCode + ' </font>  ';
@@ -27,12 +28,12 @@ function showdatatabel() {
                 }
             },
             {
-                "render": function (data, type, row) { // Tampilkan kolom aksi
-                    var html = ""
-                    var html = '<font size="1"> ' + row.SalesCode + ' </font>  ';
-                    return html
-                }
-            }, 
+               "render": function (data, type, row) { // Tampilkan kolom aksi
+                   var html = ""
+                   var html = '<font size="1"> ' + row.SalesCode + ' </font>  ';
+                   return html
+               }
+           },
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
@@ -43,14 +44,38 @@ function showdatatabel() {
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
-                    var html = '<font size="1"> ' + row.NamaUnitOrder + ' </font>  ';
+                    var html = '<font size="1"> ' + row.NoRegistrasi + ' </font>  ';
                     return html
                 }
             }, 
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
-                    var html = '<font size="1"> ' + row.NoResep + ' </font>  ';
+                    var html = '<font size="1"> ' + row.NoMR + ' </font>  ';
+                    return html
+                }
+            }, 
+            
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.NamaPembeli + ' </font>  ';
+                    return html
+                }
+            }, 
+            
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var JenisPasien = 'Rawat Jalan'
+                    var html = '<font size="1"> ' + JenisPasien +'</font>  ';
+                    return html
+                }
+            }, 
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.NamaUnitOrder + ' </font>  ';
                     return html
                 }
             }, 

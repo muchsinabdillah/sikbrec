@@ -844,13 +844,21 @@ function calculateAllDetail(){
             
         if (konversiqty > 1){
             var konversiqty_total = konversiqty * qty;
-            discrp = ((parseFloat(disconprosen) * parseFloat(harga)) / 100) / konversiqty_total; 
-            subtotal = (parseFloat(harga)/konversiqty_total - discrp) * konversiqty_total;
+            // discrp = ((parseFloat(disconprosen) * parseFloat(harga)) / 100) / konversiqty_total; 
+            discrp = ((parseFloat(disconprosen) * parseFloat(harga)) / 100); 
+            // subtotal = (parseFloat(harga)/konversiqty_total - discrp) * konversiqty_total;
+            subtotal = ((parseFloat(harga) - discrp) * qty);
             console.log(subtotal,i);
             hargamindiskonTok = (parseFloat(harga) - discrp);
-            totaldiskonrp = discrp*(qty*konversiqty_total);
-            taxrp_stn = (parseFloat(harga)/konversiqty_total-discrp)*parseFloat(taxprosen)/100;
-            taxrp = taxrp_stn * konversiqty_total;
+            // totaldiskonrp = discrp*konversiqty_total;
+            totaldiskonrp = discrp*qty;
+            // taxrp_stn = (parseFloat(harga)/konversiqty_total-discrp)*parseFloat(taxprosen)/100;
+            taxrp_stn = (parseFloat(harga)-discrp) * parseFloat(taxprosen) /100;
+            console.log("xx" , "harga : " + harga + " discrp : " + discrp + " taxprosen : " + taxprosen  
+                + " taxprosens : " + (parseFloat(harga)-discrp)  
+                + " taxprosens : " + ((parseFloat(harga)-discrp)  * parseFloat(taxprosen) )
+                + " taxprosen : " + taxrp_stn );
+            taxrp = taxrp_stn * qty;
         }else{
             var konversiqty_total = 1;
             discrp = (parseFloat(disconprosen) * parseFloat(harga)) / 100; 

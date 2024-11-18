@@ -4,7 +4,8 @@ date_default_timezone_set('Asia/Jakarta');
 $datenowcreate = date("Y-m-d");
 $datetimenow = date("Y-m-d\TH:i:s");
 ?>
-<link type="text/css" href="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css" rel="stylesheet" />
+<link type="text/css" href="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
+    rel="stylesheet" />
 <style>
     table {
         border: 2px solid #6C6A61;
@@ -124,12 +125,14 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                 <label for=" inputEmail3" class="col-sm-2 control-label"> Periode
                                                 </label>
                                                 <div class="col-sm-2">
-                                                    <input type="date" name="PeriodeAwal" id="PeriodeAwal" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px;width: 300px;">
+                                                    <input type="date" name="PeriodeAwal" id="PeriodeAwal"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px;width: 300px;">
                                                 </div>
                                                 <label for=" inputEmail3" class="col-sm-2 control-label"> Sd/
                                                 </label>
                                                 <div class="col-sm-2">
-                                                    <input type="date" name="PeriodeAkhir" id="PeriodeAkhir" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
+                                                    <input type="date" name="PeriodeAkhir" id="PeriodeAkhir"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                                 </div>
 
                                             </div>
@@ -137,14 +140,19 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                             <div class="form-group gut">
                                                 <label for="inputEmail3" class="col-sm-2 control-label"> Kasir</label>
                                                 <div class="col-sm-3">
-                                                    <select class="form-control js-example-basic-single" id="kasir" name="kasir" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
+                                                    <select class="form-control js-example-basic-single" id="kasir"
+                                                        name="kasir"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                                         <option value="">-- Pilih Nama Kasir --</option>
 
                                                     </select>
                                                 </div>
-                                                <label for="inputEmail3" class="col-sm-1 control-label"> Jenis Pasien</label>
+                                                <label for="inputEmail3" class="col-sm-1 control-label"> Jenis
+                                                    Pasien</label>
                                                 <div class="col-sm-3">
-                                                    <select class="form-control js-example-basic-single" id="jenispasien" name="jenispasien" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
+                                                    <select class="form-control js-example-basic-single"
+                                                        id="jenispasien" name="jenispasien"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                                         <option value=""></option>
                                                         <option VALUE="1">IGD</option>
                                                         <option VALUE="4">Poliklinik</option>
@@ -157,16 +165,23 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                             </div>
 
                                             <div class="form-group gut">
-                                                <label for="inputEmail3" class="col-sm-2 control-label"> Jenis Pembayaran</label>
+                                                <label for="inputEmail3" class="col-sm-2 control-label"> Jenis
+                                                    Pembayaran</label>
                                                 <div class="col-sm-2">
-                                                    <select class="form-control js-example-basic-single" id="tipepembayaran" name="tipepembayaran" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
+                                                    <select class="form-control js-example-basic-single"
+                                                        id="tipepembayaran" name="tipepembayaran"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                                         <option value="">-- Pilih Tipe Pembayaran --</option>
 
                                                     </select>
                                                 </div>
-                                                <label for="inputEmail3" class="col-sm-2 control-label"> Tipe Info</label>
+                                                <label for="inputEmail3" class="col-sm-2 control-label"> Tipe
+                                                    Info</label>
                                                 <div class="col-sm-3">
-                                                    <select class="form-control js-example-basic-single" id="tipeinfo" name="tipeinfo" style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;" onchange="clearVal(this.value)">
+                                                    <select class="form-control js-example-basic-single" id="tipeinfo"
+                                                        name="tipeinfo"
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;"
+                                                        onchange="clearVal(this.value)">
                                                         <option value=""></option>
                                                         <option VALUE="1">Informasi Detail</option>
                                                         <option VALUE="2">Informasi Detail per Tipe Pembayaran</option>
@@ -174,7 +189,19 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                     </select>
                                                 </div>
                                             </div>
-                                            <a type="button" class="btn btn-success btn-animated btn-wide" id="btn_infokasir" name="btn_infokasir"><span class="visible-content">Load</span><span class="hidden-content"><i class="fa fa-gear"></i></span></a>
+                                            <div class="form-group gut">
+                                                <label for="inputEmail3" class="col-sm-10 control-label"> </label>
+                                                <div class="col-sm-2">
+                                                    <a type="button" class="btn btn-success btn-animated btn-wide"
+                                                        id="btn_infokasir" name="btn_infokasir"><span
+                                                            class="visible-content">Load</span><span
+                                                            class="hidden-content"><i class="fa fa-gear"></i></span></a>
+                                                    <a type="button" class="btn btn-success btn-animated btn-wide"
+                                                        id="btn_infokasir_pdf" name="btn_infokasir_pdf"><span
+                                                            class="visible-content">PDF</span><span
+                                                            class="hidden-content"><i class="fa fa-gear"></i></span></a>
+                                                </div>
+                                            </div>
 
                                             <div class="panel-body">
                                                 <div class="demo-table" style="overflow-x:auto;">
@@ -204,7 +231,9 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                         </tbody>
                                                     </table>
                                                     <!-- Data table 2-->
-                                                    <table id="datatable2" class="display" width="100%" style="display: none">
+                                                    <!-- 25/08/2024 -->
+                                                    <table id="datatable2" class="display" width="100%"
+                                                        style="display: none">
                                                         <thead>
                                                             <tr>
                                                                 <th align='center'>No Transaksi</th>
@@ -222,11 +251,15 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                                 <th align='center'>Cash</th>
                                                                 <th align='center'>Debit</th>
                                                                 <th align='center'>Kredit</th>
+                                                                <th align='center'>Piutang</th>
+                                                                <th align='center'>Qris</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                         </tbody>
                                                     </table>
+                                                    <!-- 25/08/2024 -->
+
                                                 </div>
                                             </div>
 
@@ -263,7 +296,8 @@ $datetimenow = date("Y-m-d\TH:i:s");
                 <!-- /.col-md-12 -->
 
                 <div class="text-center mt-20">
-                    <button type="button" class="btn btn-success btn-labeled">Purchase Now<span class="btn-label btn-label-right"><i class="fa fa-check"></i></span></button>
+                    <button type="button" class="btn btn-success btn-labeled">Purchase Now<span
+                            class="btn-label btn-label-right"><i class="fa fa-check"></i></span></button>
                 </div>
                 <!-- /.text-center -->
             </div>

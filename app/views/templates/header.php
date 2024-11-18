@@ -974,15 +974,30 @@
                                 <li class="has-children">
                                     <a href="#"><i class="fa fa-bars"></i> <span>Penjualan</span> <i
                                             class="fa fa-angle-right arrow"></i></a>
-                                    <ul class="child-nav">
-                                        <li><a href="<?= BASEURL; ?>/aPenjualanDenganResep/list"><i
+                                            <ul class="child-nav">
+                                        <li><a href="<?= BASEURL; ?>/aPenjualanDenganResep/listRJ"><i
                                                     class="fa fa-bar-chart"></i>
-                                                <span>Dengan Resep Dokter</span></a></li>
+                                                <span>Dengan Resep Dokter Rawat Jalan</span></a></li>
+                                    </ul>
+                                    <ul class="child-nav">
+                                        <li><a href="<?= BASEURL; ?>/aPenjualanDenganResep/listRI"><i
+                                                    class="fa fa-bar-chart"></i>
+                                                <span>Dengan Resep Dokter Rawat Inap</span></a></li>
                                     </ul>
                                     <ul class="child-nav">
                                         <li><a href="<?= BASEURL; ?>/aPenjualanTanpaResep/list"><i
                                                     class="fa fa-bar-chart"></i>
                                                 <span>Tanpa Resep Dokter</span></a></li>
+                                    </ul>
+                                    <ul class="child-nav">
+                                        <li><a href="<?= BASEURL; ?>/aTebusResep/list"><i
+                                                    class="fa fa-bar-chart"></i>
+                                                <span>Tebus Resep</span></a></li>
+                                    </ul>
+                                    <ul class="child-nav">
+                                        <li><a href="<?= BASEURL; ?>/binformasiPenjualan"><i
+                                                    class="fa fa-bar-chart"></i>
+                                                <span>Info Penjualan</span></a></li>
                                     </ul>
                                 </li>
                                 <li class="has-children">

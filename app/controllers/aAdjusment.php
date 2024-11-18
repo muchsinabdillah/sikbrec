@@ -33,6 +33,12 @@ class aAdjusment extends Controller
     public function finishAdjusment(){
         echo json_encode($this->model('I_Adjusment_Model')->finishAdjusment($_POST));
     }
+    public function getAdjusmentbyID(){
+        echo json_encode($this->model('I_Adjusment_Model')->getAdjusmentbyID($_POST));
+    }
+    public function getAdjusmentDetailbyID(){
+        echo json_encode($this->model('I_Adjusment_Model')->getAdjusmentDetailbyID($_POST));
+    }
 //     public function editSatuan(){
 //         echo json_encode($this->model('I_Masterdata_Satuan_Model')->editSatuan($_POST));
 //     }

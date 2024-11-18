@@ -119,7 +119,7 @@ class B_xBPJSBridging_PRB_Model
             }
 
             $this->db->query("SELECT a.id, a.NoEpisode,a.NoRegistrasi,d.PatientName ,a.LokasiPasien,a.CaraBayar,
-                                          a.NoMR, a.NoPesertaBPJS,a.NoSEP,a.TglSEP,a.AlasanSEPtunda,a.ApproveSEP,a.NoRujukan,
+                                           a.NoMR, h.NO_KARTU NoPesertaBPJS,a.NoSEP,a.TglSEP,a.AlasanSEPtunda,a.ApproveSEP,a.NoRujukan,
                                           a.TglRujukan,a.TglKunjungan,a.PPKRujukan, a.[Visit Date],
                                           a.PatientType,a.Unit,a.Doctor_1,b.First_Name as namadokter,a.JamPraktek,a.Perusahaan as Perusahaanid,c.NamaPerusahaan as  Perusahaan,a.[Payment Type],
                                           a.Antrian,a.NoAntrianAll,e.[First Name] as namauser,

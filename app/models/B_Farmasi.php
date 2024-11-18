@@ -566,7 +566,7 @@ class  B_Farmasi
     public function getLabelResep($data)
     {
         try { 
-            $this->db->query("SELECT * FROM [Apotik_V1.1SQL].dbo.View_LabelEtiket where DetailID=:notrs ");
+            $this->db->query("SELECT * FROM [Apotik_V1.1SQL].dbo.View_LabelEtiket2024 where DetailID=:notrs ");
             $this->db->bind('notrs', $data['notrs']);
             $data =  $this->db->single();
 
@@ -575,9 +575,9 @@ class  B_Farmasi
             $pasing['Date_of_birth'] = $data['Date_of_birth'];
             $pasing['NoResep'] = $data['NoResep'];
             $pasing['tglResep'] = $data['tglResep'];
-            $pasing['ProductName'] = $data['Product Name'];
+            $pasing['ProductName'] = $data['ProductName'];
             $pasing['QtyRealisasi'] = $data['QtyRealisasi'];
-            $pasing['UnitSatuan'] = $data['Unit Satuan'];
+            $pasing['UnitSatuan'] = $data['UnitSatuan'];
             $pasing['Composisi'] = $data['Composisi'];
             $pasing['Signa'] = $data['Signa'];
             $pasing['ED'] = $data['ED'];
@@ -663,7 +663,7 @@ class  B_Farmasi
         $tglResep = date('d/m/Y', strtotime($data['listdata1']['tglResep']));
 
         $filename = $data['listdata1']['DetailID'].".prn";
-        $handle =fopen("C:\\\\xampp\\htdocs\\esiryarsi\\public\\".$filename,"w");
+        $handle =fopen("C:\\\\xampp\\htdocs\\SIKBREC\\public\\".$filename,"w");
 
         $isi = 'SIZE 59.10 mm, 40 mm
         DIRECTION 0,0
@@ -712,7 +712,7 @@ class  B_Farmasi
         //var_dump(file_get_contents($filename));
 
         
-        $cmd = shell_exec('COPY C:\\\\xampp\\htdocs\\ESIRYARSI\\public\\'.$filename.' /B \\\\172.16.40.134\\BlueprintTDx');
+        $cmd = shell_exec('COPY C:\\\\xampp\\htdocs\\SIKBREC\\public\\'.$filename.' /B \\\\172.16.40.134\\BlueprintTDx');
         
         // echo $cmd;
         // system($cmd);
@@ -734,7 +734,7 @@ class  B_Farmasi
             $tglResep = date('d/m/Y', strtotime($data['listdata1'][0]['TglResep']));
             $printer = '\\\\'.$data['getPrinterLabel']['data'][0]['IPPrinterSharing'].'\\'.$data['getPrinterLabel']['data'][0]['NamaPrinterSharing'];
             $filename = $data['listdata1'][0]['IDDetail'].".prn";
-            $handle =fopen("C:\\\\xampp\\htdocs\\esiryarsi\\public\\".$filename,"w");
+            $handle =fopen("C:\\\\xampp\\htdocs\\SIKBREC\\public\\".$filename,"w");
     
             $isi = 'SIZE 59.10 mm, 40 mm
             DIRECTION 0,0
@@ -778,9 +778,9 @@ class  B_Farmasi
             fwrite($handle, $isi);
             fclose($handle);
     
-            $cmd = shell_exec('COPY C:\\\\xampp\\htdocs\\ESIRYARSI\\public\\'.$filename.' /B '.$printer);
+            $cmd = shell_exec('COPY C:\\\\xampp\\htdocs\\SIKBREC\\public\\'.$filename.' /B '.$printer);
     
-            //unlink($filename);
+            unlink($filename);
 
             // if ($cmd == '0 file(s) copied. '){
             //     $callback = array(
@@ -790,7 +790,7 @@ class  B_Farmasi
             // }else{
                 $callback = array(
                     'status' => 'success', 
-                    'message' => 'Cetak Berhasil !' . $cmd, 
+                    'message' => 'Cetak Berhasil !', 
                 );
             //}
             return $callback;
@@ -944,7 +944,7 @@ class  B_Farmasi
                 $method = "POST";
                 $URL = "genToken";
                 $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
-
+                
                 // 2. add Data Group Barang 
                 $method_getgroup = "POST";
                 // 2. add Data Golongan
@@ -963,6 +963,9 @@ class  B_Farmasi
                     $postData,
                     $urlAddKelompok
                 );
+                if ($addSatuan['status'] == false){
+                    return $addSatuan['message'];
+                }
                 return $addSatuan['data'];
             } catch (PDOException $e) {
                 die($e->getMessage());
@@ -1092,8 +1095,19 @@ class  B_Farmasi
 
                 
                 //CEK
-                if ($hidden_racik_[$x] <> 0 ){
-                    if ($hidden_racik_header_[$x] == 1){
+                if ($isresep == 'RESEP'){
+                    if ($hidden_racik_[$x] <> 0 ){
+                        if ($hidden_racik_header_[$x] == 1){
+                            if ($hidden_signa_terjemahan[$x] == "") {
+                                $callback = array(
+                                    'status' => 'warning',
+                                    'errorname' => 'Signa Terjemahan Nomor '.$nomor.' Masih Kosong !',
+                                );
+                                return $callback;
+                                exit;
+                            } 
+                        }
+                    }else{
                         if ($hidden_signa_terjemahan[$x] == "") {
                             $callback = array(
                                 'status' => 'warning',
@@ -1103,15 +1117,6 @@ class  B_Farmasi
                             exit;
                         } 
                     }
-                }else{
-                    if ($hidden_signa_terjemahan[$x] == "") {
-                        $callback = array(
-                            'status' => 'warning',
-                            'errorname' => 'Signa Terjemahan Nomor '.$nomor.' Masih Kosong !',
-                        );
-                        return $callback;
-                        exit;
-                    } 
                 }
 
                 if ($hidden_qtyreal_barang_[$x] == ''){
@@ -1238,7 +1243,13 @@ class  B_Farmasi
                 $Unit_Farmasi = $data['Unit_Farmasi'];
                 $UnitOrder = $data['Unit'];
                 $Notes = $data['Notes'];
-                $HasilReview = $data['HasilReview'];
+                if (isset($data['No_Order']) && $data['No_Order'] != ''){
+                    $HasilReview = $data['HasilReview'];
+                    $IdOrderResep = $data['No_Order'];
+                }else{
+                    $HasilReview = null;
+                    $IdOrderResep = null;
+                }
 
                 $subtotalttlrp = str_replace(".", "", $data['subtotalttlrp']);
                 $grandtotalqty = str_replace(".", "", $data['grandtotalqty']);
@@ -1281,6 +1292,7 @@ class  B_Farmasi
                     "Tax" : "'.$taxxRp.'",
                     "Grandtotal" : "'.$grandtotalxl.'",
                     "UserCreateLast" : "'.$userid.'" ,
+                    "IdOrderResep" : "'.$IdOrderResep.'",
                     "HasilReview" : "'.$HasilReview.'"
                 }
 
@@ -1457,6 +1469,7 @@ class  B_Farmasi
                 $KodeJaminan = $data['KodeJaminan'];
                 $isresep = $data['isresep'];
                 $KodeJaminan_Nama = $data['KodeJaminan_Nama'];
+                
 
                 if ($NamaPembeli == null){
                     $callback = array(
@@ -1721,12 +1734,12 @@ class  B_Farmasi
     {
         try { 
             $ip  = $_SERVER['REMOTE_ADDR'];
-            
             if ($ip == '::1'){
                 $ip = gethostbyname(trim(`hostname`));
             }
                 
-            $IPAddress = $ip; 
+            $IPAddress = $ip;
+            
             $method = "POST";
             $URL = "genToken";
             $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
@@ -1801,7 +1814,11 @@ class  B_Farmasi
                     $postData,
                     $urlAddKelompok
                 );
-                return $addSatuan['data'];
+                if ($addSatuan['status']){
+                    return $addSatuan['data'];
+                }else{
+                    return [];
+                }
             } catch (PDOException $e) {
                 die($e->getMessage());
             }
@@ -1967,7 +1984,6 @@ class  B_Farmasi
         public function addConsumableChargedDetailv2($data)
         {
             try { 
-    
                 $TransasctionCode = $data['No_Transaksi'];
                 $kode_barang = $data['kode_barang'];
                 $nama_barang = $data['nama_barang'];
@@ -2038,7 +2054,7 @@ class  B_Farmasi
                                                           from [Apotik_V1.1SQL].dbo.OrderResep a 
                                                           inner join RawatInapSQL.dbo.Inpatient b on a.NoRegistrasi = b.NoRegRI collate Latin1_General_CI_AS
                                                           inner join MasterdataSQL.dbo.Admision c on c.NoMR = b.NoMR
-                                                          left join [Apotik_V1.1SQL].dbo.employees d on a.PetugasReview=d.ID
+                                                          left join MasterDataSQL.dbo.employees d on a.PetugasReview=d.NoPIN collate Latin1_General_CI_AS
                                                           inner join MasterdataSQL.dbo.Doctors f on f.ID = b.drPenerima
                                                               left join MasterdataSQL.dbo.MstrPerusahaanJPK jpk on b.IDJPK=jpk.ID
                                                               left join MasterdataSQL.dbo.MstrPerusahaanAsuransi asu on b.IDAsuransi=asu.ID
@@ -2067,7 +2083,7 @@ class  B_Farmasi
                                                           from [Apotik_V1.1SQL].dbo.OrderResep a 
                                                           inner join PerawatanSQL.dbo.Visit b on a.NoRegistrasi = b.NoRegistrasi collate Latin1_General_CI_AS
                                                           inner join MasterdataSQL.dbo.Admision c on c.NoMR = b.NoMR
-                                                          left join [Apotik_V1.1SQL].dbo.employees d on a.PetugasReview=d.ID
+                                                          left join MasterDataSQL.dbo.employees d on a.PetugasReview=d.NoPIN collate Latin1_General_CI_AS
                                                           inner join MasterdataSQL.dbo.Doctors f on f.ID = b.Doctor_1
                                                               left join MasterdataSQL.dbo.MstrPerusahaanJPK jpk on b.Perusahaan=jpk.ID
                                                               left join MasterdataSQL.dbo.MstrPerusahaanAsuransi asu on b.Asuransi=asu.ID
@@ -2159,4 +2175,387 @@ class  B_Farmasi
                 die($e->getMessage());
             }
         }
+
+        public function getSalesbyPeriodeResep($data)
+        {
+            try { 
+                $tglawal = $data['tglawal'];
+                $tglakhir = $data['tglakhir'];
+                // 1. Gen Token
+                $method = "POST";
+                $URL = "genToken";
+                $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                // 2. add Data Group Barang 
+                $method_getgroup = "POST";
+                // 2. add Data Golongan
+                $postData = '{ 
+                    "StartPeriode" : "' . $tglawal . '" ,
+                    "EndPeriode" : "' . $tglakhir . '" 
+                }';
+                $urlAddKelompok = "transaction/sales/getSalesbyPeriodeResep/";
+                $addSatuan = $this->curl_request(
+                    GenerateTokenRS::headers_api_token($token['access_token']),
+                    $method_getgroup,
+                    $postData,
+                    $urlAddKelompok
+                );
+                if ($addSatuan['status'] == true){
+                    $callback = $addSatuan['data'];
+                }else{
+                    $callback = [];
+                }
+                return $callback;
+                //return $addSatuan['data'];
+            } catch (PDOException $e) {
+                die($e->getMessage());
+            }
+        }
+
+        public function getSalesbyIDandNoResep($data)
+        {
+            try { 
+                $TransasctionCode = $data['TransasctionCode'];
+                $NoResep = $data['NoResep'];
+                // 1. Gen Token
+                $method = "POST";
+                $URL = "genToken";
+                $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                // 2. add Data Group Barang 
+                $method_getgroup = "POST";
+                // 2. add Data Golongan
+                $postData = '{ 
+                    "TransactionCode" : "' . $TransasctionCode . '" ,
+                    "NoResep" : "' . $NoResep . '" 
+                }';
+                $urlAddKelompok = "transaction/sales/getSalesbyIDandNoResep/";
+                $addSatuan = $this->curl_request(
+                    GenerateTokenRS::headers_api_token($token['access_token']),
+                    $method_getgroup,
+                    $postData,
+                    $urlAddKelompok
+                );
+                return $addSatuan;
+            } catch (PDOException $e) {
+                die($e->getMessage());
+            }
+        }
+
+        public function printLabelPerItem($data){
+            try {
+            $dob = date('d/m/Y', strtotime($data['dob']));
+            $tglResep = date('d/m/Y', strtotime($data['TglResep']));
+            $printer = '\\\\'.$data['getPrinterLabel']['data'][0]['IPPrinterSharing'].'\\'.$data['getPrinterLabel']['data'][0]['NamaPrinterSharing'];
+            $filename = $data['IDDetail'].".prn";
+            $handle =fopen("C:\\\\xampp\\htdocs\\SIKBREC\\public\\".$filename,"w");
+    
+            $isi = 'SIZE 59.10 mm, 40 mm
+            DIRECTION 0,0
+            REFERENCE 0,0
+            OFFSET 0 mm
+            SET PEEL OFF
+            SET CUTTER OFF
+            SET PARTIAL_CUTTER OFF
+            SET TEAR ON
+            CLS
+            CODEPAGE 1252
+            TEXT 447,291,"1",180,1,1,"Nama"
+            TEXT 341,291,"1",180,1,1,"'.$data['PatientName'].'"
+            DIAGONAL 465,266,464,269,3
+            BAR 29,267, 436, 2
+            TEXT 447,253,"1",180,1,1,"No MR"
+            TEXT 225,253,"1",180,1,1,"Tgl Lahir"
+            TEXT 447,223,"1",180,1,1,"No Resep"
+            TEXT 447,192,"1",180,1,1,"Tgl Resep"
+            TEXT 354,291,"1",180,1,1,":"
+            TEXT 354,253,"1",180,1,1,":"
+            TEXT 354,223,"1",180,1,1,":"
+            TEXT 354,192,"1",180,1,1,":"
+            TEXT 144,253,"1",180,1,1,":"
+            TEXT 341,253,"1",180,1,1,"'.$data['NoMR'].'"
+            TEXT 341,223,"1",180,1,1,"'.$data['NoRegistrasi'].'"
+            TEXT 341,192,"1",180,1,1,"'.$data['TglResep'].'"
+            TEXT 129,253,"1",180,1,1,"'.$data['dob'].'"
+            BAR 26,169, 436, 2
+            TEXT 225,192,"1",180,1,1,"No Urut"
+            TEXT 129,192,"1",180,1,1,"01"
+            TEXT 144,192,"1",180,1,1,":"
+            TEXT 466,151,"1",180,1,1,"'.$data['listdata1']['data'][0]['Product Name']. ' ('.$data['QryRealisasi'].' '.$data['listdata1']['data'][0]['Unit Satuan'].')"
+            TEXT 279,130,"1",180,1,1,"'.$data['listdata1']['data'][0]['Composisi'].'"
+            TEXT 270,102,"1",180,1,1,"'.$data['signaterjemahan'].'"
+            TEXT 319,43,"1",180,1,1,"- EXPIRED DATE : "
+            TEXT 149,43,"1",180,1,1,""
+            TEXT 430,43,"1",180,1,1,"'.$data['getSignaObat']['Signa'].'"
+            PRINT 1,1';
+    
+            fwrite($handle, $isi);
+            fclose($handle);
+    
+            $cmd = shell_exec('COPY C:\\\\xampp\\htdocs\\SIKBREC\\public\\'.$filename.' /B '.$printer);
+    
+            unlink($filename);
+                $callback = array(
+                    'status' => 'success', 
+                    'message' => 'Cetak Berhasil !', 
+                );
+            return $callback;
+
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    
+            
+            }
+
+            public function getSalesDetailbyIDandNoResep($data)
+            {
+                try { 
+                    $TransactionCode = $data['TransactionCode'];
+                    $NoResep = $data['NoResep'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '
+                    {
+                        "TransactionCode" : "'.$TransactionCode.'" ,
+                        "NoResep" : "'.$NoResep.'" 
+                    }
+                    ';
+                    $urlAddKelompok = "transaction/sales/getSalesDetailbyIDandNoResep/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+
+            public function getSalesbyPeriodeTanpaResep($data)
+            {
+                try { 
+                    $tglawal = $data['tglawal'];
+                    $tglakhir = $data['tglakhir'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+        
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '{ 
+                        "StartPeriode" : "' . $tglawal . '" ,
+                        "EndPeriode" : "' . $tglakhir . '" 
+                    }';
+                    $urlAddKelompok = "transaction/sales/getSalesbyPeriodeTanpaResep/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    if ($addSatuan['status'] == true){
+                        $callback = $addSatuan['data'];
+                    }else{
+                        $callback = [];
+                    }
+                    return $callback;
+                    //return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+
+            public function callPasien($data)
+            {
+                try { 
+                    $idunit = $data['idunit'];
+                    $noreg = $data['noreg'];
+                    $nama = $data['nama'];
+                    $noantrian = $data['noantrian'];
+                    $datenowcreate = Utils::seCurrentDateTime();
+                    $session = SessionManager::getCurrentSession();
+                    $userid = $session->username;
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '
+                    {
+                        "IDUnitFarmasi" : "'.$idunit.'", 
+                        "NoRegistrasi" : "'.$noreg.'",  
+                        "name" : "'.$nama.'",
+                        "no_antrean_poli" : "'.$noantrian.'"
+                    }
+                    ';
+                    $urlAddKelompok = "api-farmasi-called-outside";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    return $addSatuan;
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+
+            public function getSalesbyPeriodeResepRajal($data)
+            {
+                try { 
+                    $tglawal = $data['tglawal'];
+                    $tglakhir = $data['tglakhir'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+        
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '{ 
+                        "StartPeriode" : "' . $tglawal . '" ,
+                        "EndPeriode" : "' . $tglakhir . '" 
+                    }';
+                    $urlAddKelompok = "transaction/sales/getSalesbyPeriodeResepRajal/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    if ($addSatuan['status'] == true){
+                        $callback = $addSatuan['data'];
+                    }else{
+                        $callback = [];
+                    }
+                    return $callback;
+                    //return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+
+            
+            public function getSalesbyPeriodeResepRanap($data)
+            {
+                try { 
+                    $tglawal = $data['tglawal'];
+                    $tglakhir = $data['tglakhir'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+        
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '{ 
+                        "StartPeriode" : "' . $tglawal . '" ,
+                        "EndPeriode" : "' . $tglakhir . '" 
+                    }';
+                    $urlAddKelompok = "transaction/sales/getSalesbyPeriodeResepRanap/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    if ($addSatuan['status'] == true){
+                        $callback = $addSatuan['data'];
+                    }else{
+                        $callback = [];
+                    }
+                    return $callback;
+                    //return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+
+            public function viewOrderResepbyDatePeriodeRajal($data)
+            {
+                try { 
+                    $tglawal = $data['tglawal'];
+                    $tglakhir = $data['tglakhir'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '
+                    {
+                        "tglPeriodeAwal" : "'.$tglawal.'" ,
+                        "tglPeriodeAkhir" : "'.$tglakhir.'" 
+                    }
+                    ';
+                    //$urlAddKelompok = "transaction/sales/getConsumableChargedPeriode";
+                    $urlAddKelompok = "ResepTransactions/v2/viewOrderResepbyDatePeriodeRajal/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
+            
+            public function viewOrderResepbyDatePeriodeRanap($data)
+            {
+                try { 
+                    $tglawal = $data['tglawal'];
+                    $tglakhir = $data['tglakhir'];
+                    // 1. Gen Token
+                    $method = "POST";
+                    $URL = "genToken";
+                    $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+    
+                    // 2. add Data Group Barang 
+                    $method_getgroup = "POST";
+                    // 2. add Data Golongan
+                    $postData = '
+                    {
+                        "tglPeriodeAwal" : "'.$tglawal.'" ,
+                        "tglPeriodeAkhir" : "'.$tglakhir.'" 
+                    }
+                    ';
+                    //$urlAddKelompok = "transaction/sales/getConsumableChargedPeriode";
+                    $urlAddKelompok = "ResepTransactions/v2/viewOrderResepbyDatePeriodeRanap/";
+                    $addSatuan = $this->curl_request(
+                        GenerateTokenRS::headers_api_token($token['access_token']),
+                        $method_getgroup,
+                        $postData,
+                        $urlAddKelompok
+                    );
+                    return $addSatuan['data'];
+                } catch (PDOException $e) {
+                    die($e->getMessage());
+                }
+            }
 }

@@ -23,7 +23,7 @@ class A_InfoStok_Model
             $method = "POST";
             $URL = "genToken";
             $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
-
+           
             // 2. add Data Group Barang 
             $method_getgroup = "POST";
             // 2. add Data Golongan

@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $(".preloader").fadeOut();
+    //$(".preloader").fadeOut();
     asyncShowMain();
     // showDataDetil_DO('RJUM240624-0001');
 
@@ -223,6 +223,9 @@ function updateUIdataGocreateHdr(dataResponse) {
         $("#btnNewPurchase").attr('disabled', true);
         showDataDetil_DO($("#NoRegistrasi").val());
         enableAll();
+        $('#UnitCodex').prop('disabled', true);
+        $('#UnitSalesx').prop('disabled', true);
+        $('#TglTransaksi').prop('readonly', true);
         $(".preloader").fadeOut();
     }else{
         toast(dataResponse.message, "error")
@@ -307,6 +310,9 @@ async function asyncShowMain() {
         disableAll();
         if (id != ""){
             getReturJualbyID(id);
+        }else{
+            const dataunitbyIP = await getUnitbyIP();
+            updateUIdataunitbyIP(dataunitbyIP);
         }
         $(".preloader").fadeOut();
        
@@ -500,7 +506,21 @@ function updateUIdatagetReturJualbyID(dataResponse) {
     $("#Notes").val(dataResponse.data[0].Notes);
     $("#NoResep").val(dataResponse.data[0].NoResep);
     
-  
+    $("#NoMR").val(dataResponse.data[0].NoMR);
+    $("#NoEpisode").val(dataResponse.data[0].NoEpisode);
+    $("#NamaPasien").val(dataResponse.data[0].NamaPembeli);
+    $("#JenisKelamin").val(dataResponse.data[0].GenderPembeli);
+    $("#Alamat").val(dataResponse.data[0].AlamatPembeli);
+    
+    $("#GroupJaminan").val(dataResponse.data[0].groupjaminan); 
+    $("#TipePasien").val(dataResponse.data[0].TipePasien);
+    $("#Jaminan").val(dataResponse.data[0].NamaJaminan);
+    $("#KodeJaminan").val(dataResponse.data[0].KodeJaminan);
+     $("#KodeKelas").val(dataResponse.data[0].kodekelas); 
+
+    $('#UnitCodex').prop('disabled', true);
+    $('#UnitSalesx').prop('disabled', true);
+    $('#TglTransaksi').prop('readonly', true);
 
 
     $("#btnNewPurchase").attr('disabled', true);
@@ -660,12 +680,16 @@ function showDataDetil_DO(NoRegistrasi) {
             //console.log(result);
             var resultObj = JSON.parse(result);
             $.each(resultObj, function (key, val) {
+                //cek kalau qty sales remain nya kosong tidak usah dimunculkan
+                if (val.QtySalesRemain < 1){
+                    return;
+                }
                 total_items = total_items + 1;
                 $("#totalrow").val(total_items);
                 // document.getElementById('totalrow').innerHTML = total_items;
                 var newRow = $("<tr id='row_'" + total_items + "'>");
                 /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
-            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ><input type='hidden' name='hidden_id_detail[]' id='hidden_id_detail'" + total_items + "' class='hidden_id_detail'"+total_items + "' value='" + val.ID +"' ></font></td> '"+
+            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ><input type='hidden' name='hidden_id_detail[]' id='hidden_id_detail'" + total_items + "' class='hidden_id_detail'"+total_items + "' value='" + val.ID +"' ><input type='hidden' name='hidden_salescode[]' id='hidden_salescode" + total_items + "' value='" + val.TransactionCode +"' ></font></td> '"+
             /*3*/"'<td><font size='1'>" + val.ProductName + "<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
             /*4*/"' <td>" + val.Satuan + "<input type='hidden' name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items +"' value='" + val.Satuan +"' ></td> '"+
             /*5*/"' <td>" + parseFloat(val.QtySalesRemain) + "<input type='hidden'  name='hidden_min_barang_[]' id='hidden_min_barang_" + total_items + "' value='" + parseFloat(val.QtySalesRemain) + "' ></td> '"+
@@ -677,7 +701,7 @@ function showDataDetil_DO(NoRegistrasi) {
             // /*11*/"' <td><input size='1' readonly value='" + parseFloat(val.TaxProsen) + "' type='text' onkeydown='FormatCell(this)'   name='hidden_taxprosen_[]' style'width: 1sx' id='hidden_taxprosen_" + total_items +"' ></td> '"+
             // /*--12*/"' <td><input size='5' readonly='true' value='" + parseFloat(val.TaxRpTTL) + "'  type='text' name='hidden_taxrp_[]' style'width: 1sx' id='hidden_taxrp_" + total_items + "' ><input size='5' readonly='true' value='" + parseFloat(val.TaxRp) + "' type='hidden' name='hidden_taxrp2_[]' id='hidden_taxrp2_" + total_items +"' ></td> '"+
             // /*13*/"' <td><input size='8' readonly='true'  value='" + parseFloat(val.TotalDeliveryOrder) + "'   type='text' name='hidden_grandtotal_[]' style'width: 1sx' id='hidden_grandtotal_" + total_items +"' ></td>" +
-            /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus> " +
+            /*14*/"<td> <button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus> " +
             "</td>  </tr>")
             ;
 
@@ -712,14 +736,14 @@ function showDataDetil_View(TransasctionCode) {
                 // document.getElementById('totalrow').innerHTML = total_items;
                 var newRow = $("<tr id='row_'" + total_items + "'>");
              /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
-            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ></font></td> '"+
+            /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang'" + total_items + "' class='hidden_kode_barang'"+total_items + "' value='" + val.ProductCode +"' ><input type='hidden' name='hidden_salescode[]' id='hidden_salescode'" + total_items + "' value='" + val.SalesCode +"' ></font></td> '"+
             /*3*/"'<td><font size='1'>" + val.ProductName + "<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
             /*4*/"' <td>" + val.ProductSatuan + "<input type='hidden' name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items +"' value='" + val.ProductSatuan +"' ></td> '"+
             /*5*/"' <td>" + parseFloat(val.QtySales) + "<input type='hidden'  name='hidden_min_barang_[]' id='hidden_min_barang_" + total_items + "' value='" + parseFloat(val.QtySales) + "' ></td> '"+
             /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items + "' value='" + parseFloat(val.QtyReturJual) +"' ></td> '"+
             /*7*/"' <td><input size='5' readonly  type='text' name='hidden_harga_barang_[]'   id='hidden_harga_barang_" + total_items + "' class='harga' onkeydown='FormatCell(this)' value='" + parseFloat(val.ReturPrice) + "' ><input size='1'  value='" + val.KonversiQty + "' type='hidden' name='KonversiQty[]'   id='KonversiQty" + total_items +"' ><input size='1'  value='" + val.Satuan_Konversi + "' type='hidden' name='Satuan_Konversi[]'   id='Satuan_Konversi" + total_items +"' ></td>"+ 
             /*10*/"' <td><input size='7' readonly='true' value='" + parseFloat(val.TotalReturBeli) + "' type='text' name='hidden_subtotal_[]' style'width: 1sx' id='hidden_subtotal_" + total_items +"' ></td> '"+
-            /*14*/'<td> <button type="button" onclick=\'goVoidDetails("' + val.ProductCode + '","' + val.ProductName + '")\'  name="remove_details" class="btn btn-gold btn-xs remove_details btn-rounded" id="' + total_items + '" >Delete</Hapus> ' +
+            /*14*/'<td> <button type="button" onclick=\'goVoidDetails("' + val.ProductCode + '","' + val.ProductName + '","' + val.SalesCode + '")\'  name="remove_details" class="btn btn-gold btn-xs remove_details btn-rounded" id="' + total_items + '" >Delete</Hapus> ' +
             "</td>  </tr>")
             ;
 
@@ -827,7 +851,7 @@ async function goVoidHeader(param) {
     try {
         const FormData =  $("#form_hdr").serialize()+'&AlasanBatal='+param;
         const ctlrname = 'ReturJual';
-        const funcname = 'voidReturJual';
+        const funcname = 'voidReturJualPerRegister';
         const data = await getpostData(FormData,ctlrname,funcname);
         updateUIdatafinish(data);
     } catch (err) {
@@ -836,7 +860,7 @@ async function goVoidHeader(param) {
 }
 
 
-function goVoidDetails(product_code,product_name) {
+function goVoidDetails(product_code,product_name,trscode) {
     swal("Alasan Hapus:", {
         content: "input",
         buttons: true,
@@ -848,13 +872,13 @@ function goVoidDetails(product_code,product_name) {
             } else if (value == null) {
                 return false;
             }
-            goVoidDetailsByID(product_code, value,product_name);
+            goVoidDetailsByID(product_code, value,product_name,trscode);
         });
 }
 
-async function goVoidDetailsByID(product_code, param) {
+async function goVoidDetailsByID(product_code, param,product_name,trscode) {
     try {
-        const FormData =  $("#form_hdr").serialize()+'&AlasanBatal='+param+'&product_code='+product_code;
+        const FormData =  $("#form_hdr").serialize()+'&AlasanBatal='+param+'&product_code='+product_code+'&TransactionCodeReff='+trscode;
         const ctlrname = 'ReturJual';
         const funcname = 'voidReturJualDetailbyItem';
         const data = await getpostData(FormData,ctlrname,funcname);
@@ -1114,7 +1138,7 @@ function updategetNoregistrasibyNoreg(params){
         // $("#UnitSales").val(dataResponse.data[0].IdUnit);
 
        // $("#UnitCodex").prop("disabled", true);
-        //$("#UnitSalesx").prop("disabled", true);
+        $("#UnitSalesx").prop("disabled", true);
         
         $("#NamaPasien").val(dataResponse.data[0].PatientName);
         $("#JenisKelamin").val(dataResponse.data[0].GenderPembeli);
@@ -1194,6 +1218,77 @@ function getNoregistrasibyNoreg(noreg) {
             "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
         },
         body: 'noreg=' + noreg
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+
+$(document).on('click', '.remove_details', function () {
+    swal({
+        title: "Are you sure?",
+        text: "Apakah anda yakin Ingin hapus data ini ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+            //$('#row_' + row_id + '').remove();
+            $(this).closest("tr").remove();
+            var count = $('#totalrow').val();
+            count = count - 1 ;
+            //document.getElementById('grantotalOrder').innerHTML = count;
+            $('#totalrow').val(count);
+            toast('Berhasil Hapus !', "success")
+            CalculateALL();
+        } else {
+          //swal("Your imaginary file is safe!");
+        }
+      });
+});
+
+function updateUIdataunitbyIP(dataResponse) {
+    if (dataResponse.status == true){
+        $("#UnitCodex").val(dataResponse.data[0].UnitCode).trigger('change');
+        //$('#UnitCodex option:not(:selected)').prop('disabled', true);
+        $('#UnitCodex').prop('disabled', true);
+    }else{
+        swal("IP komputer ini belum disetting / dimapping di master unit ! Silahkan cek dan tambahkan IP ini di Master IP Unit Farmasi !",{
+            closeOnClickOutside: false,
+            closeOnEsc: false
+        }).then(function() {
+            MyBack();
+        });
+        $("#UnitCode").prop('disabled',true)
+    }
+}
+
+async function getUnitbyIP() {
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/aPenjualanTanpaResep/getUnitbyIP/';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'TransasctionCode=' + $("#No_Transaksi").val()
     })
         .then(response => {
             if (!response.ok) {

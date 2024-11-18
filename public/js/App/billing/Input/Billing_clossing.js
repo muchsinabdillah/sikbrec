@@ -462,15 +462,45 @@ function updateUIdataSaveTrsPayment_closing(params) {
     let response = params;
     if (response.status == "success") {
         toast(response.message, "success")
+        // swal({
+        //     title: "Simpan Berhasil!",
+        //     text: response.message,
+        //     icon: "success",
+        // })
+        // var base_url = window.location.origin;
+        // printkuitansi(base_url);
+        // printrincian(base_url);
+        // location.reload();
+
+
         swal({
-            title: "Simpan Berhasil!",
-            text: response.message,
+            title: "Simpan Berhasil!",  
+            // text: response.message,
+            text: "Terimakasih",
             icon: "success",
-        })
-        var base_url = window.location.origin;
-        printkuitansi(base_url);
-        printrincian(base_url);
-        location.reload();
+        }).then((willDelete) => {
+            if (willDelete) {
+                location.reload();
+                // printkuitansi();
+                // swal({
+                //     title: "Cetak Kuitansi Berhasil!",  
+                //     // text: response.message,
+                //     text: "Cetak Nota Pembayaran",
+                //     icon: "success",
+                // }).then((willDelete) => {
+                //     if (willDelete) {
+                //         printrincian();
+                //         location.reload();
+                //     }
+                //     else{
+                //         location.reload();
+                //     }
+                // });
+            }
+            else{
+                location.reload();
+            }
+        });
         //getDataApproveFarmasi();
     }else{
         toast(response.message, "error")
@@ -552,22 +582,67 @@ function SaveTrsPayment_closing() {
 }
 //#END PAYMENT ACT
 
-async function printkuitansi(base_url) {
-    var base_url = base_url;
+// async function printkuitansi() {
+//     var base_url = window.location.origin;
+//     var jeniscetak = 'PrintKuitansiAll';
+//     var notrs = $("#NoRegistrasi").val();
+//     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
+//     window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs);
+// }
+
+// async function printrincian() {
+//     var base_url = window.location.origin;
+//     var notrs = $("#NoRegistrasi").val();
+//     var kodereg = $("#NoRegistrasi").val().slice(0,2);
+//     // window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
+//     // "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+//     window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs);
+// }
+
+
+async function printkuitansi() {
+    var base_url = window.location.origin;
     var jeniscetak = 'PrintKuitansiAll';
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
-    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs, "_blank",
-            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs);
 }
 
 async function printrincian(base_url) {
-    var base_url = base_url;
+    var base_url = window.location.origin;
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0,2);
-    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
-    "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs);
 }
+
+
+// async function printkuitansi() {
+//     var base_url = window.location.origin;
+//     var jeniscetak = 'PrintKuitansiDetail';
+//     var notrs = $("#NoRegistrasi").val();
+//     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
+//     var lang = $("#idkuitansi").val();
+//     // window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs,
+//     //         "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+//     window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs);
+//     // console.log(base_url);
+// }
+
+// async function printrincian() {
+//     // var base_url = window.location.origin;
+//     // var notrs = $("#NoRegistrasi").val();
+//     // var kodereg = $("#NoRegistrasi").val().slice(0,2);
+//     // var lang = $("#idkuitansi").val();
+//     // window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs,
+//     // "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+
+//     var base_url = window.location.origin;
+//     var notrs = $("#NoRegistrasi").val();
+//     var kodereg = $("#NoRegistrasi").val().slice(0,2);
+//     var lang = $("#idkuitansi").val();
+//     window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs);
+//     // location.reload();
+// }
 
 // END print kuitansi
 
@@ -616,8 +691,8 @@ async function updateUIdatagetTotalPembayaranx(datagetTotalPembayaranx) {
     T_Kekurangan = parseInt(number(T_Kekurangan));
     T_Deposit = parseInt(number(T_Deposit));
 
-    console.log(T_Kekurangan);
-    console.log(T_Deposit);
+    // console.log(T_Kekurangan);
+    // console.log(T_Deposit);
 
     if(T_Deposit != 0){
         var T_Sisakekurangan = T_Deposit - T_Kekurangan;
@@ -1354,7 +1429,7 @@ function getBillto(param){
         var attr = null;
         getDataDetailBilling_Payment(attr);
     }
-    else if(param=='Tunai' || param=='Setor Bank' || param=='Transfer Bank' || param=='Voucher'){
+    else if(param=='Tunai' || param=='Setor Bank' || param=='Transfer Bank' || param=='Voucher' || param=='QRIS'){
        
         $('#card_ui').fadeOut().fadeOut('fast') 
         $('#telahterima_ui2').fadeOut().fadeOut('fast') 

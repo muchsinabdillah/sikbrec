@@ -13,6 +13,32 @@
                             </div>
                         </div>
                         <div class="panel-body p-20">
+                        <div class="form-group">
+                                            <!-- <h3>Cari Data Reservasi</h3> -->
+                                            <!-- <div class="alert alert-info alert-dismissible">
+                                                <p> <strong>Info !</strong> Textbox NOTE di gunakan untuk mengisi jika
+                                                    ada Keterangan Tambahan. Contoh : Ada Perubahan Jam Praktek menjadi
+                                                    jam 10:00.</p>
+                                                <p> <strong>Info !</strong> Jika tidak ada Tambahan Note, maka Textbox
+                                                    NOTE diisikan saja -.</p>
+                                            </div> -->
+                                            <label for="inputEmail3" class="col-sm-1 control-label">Periode:</label>
+                                        <div class="col-sm-3">
+                                            <input type="date" class="form-control" name="tglawal" id="tglawal"
+                                                placeholder="Tanggal dari" value="<?= Utils::datenowcreateNotFull() ?>">
+                                        </div>
+                                        <label for="inputEmail3" class="col-sm-1 control-label">s / d</label>
+                                        <div class="col-sm-3">
+                                            <input type="date" class="form-control" name="tglakhir" id="tglakhir"
+                                                placeholder="Tanggal Sampai"
+                                                value="<?= Utils::datenowcreateNotFull() ?>">
+                                        </div>
+                                        <a class="btn btn-danger btn-sm btn-rounded " id="btnSearching"
+                                            name="btnSearching">
+                                            <span class="glyphicon glyphicon glyphicon-search"></span> Cari</a>
+                                        </thead>
+                                        </div>
+                                        <br><br>
                             <div class="demo-table" style="overflow-x:auto;">
                                 <table id="example" class="display table table-striped table-bordered" cellspacing="0" width="100%">
                                     <thead>
@@ -20,17 +46,20 @@
                                             <th align='center' style="width: 3em;">
                                                 <font size="1">No
                                             </th>
-                                            <th align='center'>
+                                            <!-- <th align='center'>
                                                 <font size="1">No. Resep
-                                            </th>
+                                            </th> -->
                                             <th align='center'>
                                                 <font size="1">Tgl Resep
                                             </th>
                                             <th align='center'>
-                                                <font size="1">No Registrasi
+                                                <font size="1">Nama
                                             </th>
                                             <th align='center'>
                                                 <font size="1">Notes
+                                            </th>
+                                            <th align='center'>
+                                                <font size="1">Jenis Pasien
                                             </th>
                                             <th align='center'>
                                                 <font size="1">User

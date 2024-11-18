@@ -78,14 +78,14 @@ function getListBillingBebas(tglawal,tglakhir) {
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NoRegistrasi+'</font> '
+                        var html  = '<font size="2">'+row.No+'</font> '
                             return html 
                     }
                 },
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NamaPasien+'</font> '
+                        var html  = '<font size="2">'+row.TransactionCode+'</font> '
                             return html 
                     }
                 },
@@ -99,18 +99,18 @@ function getListBillingBebas(tglawal,tglakhir) {
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NamaUnit+'</font> '
+                        var html  = '<font size="2">'+row.NamaPasien+'</font> '
                             return html 
                     }
                 }  ,   
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                     var html = ""
 
-                    if (row.NamaStatus == 'New'){
+                    if (row.NamaStatus == 'NEW'){
                         var badgecol = "success";
-                    }else if (row.NamaStatus == 'Review'){
+                    }else if (row.NamaStatus == 'APPROVED'){
                         var badgecol = 'warning';
-                    }else if (row.NamaStatus == 'Lunas'){
+                    }else if (row.NamaStatus == 'PAYMENT'){
                         var badgecol = 'danger';
                     }
                     
@@ -120,8 +120,8 @@ function getListBillingBebas(tglawal,tglakhir) {
             } ,
                { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                      var html = ""
-                      
-                       var html  = '<button type="button" class="btn btn-primary border-primary btn-animated btn-xs"  onclick=\'showID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > View</span><span class="hidden-content"><i class="fa fa-eye"></i></span></button>&nbsp<button type="button" class="btn btn-success border-success btn-animated btn-xs"  onclick=\'PrintbyID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > Cetak</span><span class="hidden-content"><i class="glyphicon glyphicon-print"></i></span></button>'
+                      //--13-09-2024 editan fiqri
+                       var html  = '<button type="button" class="btn btn-primary border-primary btn-animated btn-xs"  onclick=\'showID("' + row.TransactionCode + '")\' ><span class="visible-content" > View</span><span class="hidden-content"><i class="fa fa-eye"></i></span></button>&nbsp<button type="button" class="btn btn-success border-success btn-animated btn-xs"  onclick=\'PrintbyID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > Cetak</span><span class="hidden-content"><i class="glyphicon glyphicon-print"></i></span></button>'
                           return html 
                    }
                },
@@ -150,17 +150,17 @@ function getListBillingBebas_Arsip(tglawal,tglakhir) {
            "deferRender": true,
            }, 
                 "columns": [
-                { "render": function ( data, type, row ) { // Tampilkan kolom aksi
+                    { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NoRegistrasi+'</font> '
+                        var html  = '<font size="2">'+row.No+'</font> '
                             return html 
                     }
                 },
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NamaPasien+'</font> '
+                        var html  = '<font size="2">'+row.TransactionCode+'</font> '
                             return html 
                     }
                 },
@@ -174,13 +174,20 @@ function getListBillingBebas_Arsip(tglawal,tglakhir) {
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                         var html = ""
                         
-                        var html  = '<font size="2">'+row.NamaUnit+'</font> '
+                        var html  = '<font size="2">'+row.NamaPasien+'</font> '
                             return html 
                     }
                 }  ,   
                 { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                     var html = ""
-                        var badgecol = 'secondary';
+
+                    if (row.NamaStatus == 'NEW'){
+                        var badgecol = "success";
+                    }else if (row.NamaStatus == 'APPROVED'){
+                        var badgecol = 'warning';
+                    }else if (row.NamaStatus == 'PAYMENT'){
+                        var badgecol = 'danger';
+                    }
                     
                     var html  = '<span class="badge badge-'+badgecol+'">'+row.NamaStatus+'</span>'
                         return html 
@@ -188,8 +195,8 @@ function getListBillingBebas_Arsip(tglawal,tglakhir) {
             } ,
                { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                      var html = ""
-                      
-                       var html  = '<button type="button" class="btn btn-primary border-primary btn-animated btn-xs"  onclick=\'showID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > View</span><span class="hidden-content"><i class="fa fa-eye"></i></span></button>&nbsp<button type="button" class="btn btn-success border-success btn-animated btn-xs"  onclick=\'PrintbyID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > Cetak</span><span class="hidden-content"><i class="glyphicon glyphicon-print"></i></span></button>'
+                      //--13-09-2024 editan fiqri
+                       var html  = '<button type="button" class="btn btn-primary border-primary btn-animated btn-xs"  onclick=\'showID("' + row.TransactionCode + '")\' ><span class="visible-content" > View</span><span class="hidden-content"><i class="fa fa-eye"></i></span></button>&nbsp<button type="button" class="btn btn-success border-success btn-animated btn-xs"  onclick=\'PrintbyID("' + row.NoRegistrasi + '")\' ><span class="visible-content" > Cetak</span><span class="hidden-content"><i class="glyphicon glyphicon-print"></i></span></button>'
                           return html 
                    }
                },
@@ -207,9 +214,11 @@ function PrintSPR(idParams){
 function showID(str) {
     const base_url = window.location.origin;
     var str = btoa(str);
-    var judul = 'Billing Rawat Jalan';
+    // var judul = 'Billing Rawat Jalan';
     //window.location = base_url + '/SIKBREC/public/aBillingPasien/' + str;
-    window.open(base_url + '/SIKBREC/public/aBillingPasien/' + str , "_blank");
+    //window.open(base_url + '/SIKBREC/public/aBillingPasien/' + str , "_blank");
+    //---13-09-2024 editan fiqri
+    window.open(base_url + '/SIKBREC/public/aBillingPasien/viewbebas/' + str , "_blank");
 }
 
 // Primary function always

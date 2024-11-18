@@ -163,6 +163,22 @@ class MasterDataJadwalDokter_Model
             $jumatwaktumix = $_POST['JumatWaktuAwal'] . "-" . $_POST['JumatWaktuAkhir'];
             $sabtuwaktumix = $_POST['SabtuWaktuAwal'] . "-" . $_POST['SabtuWaktuAkhir'];
             $mingguwaktumix = $_POST['MingguWaktuAwal'] . "-" . $_POST['MingguWaktuAkhir'];
+            $Close_Schedule_Senin = $data['Close_Schedule_Senin'];
+            $Close_Schedule_Selasa = $data['Close_Schedule_Selasa'];
+            $Close_Schedule_Rabu = $data['Close_Schedule_Rabu'];
+            $Close_Schedule_Kamis = $data['Close_Schedule_Kamis'];
+            $Close_Schedule_Jumat = $data['Close_Schedule_Jumat'];
+            $Close_Schedule_Sabtu = $data['Close_Schedule_Sabtu'];
+            $Close_Schedule_Minggu = $data['Close_Schedule_Minggu'];
+            
+            $Open_Jadwal_Senin = $data['Open_Jadwal_Senin'];
+            $Open_Jadwal_Selasa = $data['Open_Jadwal_Selasa'];
+            $Open_Jadwal_Rabu = $data['Open_Jadwal_Rabu'];
+            $Open_Jadwal_Kamis = $data['Open_Jadwal_Kamis'];
+            $Open_Jadwal_Jumat = $data['Open_Jadwal_Jumat'];
+            $Open_Jadwal_Sabtu = $data['Open_Jadwal_Sabtu'];
+            $Open_Jadwal_Minggu = $data['Open_Jadwal_Minggu'];
+            
 
             //Get nama unit
             $this->db->query("SELECT NamaUnit
@@ -551,7 +567,7 @@ class MasterDataJadwalDokter_Model
             }
 
             if ($IdAuto == "") {
-
+               
                 $this->db->query("INSERT INTO MasterdataSQL.dbo.JadwalPraktek (IDDokter,IDUnit,Status_Aktif,Senin,Senin_waktu,Senin_Sesion,
                   Selasa,Selasa_waktu,Selasa_Sesion, Rabu,Rabu_waktu,Rabu_Sesion,
                   Kamis,Kamis_waktu,Kamis_Sesion,Jumat,Jumat_waktu,Jumat_Sesion,
@@ -561,7 +577,8 @@ class MasterDataJadwalDokter_Model
                   Senin_Max,Selasa_Max,Rabu_Max,Kamis_Max, Jumat_Max,Sabtu_Max,Minggu_Max,NamaDokter,Poli,Senin_Max_JKN,
                   Senin_Max_NonJKN,Selasa_Max_JKN,Selasa_Max_NonJKN,Rabu_Max_JKN,Rabu_Max_NonJKN,Kamis_Max_JKN,
                   Kamis_Max_NonJKN,Jumat_Max_JKN,Jumat_Max_NonJKN,Sabtu_Max_JKN,Sabtu_Max_NonJKN,Minggu_Max_JKN,Minggu_Max_NonJKN
-                  ,Group_Jadwal
+                  ,Group_Jadwal,Close_Schedule_Senin,Close_Schedule_Selasa,Close_Schedule_Rabu,Close_Schedule_Kamis,Close_Schedule_Jumat,Close_Schedule_Sabtu,Close_Schedule_Minggu,Open_Assesment_Senin,Open_Assesment_Selasa,Open_Assesment_Rabu,Open_Assesment_Kamis,Open_Assesment_Jumat,Open_Assesment_Sabtu,
+                    Open_Assesment_Minggu
                   ) 
                   VALUES
                   (:NamaDokter,:GrupPerawatan,:Status_Aktif,:SeninStatus,:seninwaktumix,:SessionSenin,:SelasaStatus,
@@ -574,43 +591,15 @@ class MasterDataJadwalDokter_Model
                   :NamaUnit,:KuotaBpjsSenin,:KuotaNonBpjsSenin,:KuotaBpjsSelasa,:KuotaNonBpjsSelasa,:KuotaBpjsRabu,
                   :KuotaNonBpjsRabu,:KuotaBpjsKamis,:KuotaNonBpjsKamis,:KuotaBpjsJumat,:KuotaNonBpjsJumat,:KuotaBpjsSabtu,
                   :KuotaNonBpjsSabtu,:KuotaBpjsMinggu,:KuotaNonBpjsMinggu
-                  ,:Group_Jadwal
+                  ,:Group_Jadwal, :Close_Schedule_Senin,:Close_Schedule_Selasa,:Close_Schedule_Rabu,:Close_Schedule_Kamis,:Close_Schedule_Jumat,:Close_Schedule_Sabtu,:Close_Schedule_Minggu,:Open_Jadwal_Senin,:Open_Jadwal_Selasa,:Open_Jadwal_Rabu,:Open_Jadwal_Kamis,:Open_Jadwal_Jumat,:Open_Jadwal_Sabtu,
+                    :Open_Jadwal_Minggu
               )");
             } else {
                 //alim
                 //CEK ADA PERUBAHAN ATAU TIDAK
+            
                 $this->db->query("SELECT 
-                Group_Jadwal,
-                Status_Aktif,
-                Senin,
-                Selasa,
-                Rabu,
-                Kamis,
-                Jumat,
-                Sabtu,
-                Minggu,
-                Note,
-                Senin_Sesion,
-                Selasa_Sesion,
-                Rabu_Sesion,
-                Kamis_Sesion,
-                Jumat_Sesion,
-                Sabtu_Sesion,
-                Minggu_Sesion,
-                Senin_Awal,
-                Senin_Akhir,
-                Selasa_Awal,
-                Selasa_Akhir,
-                Rabu_Awal,
-                Rabu_Akhir,
-                Kamis_Awal,
-                Kamis_akhir,
-                Jumat_Awal,
-                Jumat_Akhir,
-                Sabtu_Awal,
-                Sabtu_Akhir,
-                Minggu_Awal,
-                Minggu_Akhir
+             *
                  from MasterdataSQL.dbo.JadwalPraktek WHERE ID=:IdAuto");
                 $this->db->bind('IdAuto', $IdAuto);
                 $data2 =  $this->db->single();
@@ -621,7 +610,168 @@ class MasterDataJadwalDokter_Model
                 $session = SessionManager::getCurrentSession();
                 $namauserx = $session->name;
 
-                //HARI SENIN
+
+                
+        //     //Get reservasi
+        //     //Senin
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Senin'] != $SeninStatus || $data2['Senin_Awal'] != $SeninWaktuAwal || $data2['Senin_Akhir'] != $SeninWaktuAkhir || $data2['Senin_Sesion'] != $SessionSenin || $data2['Senin_Max'] != $MaxSenin || $data2['Senin_Max_JKN'] != $KuotaBpjsSenin || $data2['Senin_Max_NonJKN'] != $KuotaNonBpjsSenin) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Monday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         // $hari = $key['hari'];
+
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }            
+        //     //Selasa
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Selasa'] != $SelasaStatus || $data2['Selasa_Awal'] != $SelasaWaktuAwal || $data2['Selasa_Akhir'] != $SelasaWaktuAkhir || $data2['Selasa_Sesion'] != $SessionSelasa || $data2['Selasa_Max'] != $MaxSelasa || $data2['Selasa_Max_JKN'] != $KuotaBpjsSelasa || $data2['Selasa_Max_NonJKN'] != $KuotaNonBpjsSelasa) {
+
+        //     $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Tuesday' ");
+        //     $this->db->bind('IdAuto', $IdAuto);
+        //     $this->db->bind('ApmDate', $dates);
+
+        //     $dataReservasi =  $this->db->resultSet();
+        //     foreach ($dataReservasi as $key) {
+        //     $JumlahReservasi = $key['JumlahReservasi'];
+        //     // $hari = $key['hari'];
+
+        //     }
+
+        //     if ($JumlahReservasi >= 1 ) {
+        //         $callback = array(
+        //             'status' => 'warning',
+        //             'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //         );
+        //         return $callback;
+        //         exit;
+        //     }
+        // }
+
+        //     //Rabu
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Rabu'] != $RabuStatus || $data2['Rabu_Awal'] != $RabuWaktuAwal || $data2['Rabu_Akhir'] != $RabuWaktuAkhir || $data2['Rabu_Sesion'] != $SessionRabu || $data2['Rabu_Max'] != $MaxRabu || $data2['Rabu_Max_JKN'] != $KuotaBpjsRabu || $data2['Rabu_Max_NonJKN'] != $KuotaNonBpjsRabu) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Wednesday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }
+
+        //     //Kamis
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Kamis'] != $KamisStatus || $data2['Kamis_Awal'] != $KamisWaktuAwal || $data2['Kamis_akhir'] != $KamisWaktuAkhir || $data2['Kamis_Sesion'] != $SessionKamis || $data2['Kamis_Max'] != $MaxKamis || $data2['Kamis_Max_JKN'] != $KuotaBpjsKamis || $data2['Kamis_Max_NonJKN'] != $KuotaNonBpjsKamis) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Thursday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }
+
+        //     //Jumat
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Jumat'] != $JumatStatus || $data2['Jumat_Awal'] != $JumatWaktuAwal || $data2['Jumat_Akhir'] != $JumatWaktuAkhir || $data2['Jumat_Sesion'] != $SessionJumat || $data2['Jumat_Max'] != $MaxJumat || $data2['Jumat_Max_JKN'] != $KuotaBpjsJumat || $data2['Jumat_Max_NonJKN'] != $KuotaNonBpjsJumat) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Friday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }
+
+
+        //     //Sabtu
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Sabtu'] != $SabtuStatus || $data2['Sabtu_Awal'] != $SabtuWaktuAwal || $data2['Sabtu_Akhir'] != $SabtuWaktuAkhir || $data2['Sabtu_Sesion'] != $SessionSabtu || $data2['Sabtu_Max'] != $MaxSabtu || $data2['Sabtu_Max_JKN'] != $KuotaBpjsSabtu || $data2['Sabtu_Max_NonJKN'] != $KuotaNonBpjsSabtu) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Saturday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }
+
+
+        //     //Minggu
+        //     if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Minggu'] != $MingguStatus || $data2['Minggu_Awal'] != $MingguWaktuAwal || $data2['Minggu_Akhir'] != $MingguWaktuAkhir || $data2['Minggu_Sesion'] != $SessionMinggu || $data2['Minggu_Max'] != $MaxMinggu || $data2['Minggu_Max_JKN'] != $KuotaBpjsMinggu || $data2['Minggu_Max_NonJKN'] != $KuotaNonBpjsMinggu) {
+
+        //         $this->db->query("SELECT count(ID) AS JumlahReservasi from PerawatanSQL.dbo.Apointment where ID_JadwalPraktek=:IdAuto and replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') >=:ApmDate and DATENAME(weekday, ApmDate)='Sunday'");
+        //         $this->db->bind('IdAuto', $IdAuto);
+        //         $this->db->bind('ApmDate', $dates);
+    
+        //         $dataReservasi =  $this->db->resultSet();
+        //         foreach ($dataReservasi as $key) {
+        //         $JumlahReservasi = $key['JumlahReservasi'];
+        //         }
+    
+        //         if ($JumlahReservasi >= 1 ) {
+        //             $callback = array(
+        //                 'status' => 'warning',
+        //                 'errorname' => 'Pasien Sudah Ada Reservasi di Hari Tersebut, Harap Batal kan Reservasi Tersebut Dahulu Bila ingin Edit Jadwal',
+        //             );
+        //             return $callback;
+        //             exit;
+        //         }
+        //     }
+        //         //HARI SENIN
 
                 if ($data2['Status_Aktif'] != $StatusJadwal || $data2['Senin'] != $SeninStatus || $data2['Senin_Awal'] != $SeninWaktuAwal || $data2['Senin_Akhir'] != $SeninWaktuAkhir || $data2['Senin_Sesion'] != $SessionSenin) {
                     $hari = 'Monday';
@@ -1308,31 +1458,160 @@ class MasterDataJadwalDokter_Model
                     $this->db->execute();
                 }
                 //alim
-                $this->db->query("UPDATE MasterdataSQL.dbo.JadwalPraktek set  
-                        IDDokter=:NamaDokter,IDUnit=:GrupPerawatan,Status_Aktif=:Status_Aktif,Senin=:SeninStatus,Senin_waktu=:seninwaktumix,Senin_Sesion=:SessionSenin,
-                  Selasa=:SelasaStatus,Selasa_waktu=:selasawaktumix,Selasa_Sesion=:SessionSelasa, Rabu=:RabuStatus,Rabu_waktu=:rabuwaktumix,Rabu_Sesion=:SessionRabu,
-                  Kamis=:KamisStatus,Kamis_waktu=:kamiswaktumix,Kamis_Sesion=:SessionKamis,Jumat=:JumatStatus,Jumat_waktu=:jumatwaktumix,Jumat_Sesion=:SessionJumat,
-                  Sabtu=:SabtuStatus,Sabtu_waktu=:sabtuwaktumix,Sabtu_Sesion=:SessionSabtu,Minggu=:MingguStatus,Minggu_waktu=:mingguwaktumix,Minggu_Sesion=:SessionMinggu,Note=:Note,
-                  Senin_Awal=:SeninWaktuAwal,Senin_Akhir=:SeninWaktuAkhir,Selasa_Awal=:SelasaWaktuAwal,Selasa_Akhir=:SelasaWaktuAkhir, Rabu_Awal=:RabuWaktuAwal,Rabu_Akhir=:RabuWaktuAkhir,Kamis_Awal=:KamisWaktuAwal,Kamis_Akhir=:KamisWaktuAkhir,
-                  Jumat_Awal=:JumatWaktuAwal,Jumat_Akhir=:JumatWaktuAkhir,Sabtu_Awal=:SabtuWaktuAwal,Sabtu_Akhir=:SabtuWaktuAkhir,Minggu_Awal=:MingguWaktuAwal,Minggu_Akhir=:MingguWaktuAkhir,
-                  Senin_Max=:MaxSenin,Selasa_Max=:MaxSelasa,Rabu_Max=:MaxRabu,Kamis_Max=:MaxKamis, Jumat_Max=:MaxJumat,Sabtu_Max=:MaxSabtu,Minggu_Max=:MaxMinggu,NamaDokter=:First_Name,Poli=:NamaUnit
-                  ,Senin_Max_JKN=:KuotaBpjsSenin
-                  ,Senin_Max_NonJKN=:KuotaNonBpjsSenin
-                  ,Selasa_Max_JKN=:KuotaBpjsSelasa
-                  ,Selasa_Max_NonJKN=:KuotaNonBpjsSelasa
-                  ,Rabu_Max_JKN=:KuotaBpjsRabu
-                  ,Rabu_Max_NonJKN=:KuotaNonBpjsRabu
-                  ,Kamis_Max_JKN=:KuotaBpjsKamis
-                  ,Kamis_Max_NonJKN=:KuotaNonBpjsKamis
-                  ,Jumat_Max_JKN=:KuotaBpjsJumat
-                  ,Jumat_Max_NonJKN=:KuotaNonBpjsJumat
-                  ,Sabtu_Max_JKN=:KuotaBpjsSabtu
-                  ,Sabtu_Max_NonJKN=:KuotaNonBpjsSabtu
-                  ,Minggu_Max_JKN=:KuotaBpjsMinggu
-                  ,Minggu_Max_NonJKN=:KuotaNonBpjsMinggu,Group_Jadwal=:Group_Jadwal
-                            WHERE ID=:IdAuto");
-                $this->db->bind('IdAuto', $IdAuto);
-            }
+                if ($SeninStatus == '0' ) {
+                    // var_dump($SeninStatus);exit;
+                    // $seninwaktumix = null;
+                    $SeninWaktuAwal=NULL;
+                    $SeninWaktuAkhir= NULL;
+                    $SessionSenin= NULL;
+                    $MaxSenin= NULL;
+                    $seninwaktumix= NULL;
+                    $KuotaBpjsSenin= NULL;
+                    $KuotaNonBpjsSenin= NULL;
+
+                }
+                if ($SelasaStatus == '0' ) {
+                    $SelasaWaktuAwal=NULL;
+                    $SelasaWaktuAkhir= NULL;
+                    $SessionSelasa= NULL;
+                    $MaxSelasa= NULL;
+                    $Selasawaktumix= NULL;
+                    $KuotaBpjsSelasa= NULL;
+                    $KuotaNonBpjsSelasa= NULL;
+
+                }
+                if ($RabuStatus == '0' ) {
+                    $RabuWaktuAwal=NULL;
+                    $RabuWaktuAkhir= NULL;
+                    $SessionRabu= NULL;
+                    $MaxRabu= NULL;
+                    $rabuwaktumix= NULL;
+                    $KuotaBpjsRabu= NULL;
+                    $KuotaNonBpjsRabu= NULL;
+
+                }
+                if ($KamisStatus == '0' ) {  
+                    $KamisWaktuAwal=NULL;
+                    $KamisWaktuAkhir= NULL;
+                    $SessionKamis= NULL;
+                    $MaxKamis= NULL;
+                    $kamiswaktumix= NULL;
+                    $KuotaBpjsKamis= NULL;
+                    $KuotaNonBpjsKamis= NULL;
+                    
+                }
+                if ($JumatStatus == '0' ) {
+                    $JumatWaktuAwal=NULL;
+                    $JumatWaktuAkhir= NULL;
+                    $SessionJumat= NULL;
+                    $MaxJumat= NULL;
+                    $jumatwaktumix= NULL;
+                    $KuotaBpjsJumat= NULL;
+                    $KuotaNonBpjsJumat= NULL;
+
+                }
+                if ($SabtuStatus == '0' ) {
+                    $SabtuWaktuAwal=NULL;
+                    $SabtuWaktuAkhir= NULL;
+                    $SessionSabtu= NULL;
+                    $MaxSabtu= NULL;
+                    $sabtuwaktumix= NULL;
+                    $KuotaBpjsSabtu= NULL;
+                    $KuotaNonBpjsSabtu= NULL;
+
+                }
+                if ($MingguStatus == '0' ) {
+                    $MingguWaktuAwal=NULL;
+                    $MingguWaktuAkhir= NULL;
+                    $SessionMinggu= NULL;
+                    $MaxMinggu= NULL;
+                    $mingguwaktumix= NULL;
+                    $KuotaBpjsMinggu= NULL;
+                    $KuotaNonBpjsMinggu= NULL;
+                
+                  
+                                        $this->db->query("UPDATE MasterdataSQL.dbo.JadwalPraktek set  
+                                        IDDokter=:NamaDokter,IDUnit=:GrupPerawatan,Status_Aktif=:Status_Aktif,Senin=:SeninStatus,Senin_waktu=:seninwaktumix,Senin_Sesion=:SessionSenin,
+                                  Selasa=:SelasaStatus,Selasa_waktu=:selasawaktumix,Selasa_Sesion=:SessionSelasa, Rabu=:RabuStatus,Rabu_waktu=:rabuwaktumix,Rabu_Sesion=:SessionRabu,
+                                  Kamis=:KamisStatus,Kamis_waktu=:kamiswaktumix,Kamis_Sesion=:SessionKamis,Jumat=:JumatStatus,Jumat_waktu=:jumatwaktumix,Jumat_Sesion=:SessionJumat,
+                                  Sabtu=:SabtuStatus,Sabtu_waktu=:sabtuwaktumix,Sabtu_Sesion=:SessionSabtu,Minggu=:MingguStatus,Minggu_waktu=:mingguwaktumix,Minggu_Sesion=:SessionMinggu,Note=:Note,
+                                  Senin_Awal=:SeninWaktuAwal,Senin_Akhir=:SeninWaktuAkhir,Selasa_Awal=:SelasaWaktuAwal,Selasa_Akhir=:SelasaWaktuAkhir, Rabu_Awal=:RabuWaktuAwal,Rabu_Akhir=:RabuWaktuAkhir,Kamis_Awal=:KamisWaktuAwal,Kamis_Akhir=:KamisWaktuAkhir,
+                                  Jumat_Awal=:JumatWaktuAwal,Jumat_Akhir=:JumatWaktuAkhir,Sabtu_Awal=:SabtuWaktuAwal,Sabtu_Akhir=:SabtuWaktuAkhir,Minggu_Awal=:MingguWaktuAwal,Minggu_Akhir=:MingguWaktuAkhir,
+                                  Senin_Max=:MaxSenin,Selasa_Max=:MaxSelasa,Rabu_Max=:MaxRabu,Kamis_Max=:MaxKamis, Jumat_Max=:MaxJumat,Sabtu_Max=:MaxSabtu,Minggu_Max=:MaxMinggu,NamaDokter=:First_Name,Poli=:NamaUnit
+                                  ,Senin_Max_JKN=:KuotaBpjsSenin
+                                  ,Senin_Max_NonJKN=:KuotaNonBpjsSenin
+                                  ,Selasa_Max_JKN=:KuotaBpjsSelasa
+                                  ,Selasa_Max_NonJKN=:KuotaNonBpjsSelasa
+                                  ,Rabu_Max_JKN=:KuotaBpjsRabu
+                                  ,Rabu_Max_NonJKN=:KuotaNonBpjsRabu
+                                  ,Kamis_Max_JKN=:KuotaBpjsKamis
+                                  ,Kamis_Max_NonJKN=:KuotaNonBpjsKamis
+                                  ,Jumat_Max_JKN=:KuotaBpjsJumat
+                                  ,Jumat_Max_NonJKN=:KuotaNonBpjsJumat
+                                  ,Sabtu_Max_JKN=:KuotaBpjsSabtu
+                                  ,Sabtu_Max_NonJKN=:KuotaNonBpjsSabtu
+                                  ,Minggu_Max_JKN=:KuotaBpjsMinggu
+                                  ,Minggu_Max_NonJKN=:KuotaNonBpjsMinggu,Group_Jadwal=:Group_Jadwal,Close_Schedule_Senin=:Close_Schedule_Senin,
+                    Close_Schedule_Selasa=:Close_Schedule_Selasa,
+                    Close_Schedule_Rabu =:Close_Schedule_Rabu ,
+                    Close_Schedule_Kamis=:Close_Schedule_Kamis,
+                    Close_Schedule_Jumat=:Close_Schedule_Jumat,
+                    Close_Schedule_Sabtu=:Close_Schedule_Sabtu,
+                    Close_Schedule_Minggu=:Close_Schedule_Minggu,Open_Assesment_Senin=:Open_Jadwal_Senin
+,Open_Assesment_Selasa=:Open_Jadwal_Selasa
+,Open_Assesment_Rabu=:Open_Jadwal_Rabu
+,Open_Assesment_Kamis=:Open_Jadwal_Kamis
+,Open_Assesment_Jumat=:Open_Jadwal_Jumat
+,Open_Assesment_Sabtu=:Open_Jadwal_Sabtu
+,Open_Assesment_Minggu=:Open_Jadwal_Minggu
+                                            WHERE ID=:IdAuto");
+                                $this->db->bind('IdAuto', $IdAuto);
+
+                                    }else{
+                                        // var_dump($SeninStatus);exit;
+                    
+                                        $this->db->query("UPDATE MasterdataSQL.dbo.JadwalPraktek set  
+                                        IDDokter=:NamaDokter,IDUnit=:GrupPerawatan,Status_Aktif=:Status_Aktif,Senin=:SeninStatus,Senin_waktu=:seninwaktumix,Senin_Sesion=:SessionSenin,
+                                  Selasa=:SelasaStatus,Selasa_waktu=:selasawaktumix,Selasa_Sesion=:SessionSelasa, Rabu=:RabuStatus,Rabu_waktu=:rabuwaktumix,Rabu_Sesion=:SessionRabu,
+                                  Kamis=:KamisStatus,Kamis_waktu=:kamiswaktumix,Kamis_Sesion=:SessionKamis,Jumat=:JumatStatus,Jumat_waktu=:jumatwaktumix,Jumat_Sesion=:SessionJumat,
+                                  Sabtu=:SabtuStatus,Sabtu_waktu=:sabtuwaktumix,Sabtu_Sesion=:SessionSabtu,Minggu=:MingguStatus,Minggu_waktu=:mingguwaktumix,Minggu_Sesion=:SessionMinggu,Note=:Note,
+                                  Senin_Awal=:SeninWaktuAwal,Senin_Akhir=:SeninWaktuAkhir,Selasa_Awal=:SelasaWaktuAwal,Selasa_Akhir=:SelasaWaktuAkhir, Rabu_Awal=:RabuWaktuAwal,Rabu_Akhir=:RabuWaktuAkhir,Kamis_Awal=:KamisWaktuAwal,Kamis_Akhir=:KamisWaktuAkhir,
+                                  Jumat_Awal=:JumatWaktuAwal,Jumat_Akhir=:JumatWaktuAkhir,Sabtu_Awal=:SabtuWaktuAwal,Sabtu_Akhir=:SabtuWaktuAkhir,Minggu_Awal=:MingguWaktuAwal,Minggu_Akhir=:MingguWaktuAkhir,
+                                  Senin_Max=:MaxSenin,Selasa_Max=:MaxSelasa,Rabu_Max=:MaxRabu,Kamis_Max=:MaxKamis, Jumat_Max=:MaxJumat,Sabtu_Max=:MaxSabtu,Minggu_Max=:MaxMinggu,NamaDokter=:First_Name,Poli=:NamaUnit
+                                  ,Senin_Max_JKN=:KuotaBpjsSenin
+                                  ,Senin_Max_NonJKN=:KuotaNonBpjsSenin
+                                  ,Selasa_Max_JKN=:KuotaBpjsSelasa
+                                  ,Selasa_Max_NonJKN=:KuotaNonBpjsSelasa
+                                  ,Rabu_Max_JKN=:KuotaBpjsRabu
+                                  ,Rabu_Max_NonJKN=:KuotaNonBpjsRabu
+                                  ,Kamis_Max_JKN=:KuotaBpjsKamis
+                                  ,Kamis_Max_NonJKN=:KuotaNonBpjsKamis
+                                  ,Jumat_Max_JKN=:KuotaBpjsJumat
+                                  ,Jumat_Max_NonJKN=:KuotaNonBpjsJumat
+                                  ,Sabtu_Max_JKN=:KuotaBpjsSabtu
+                                  ,Sabtu_Max_NonJKN=:KuotaNonBpjsSabtu
+                                  ,Minggu_Max_JKN=:KuotaBpjsMinggu
+                                  ,Minggu_Max_NonJKN=:KuotaNonBpjsMinggu,Group_Jadwal=:Group_Jadwal,
+                                    Close_Schedule_Senin=:Close_Schedule_Senin,
+                                    Close_Schedule_Selasa=:Close_Schedule_Selasa,
+                                    Close_Schedule_Rabu =:Close_Schedule_Rabu ,
+                                    Close_Schedule_Kamis=:Close_Schedule_Kamis,
+                                    Close_Schedule_Jumat=:Close_Schedule_Jumat,
+                                    Close_Schedule_Sabtu=:Close_Schedule_Sabtu,
+                                    Close_Schedule_Minggu=:Close_Schedule_Minggu,
+                                    Open_Assesment_Senin=:Open_Jadwal_Senin
+,Open_Assesment_Selasa=:Open_Jadwal_Selasa
+,Open_Assesment_Rabu=:Open_Jadwal_Rabu
+,Open_Assesment_Kamis=:Open_Jadwal_Kamis
+,Open_Assesment_Jumat=:Open_Jadwal_Jumat
+,Open_Assesment_Sabtu=:Open_Jadwal_Sabtu
+,Open_Assesment_Minggu=:Open_Jadwal_Minggu
+                                            WHERE ID=:IdAuto");
+                                $this->db->bind('IdAuto', $IdAuto);
+                             
+                                    }
+                                }
+                                    
             $this->db->bind('Status_Aktif', $StatusJadwal);
             $this->db->bind('SeninStatus', $SeninStatus);
             $this->db->bind('SeninWaktuAwal', $SeninWaktuAwal);
@@ -1398,6 +1677,20 @@ class MasterDataJadwalDokter_Model
             $this->db->bind('KuotaBpjsMinggu', $KuotaBpjsMinggu);
             $this->db->bind('KuotaNonBpjsMinggu', $KuotaNonBpjsMinggu);
             $this->db->bind('Group_Jadwal', $GroupJadwal);
+            $this->db->bind('Close_Schedule_Senin',$Close_Schedule_Senin);
+            $this->db->bind('Close_Schedule_Selasa',$Close_Schedule_Selasa);
+            $this->db->bind('Close_Schedule_Rabu',$Close_Schedule_Rabu);
+            $this->db->bind('Close_Schedule_Kamis',$Close_Schedule_Kamis);
+            $this->db->bind('Close_Schedule_Jumat',$Close_Schedule_Jumat);
+            $this->db->bind('Close_Schedule_Sabtu',$Close_Schedule_Sabtu);
+            $this->db->bind('Close_Schedule_Minggu',$Close_Schedule_Minggu);
+            $this->db->bind('Open_Jadwal_Senin',$Open_Jadwal_Senin);
+            $this->db->bind('Open_Jadwal_Selasa',$Open_Jadwal_Selasa);
+            $this->db->bind('Open_Jadwal_Rabu',$Open_Jadwal_Rabu);
+            $this->db->bind('Open_Jadwal_Kamis',$Open_Jadwal_Kamis);
+            $this->db->bind('Open_Jadwal_Jumat',$Open_Jadwal_Jumat);
+            $this->db->bind('Open_Jadwal_Sabtu',$Open_Jadwal_Sabtu);
+            $this->db->bind('Open_Jadwal_Minggu',$Open_Jadwal_Minggu);
 
             $this->db->execute();
             $this->db->commit();
@@ -1484,6 +1777,21 @@ class MasterDataJadwalDokter_Model
             $passing['Sabtu_Max_NonJKN'] = $data['Sabtu_Max_NonJKN'];
             $passing['Minggu_Max_JKN'] = $data['Minggu_Max_JKN'];
             $passing['Minggu_Max_NonJKN'] = $data['Minggu_Max_NonJKN'];
+            $passing['Close_Schedule_Senin'] = $data['Close_Schedule_Senin'];
+            $passing['Close_Schedule_Selasa'] = $data['Close_Schedule_Selasa'];
+            $passing['Close_Schedule_Rabu'] = $data['Close_Schedule_Rabu'];
+            $passing['Close_Schedule_Kamis'] = $data['Close_Schedule_Kamis'];
+            $passing['Close_Schedule_Jumat'] = $data['Close_Schedule_Jumat'];
+            $passing['Close_Schedule_Sabtu'] = $data['Close_Schedule_Sabtu'];
+            $passing['Close_Schedule_Minggu'] = $data['Close_Schedule_Minggu'];
+            $passing['Open_Assesment_Senin'] = $data['Open_Assesment_Senin'];
+            $passing['Open_Assesment_Selasa'] = $data['Open_Assesment_Selasa'];
+            $passing['Open_Assesment_Rabu'] = $data['Open_Assesment_Rabu'];
+            $passing['Open_Assesment_Kamis'] = $data['Open_Assesment_Kamis'];
+            $passing['Open_Assesment_Jumat'] = $data['Open_Assesment_Jumat'];
+            $passing['Open_Assesment_Sabtu'] = $data['Open_Assesment_Sabtu'];
+            $passing['Open_Assesment_Minggu'] = $data['Open_Assesment_Minggu'];
+
 
             $callback = array(
                 'message' => "success", // Set array nama 

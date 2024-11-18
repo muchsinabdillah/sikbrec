@@ -7,26 +7,26 @@ $datetimenow = date("Y-m-d\TH:i:s");
 <link type="text/css" href="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
     rel="stylesheet" />
 <style>
-table {
-    border: 2px solid #6C6A61;
-    border-collapse: collapse;
-    font-size: 10px;
-}
+    table {
+        border: 2px solid #6C6A61;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
 
-th,
-td {
-    border: 1px solid #bbb;
-    padding: 2px 8px 0;
-    font-size: 10px;
-}
+    th,
+    td {
+        border: 1px solid #bbb;
+        padding: 2px 8px 0;
+        font-size: 10px;
+    }
 
-thead>tr>th {
-    background-color: #C0C0C0;
-    border-bottom: 2px solid #999;
-    font-size: 10px;
-}
+    thead>tr>th {
+        background-color: #C0C0C0;
+        border-bottom: 2px solid #999;
+        font-size: 10px;
+    }
 
-/* .border-ranap {
+    /* .border-ranap {
     border-left-color: #1E90FF;
     border-left-style: groove;
     border-left-width: 7px;
@@ -55,45 +55,45 @@ thead>tr>th {
 } */
 
 
-/* input transparant */
-input {
-    /* width: 300px; */
-    padding: 10px 20px;
-    border-color: transparent;
-    border-bottom: 5px solid darkgrey;
-    font-size: 15px;
-    background: transparent;
-}
+    /* input transparant */
+    input {
+        /* width: 300px; */
+        padding: 10px 20px;
+        border-color: transparent;
+        border-bottom: 5px solid darkgrey;
+        font-size: 15px;
+        background: transparent;
+    }
 
-input:focus {
-    outline: none;
-}
+    input:focus {
+        outline: none;
+    }
 
-input::-webkit-input-placeholder {
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input::-webkit-input-placeholder {
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input:-moz-placeholder {
-    /* Firefox 18- */
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input:-moz-placeholder {
+        /* Firefox 18- */
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input::-moz-placeholder {
-    /* Firefox 19+ */
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input::-moz-placeholder {
+        /* Firefox 19+ */
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input:-ms-input-placeholder {
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input:-ms-input-placeholder {
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 </style>
 <div class="main-page">
     <section class="section" style="margin-top: -20px;">
@@ -328,18 +328,6 @@ input:-ms-input-placeholder {
                                             <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
                                             Print Kuintansi Rekap</button> -->
 
-                                        <!-- 20/08/2024 -->
-                                        <button class="btn btn-warning  btn-xs" data-toggle='modal'
-                                            title="Print This Payment" id="btn_openorclose_bill" type="button"
-                                            onclick="btnCloseOrOpenBill()">
-                                            <span class="glyphicon glyphicon-printx" aria-hidden="true">
-                                            </span>
-                                        </button>
-
-                                        <input type="hidden" name="Ket_btn_closeoropenbill"
-                                            id="Ket_btn_closeoropenbill">
-                                        <!-- 20/08/2024 -->
-
                                         <!-- <button class="btn btn-warning  btn-xs" data-toggle='modal'
                                             title="Print This Payment" id="btn_close_bill" type="button">
                                             <span class="glyphicon glyphicon-printx" aria-hidden="true"></span>
@@ -411,11 +399,23 @@ input:-ms-input-placeholder {
                                                     <input type="date" class="form-control" id="tglakhir"
                                                         name="tglakhir">
                                                 </div>
-                                                <div class="col-sm-2">
+                                                <div class="col-sm-6">
                                                     <button class="btn btn-warning  btn-rounded " id="btn_periode"
                                                         name="btn_periode">
                                                         <span class="glyphicon glyphicon-calendar"
                                                             aria-hidden="true"></span></button>
+                                                </div>
+                                                <div class="col-sm-1">
+                                                    <!-- 20/08/2024 -->
+                                                    <button class="btn btn-warning  btn-rounded" data-toggle='modal'
+                                                        title="Print This Payment" id="btn_openorclose_bill"
+                                                        type="button" onclick="btnCloseOrOpenBill()">
+                                                        <span class="glyphicon glyphicon-printx" aria-hidden="true">
+                                                        </span>
+                                                    </button>
+                                                    <input type="hidden" name="Ket_btn_closeoropenbill"
+                                                        id="Ket_btn_closeoropenbill">
+                                                    <!-- 20/08/2024 -->
                                                 </div>
 
                                             </div>
@@ -454,11 +454,11 @@ input:-ms-input-placeholder {
             <div class="modal-body">
                 <form class="form-horizontal" id="frmDigitalSign">
                     <br>
-                    <div class="form-group gut ">
+                    <!-- <div class="form-group gut ">
                         <label for="inputEmail3" class="col-sm-4 control-label">Bahasa</label>
                         <div class="col-sm-6">
                             <input class="form-control input-sm" type="text" id="pkuitansi_lang" readonly
-                                autocomplete="off" name="pkuitansi_lang" value="<?= $data['pkuitansi_lang'] ?>">
+                                autocomplete="off" name="pkuitansi_lang" value=>">
                         </div>
                     </div>
                     <div class="form-group gut ">
@@ -466,14 +466,26 @@ input:-ms-input-placeholder {
                         <div class="col-sm-6">
                             <input class="form-control input-sm" type="text" id="pkuitansi_jeniscetakan" readonly
                                 autocomplete="off" name="pkuitansi_jeniscetakan"
-                                value="<?= $data['pkuitansi_jeniscetakan'] ?>">
+                                value="">
+                        </div>
+                    </div> -->
+                    <div class="form-group gut ">
+                        <label for="inputEmail3" class="col-sm-4 control-label">Status E-Materai</label>
+                        <div class="col-sm-5">
+                            <input class="form-control input-sm" type="text" id="pstatsu_Ematerai" readonly
+                                autocomplete="off" name="pstatsu_Ematerai">
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" class="btn btn-primary btn-xs" id="btnGenerateEmaterai"
+                                name="btnGenerateEmaterai"><i class="fa fa-save" aria-hidden="true"></i> GENERATE
+                            </button>
                         </div>
                     </div>
                     <div class="form-group gut ">
                         <label for="inputEmail3" class="col-sm-4 control-label">No. Transaksi</label>
                         <div class="col-sm-6">
                             <input class="form-control input-sm" type="text" id="pkuitansi_notrs" readonly
-                                autocomplete="off" name="pkuitansi_notrs" value="<?= $data['pkuitansi_notrs'] ?>">
+                                autocomplete="off" name="pkuitansi_notrs">
                         </div>
                     </div>
                     <div class="form-group gut ">
@@ -492,23 +504,30 @@ input:-ms-input-placeholder {
                                 name="pemail_pasien">
                         </div>
                     </div>
-                    <!-- <div class="form-group gut ">
+                    <div class="form-group gut ">
                         <label for="inputEmail3" class="col-sm-4 control-label">Alasan Cetak/Kirim</label>
                         <div class="col-sm-6">
-                            <input class="form-control input-sm" type="text" id="signAlasanCetak" autocomplete="off" name="signAlasanCetak" placeholder="ketik Alasan Cetak disini">
-                            <small>Silahkan Masukan Alasan cetak selengkap mungkin, untuk memudahkan Tracing Data.</small>
+                            <input class="form-control input-sm" type="text" id="Alasan_Cetak" autocomplete="off"
+                                name="Alasan_Cetak" placeholder="ketik Alasan Cetak disini">
+                            <small>Silahkan Masukan Alasan cetak selengkap mungkin, untuk memudahkan Tracing
+                                Data.</small>
                         </div>
 
-                    </div> -->
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-wide" id="btnSaveSendX" name="btnSaveSendX"><i
+                        class="fa fa-whatsapp" aria-hidden="true"></i> Send WhatsApp </button>
+
+                <button type="button" class="btn btn-primary btn-wide" id="btnSendEmail" name="btnSendEmail"><i
+                        class="fa fa-envelope" aria-hidden="true"></i> Send Email </button>
                 <!-- <div class="btn-group" role="group">
                 <button type="button" class="btn btn-success btn-wide btn-rounded" id="btnSendWA" name="btnSendWA"><i class="fa fa-whatsapp"></i> Send WA </button>
                     <button type="button" class="btn btn-warning btn-wide btn-rounded" id="btnSendEmail" name="btnSendEmail"><i class="fa fa-envelope" aria-hidden="true"></i> Send Email </button>
                 </div> -->
-                <button type="button" class="btn btn-primary btn-wide" id="btnSaveSend" name="btnSaveSend"><i
-                        class="fa fa-save" aria-hidden="true"></i> SIMPAN DAN KIRIM </button>
+                <button type="button" class="btn btn-primary btn-wide" onclick="CetakPDF()"><i class="fa fa-save"
+                        aria-hidden="true"></i> Cetak</button>
                 <!-- <button type="button" class="btn btn-primary btn-wide" data-toggle=' modal'
                                             id="btn_rincian_biaya">
                                             <span class="glyphicon glyphicon-print" aria-hidden="true"></span>
@@ -526,6 +545,64 @@ input:-ms-input-placeholder {
     </div>
 </div>
 
+
+<div class="modal fade" id="mAlasanBtlPayment" data-backdrop="static" data-keyboard="false" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Masukkan Alasan Untuk Pembatalan Payment</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="frmAlasanBtlPayment">
+                    <br>
+                    <div class="form-group gut ">
+                        <div class="col-sm-12">
+                            <input class="form-control input-sm" type="hidden" id="tNoTrs" name="tNoTrs">
+                            <textarea class="form-control input-sm " id="alasanBtlPayment" name="alasanBtlPayment"
+                                placeholder="Ketik alasan disini, untuk pembatalan payment"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" class="btn btn-default" href="#" id="CloseMe" name="CloseMe">Close</a>
+                <button type="button" class="btn btn-danger btn-wide" onclick="btnbatalriwayatpembayaranbymodal()"><i
+                        class="fa fa-trash" aria-hidden="true"></i> Batal </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="mAlasanOpenBill" data-backdrop="static" data-keyboard="false" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Masukkan Alasan Open Bill</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="frmAlasanOpenBill">
+                    <br>
+                    <div class="form-group gut ">
+                        <div class="col-sm-12">
+                            <textarea class="form-control input-sm " id="AlasanOpen" name="AlasanOpen"
+                                placeholder="Ketik alasan disini, untuk pembatalan payment"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" class="btn btn-default" href="#" id="CloseMe" name="CloseMe">Close</a>
+                <button type="button" class="btn btn-danger btn-wide" onclick="btnCloseOrOpenBillNext()"><i
+                        class="fa fa-trash" aria-hidden="true"></i> Open Bill </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <?php include("section/modalall.php"); ?>
 <?php include("section/modalclosing.php"); ?>
 <?php include("section/modalpembayaran.php"); ?>
@@ -539,6 +616,7 @@ input:-ms-input-placeholder {
 <?php include("section/modalpasienKabur.php"); ?>
 <?php include("section/modaldetailkomponen.php"); ?>
 <?php include("section/modaledittarif.php"); ?>
+
 
 
 <!--#END Modal closing ------------------------>

@@ -673,7 +673,7 @@ function getAge(birthdaypasien) {
 }
 function createReservasiWalkin(){
     // event.preventDefault();
-    $(".preloader").fadeIn();
+    // $(".preloader").fadeIn();
 
     var formData = {
         MrExist:$('#nomormr').val(),

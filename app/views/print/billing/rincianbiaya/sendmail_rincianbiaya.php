@@ -17,13 +17,13 @@ try {
     $mail->isSMTP();                                            //Send using SMTP
     $mail->Host       = 'smtp.kirimemail.com';                     //Set the SMTP server to send through
     $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
-    $mail->Username   = 'email@noreply.rsyarsi.co.id';                     //SMTP username
-    $mail->Password   = '6umEJL0r';                               //SMTP password
+    $mail->Username   = 'noreply@csmails.rsyarsi.co.id';                     //SMTP username
+    $mail->Password   = 'GZKlH4YI';                               //SMTP password
     $mail->SMTPSecure = 'ssl';            //Enable implicit TLS encryption
     $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
     //pengirim
-    $mail->setFrom('email@noreply.rsyarsi.co.id', 'Rumah Sakit YARSI');
+    $mail->setFrom('noreply@csmails.rsyarsi.co.id', 'Rumah Sakit YARSI');
     $email_to = 'muchsin.abdillah@gmail.com';
     $mail->addAddress($email_to);     //Add a recipient
  

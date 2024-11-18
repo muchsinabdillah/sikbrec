@@ -7,6 +7,9 @@ use Ramsey\Uuid\UuidInterface;
 
 class  B_Billing_Model
 {
+    use ApiRsyarsi;
+    use ApiGenerateEmaterai;
+
     private $db;
 
     public function __construct()
@@ -491,17 +494,24 @@ class  B_Billing_Model
         }
     }
 
+    // Penjualan Obat Bebas
     public function getDataListBillingBebas($data)
     {
         try {
+            //13-09-2024 editan fiqri
             $tglawal = $data['tglawal'];
             $tglakhir = $data['tglakhir'];
-            $this->db->query(" SELECT '-' as NoMR,NoRegistrasi,[Ship Name] as NamaPasien,[Order Date] as TglKunjungan,JenisResep AS NamaUnit,ss.[Status Name] as NamaStatus
-            FROM [Apotik_V1.1SQL].dbo.Orders a
-			inner join [Apotik_V1.1SQL].dbo.[Orders Status] ss on a.[Status ID]=ss.[Status ID]
-            Where a.[Status ID]<>4  and OrderBatal=0 AND NoRegistrasi like '%B%' and
-                 replace(CONVERT(VARCHAR(11),[Order Date], 111), '/','-')  between :tglawal and :tglakhir
-             ");
+            $this->db->query("SELECT TransactionCode,'-' as NoMR,NoRegistrasi,NamaPembeli as NamaPasien,TransactionDate as TglKunjungan,JenisPasien AS NamaUnit,
+CASE 
+WHEN b.NO_TRS_BILLING  IS NULL AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'NEW' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'APPROVED' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NOT NULL AND d.NOREG_FIRST IS NULL THEN 'PAYMENT'
+ELSE 'CLOSED' END AS NamaStatus
+                FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+				LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING b on b.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.FO_T_KASIR c on c.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.CLOSING_BILL d on d.NOREG_FIRST = a.TransactionCode
+                Where replace(CONVERT(VARCHAR(11),TransactionDate, 111), '/','-')  between :tglawal and :tglakhir and Group_Transaksi='NON RESEP' AND d.NOREG_FIRST IS NULL AND a.Void = '0'");
             $this->db->bind('tglawal', $tglawal);
             $this->db->bind('tglakhir', $tglakhir);
             $data =  $this->db->resultSet();
@@ -515,6 +525,44 @@ class  B_Billing_Model
                 $pasing['TglKunjungan'] = $key['TglKunjungan'];
                 $pasing['NamaUnit'] = $key['NamaUnit'];
                 $pasing['NamaStatus'] = $key['NamaStatus'];
+                $pasing['TransactionCode'] = $key['TransactionCode'];
+                $rows[] = $pasing;
+            }
+            return $rows;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+    public function getDataListBillingBebas_Arsip($data)
+    {
+        try {
+            $tglawal = $data['tglawal'];
+            $tglakhir = $data['tglakhir'];
+            $this->db->query("SELECT TransactionCode,'-' as NoMR,NoRegistrasi,NamaPembeli as NamaPasien,TransactionDate as TglKunjungan,JenisPasien AS NamaUnit,
+CASE 
+WHEN b.NO_TRS_BILLING  IS NULL AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'NEW' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'APPROVED' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NOT NULL AND d.NOREG_FIRST IS NULL THEN 'PAYMENT'
+ELSE 'CLOSED' END AS NamaStatus
+                FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+				LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING b on b.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.FO_T_KASIR c on c.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.CLOSING_BILL d on d.NOREG_FIRST = a.TransactionCode
+                Where replace(CONVERT(VARCHAR(11),TransactionDate, 111), '/','-')  between :tglawal and :tglakhir and Group_Transaksi='NON RESEP' AND d.NOREG_FIRST IS NOT NULL AND a.Void = '0'");
+            $this->db->bind('tglawal', $tglawal);
+            $this->db->bind('tglakhir', $tglakhir);
+            $data =  $this->db->resultSet();
+            $rows = array();
+            $no = 1;
+            foreach ($data as $key) {
+                $pasing['No'] = $no++;
+                $pasing['NoMR'] = $key['NoMR'];
+                $pasing['NoRegistrasi'] = $key['NoRegistrasi'];
+                $pasing['NamaPasien'] = $key['NamaPasien'];
+                $pasing['TglKunjungan'] = $key['TglKunjungan'];
+                $pasing['NamaUnit'] = $key['NamaUnit'];
+                $pasing['NamaStatus'] = $key['NamaStatus'];
+                $pasing['TransactionCode'] = $key['TransactionCode'];
                 $rows[] = $pasing;
             }
             return $rows;
@@ -523,17 +571,73 @@ class  B_Billing_Model
         }
     }
 
-    public function getDataListBillingBebas_Arsip($data)
+
+    public function getDataPasienBebas($data)
     {
         try {
+            $notrscode = $data['NoRegistrasi'];
+            $this->db->query("SELECT TransactionCode, NamaPembeli, GenderPembeli, JenisPasien, replace(CONVERT(VARCHAR(11), TglLahirPembeli, 111), '/','-') as TglLahir, 
+replace(CONVERT(VARCHAR(11), TransactionDate, 111), '/','-') as TglKunjungan, NamaUnit, NamaJaminan, KodeJaminan, GroupJaminan, AlamatPembeli,
+CASE 
+WHEN b.NO_TRS_BILLING  IS NULL AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'NEW' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NULL AND d.NOREG_FIRST IS NULL THEN 'APPROVED' 
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NOT NULL AND d.NOREG_FIRST IS NULL THEN 'PAYMENT'
+ELSE 'CLOSED' END AS NamaStatus,
+CASE
+WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NOT NULL AND d.NOREG_FIRST IS NOT NULL THEN 'close'
+ELSE 'open' END AS statusclose
+FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING b on b.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.FO_T_KASIR c on c.NO_REGISTRASI = a.TransactionCode
+				LEFT JOIN Billing_Pasien.dbo.CLOSING_BILL d on d.NOREG_FIRST = a.TransactionCode WHERE TransactionCode = :notrscode");
+            $this->db->bind('notrscode', $notrscode);
+            $key =  $this->db->single();
+            $pasing['TransactionCode'] = $key['TransactionCode'];
+            $pasing['NamaPembeli'] = $key['NamaPembeli'];
+            $pasing['GenderPembeli'] = $key['GenderPembeli'];
+            $pasing['JenisPasien'] = $key['JenisPasien'];
+            $pasing['TglLahir'] = $key['TglLahir'];
+            $pasing['TglKunjungan'] = $key['TglKunjungan'];
+            $pasing['NamaUnit'] = $key['NamaUnit'];
+            $pasing['NamaJaminan'] = $key['NamaJaminan'];
+            $pasing['KodeJaminan'] = $key['KodeJaminan'];
+            $pasing['GroupJaminan'] = $key['GroupJaminan'];
+            $pasing['AlamatPembeli'] = $key['AlamatPembeli'];
+            $pasing['StatusReg'] = $key['NamaStatus'];
+            $pasing['statusclose'] = $key['statusclose'];
+
+            $callback = array(
+                'message' => "success", // Set array nama 
+                'data' => $pasing
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function getDataApproveFarmasiBebas($data)
+    {
+        try {
+            $notrs = $data['noreg'];
             $tglawal = $data['tglawal'];
             $tglakhir = $data['tglakhir'];
-            $this->db->query("SELECT '-' as NoMR,NoRegistrasi,[Ship Name] as NamaPasien,[Order Date] as TglKunjungan,JenisResep AS NamaUnit,ss.[Status Name] as NamaStatus
-            FROM [Apotik_V1.1SQL].dbo.Orders a
-			inner join [Apotik_V1.1SQL].dbo.[Orders Status] ss on a.[Status ID]=ss.[Status ID]
-            Where a.[Status ID]=4  and OrderBatal=0 AND NoRegistrasi like '%B%' and
-                 replace(CONVERT(VARCHAR(11),[Order Date], 111), '/','-')  between :tglawal and :tglakhir
-             ");
+            $substr = substr($notrs, 0, 2);
+
+            // Badrul
+            // Start Data Approve
+            $query = "SELECT a.ID, TransactionCode, Satuan_Beli, ProductCode, ProductName, a.Qty, a.Grandtotal, '-' AS StatusOrder, replace(CONVERT(VARCHAR(11), DateAdd, 111), '/','-') as TglOrder, 
+            CASE 
+	        WHEN b.NO_TRS_BILLING  IS NULL THEN 'NEW'
+	        ELSE 'APPROVED' END AS NamaStatus
+            FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_dtl a
+			LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING_1 b on b.KODE_REF = a.ID
+			WHERE TransactionCode = :notrs1 AND a.Void = '0' AND replace(CONVERT(VARCHAR(11), DateAdd, 111), '/','-') Between :tglawal AND :tglakhir";
+            // End Data Approve
+            // Badrul
+
+            $this->db->query($query);
+            $this->db->bind('notrs1', $notrs);
             $this->db->bind('tglawal', $tglawal);
             $this->db->bind('tglakhir', $tglakhir);
             $data =  $this->db->resultSet();
@@ -541,12 +645,1084 @@ class  B_Billing_Model
             $no = 1;
             foreach ($data as $key) {
                 $pasing['No'] = $no++;
-                $pasing['NoMR'] = $key['NoMR'];
-                $pasing['NoRegistrasi'] = $key['NoRegistrasi'];
-                $pasing['NamaPasien'] = $key['NamaPasien'];
-                $pasing['TglKunjungan'] = $key['TglKunjungan'];
-                $pasing['NamaUnit'] = $key['NamaUnit'];
+                $pasing['ID'] = $key['ID'];
+                $pasing['TransactionCode'] = $key['TransactionCode'];
+                $pasing['Satuan_Beli'] = $key['Satuan_Beli'];
+                $pasing['ProductCode'] = $key['ProductCode'];
+                $pasing['ProductName'] = $key['ProductName'];
+                $pasing['Qty'] = $key['Qty'];
+                $pasing['Grandtotal'] = number_format($key['Grandtotal'], 0, ',', '.');
+                $pasing['StatusOrder'] = $key['StatusOrder'];
+                $pasing['TglOrder'] = $key['TglOrder'];
                 $pasing['NamaStatus'] = $key['NamaStatus'];
+                //$rows[] = $pasing;
+                $rows[] = $pasing;
+            }
+            // var_dump($rows);
+            return $rows;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function ApprovePenjualanBebas($data)
+    {
+        try {
+            $this->db->transaksi();
+            $session = SessionManager::getCurrentSession();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+
+            $noreg = $data['noreg'];
+            $noeps = $data['noeps'];
+            $nomr = $data['nomr'];
+            $datebill = $data['datebill'];
+            $datebills  = date('dmy', strtotime($datebill));
+            $datenowcreatex =  $datebill . ' 00:00:00';
+            $dataaptk = $data['data'];
+            $idbtn = $_POST['idbtn'];
+            $getREG = $data['getreg'];
+            $kelas = NULL;
+
+            //noreg = transaction code
+
+            $this->db->query("SELECT COUNT(*) AS statuspasien FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :norega1 AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+            $this->db->bind('norega1', $data['noreg']);
+            $statuscek =  $this->db->single();
+            $statuspasien = $statuscek['statuspasien'];
+
+            if ($statuspasien <> '0') {
+                $callback = array(
+                    'status' => "error", // Set array nama
+                    'message' => "Gagal, Status Penjualan Bebas Sudah Di Approve dan Sudah ada Pembayaran"
+                );
+                return $callback;
+                exit;
+            }
+
+            if ($idbtn == 'cb_approvefarmasiall') {
+                //Cek
+                $this->db->query("SELECT COUNT(*) AS statuspasien FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :norega2 AND BATAL = '0'");
+                $this->db->bind('norega2', $data['noreg']);
+                $statuscek2 =  $this->db->single();
+                $statuspasie2 = $statuscek2['statuspasien'];
+
+                if ($statuspasie2 <> '0') {
+                    $callback = array(
+                        'status' => "error", // Set array nama
+                        'message' => "Gagal Approve, Status Penjualan Bebas Sudah Di Approve"
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                $datenowcreate = Utils::seCurrentDateTime();
+                $datenowcreate1 = date('Y-m-d', strtotime($datenowcreate));
+                $datenowcreate2 = date('dmy', strtotime($datenowcreate));
+                $session = SessionManager::getCurrentSession();
+                $namauserx = $session->name;
+
+                $this->db->query("SELECT ID AS Unit FROM MasterdataSQL.dbo.MstrUnitPerwatan WHERE NamaUnit = :NamaUnit1");
+                $this->db->bind('NamaUnit1', $data['lokasipembelian']);
+                $datax =  $this->db->single();
+
+                $IdGrupPerawatan = $datax['Unit'];
+                $JenisBayar = $data['PatientType'];
+                $perusahaanid = $data['perusahaanid'];
+                $datenowcreatex1 = $datenowcreatex;
+
+                // insert ke tabel FO_T_Billing
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.FO_T_BILLING
+                    ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],[TOTAL_TARIF],[TOTAL_QTY],[SUBTOTAL],[TOTAL_DISCOUNT],[TOTAL_DISCOUNT_RP],[SUBTOTAL_2],[GRANDTOTAL],[BATAL],[FB_CLOSE_KEUANGAN],[FB_VERIF_JURNAL]) 
+                    VALUES
+                    (:notrsbill,:datenowx,:namauserx,:NoMrfix,:NoEpisode,:nofixReg,:IdGrupPerawatan,:JenisBayar,:perusahaanid,:totaltarif,:totalqty,:subtotal,:totaldiscount,:totaldiscountrp,:subtotal2,:grandtotal,:batal,:closekeuangan,:verifkeuangan)");
+
+                $this->db->bind('notrsbill', $noreg);
+                $this->db->bind('datenowx', $datenowcreatex1);
+                $this->db->bind('namauserx', $namauserx);
+                $this->db->bind('NoMrfix', $nomr);
+                $this->db->bind('NoEpisode', $noeps);
+                $this->db->bind('nofixReg', $noreg);
+                $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
+                $this->db->bind('JenisBayar', $JenisBayar);
+                $this->db->bind('perusahaanid', $perusahaanid);
+                $this->db->bind('totaltarif', 0);
+                $this->db->bind('totalqty', 0);
+                $this->db->bind('subtotal', 0);
+                $this->db->bind('totaldiscount', 0);
+                $this->db->bind('totaldiscountrp', 0);
+                $this->db->bind('subtotal2', 0);
+                $this->db->bind('grandtotal', 0);
+                $this->db->bind('batal', 0);
+                $this->db->bind('closekeuangan', 0);
+                $this->db->bind('verifkeuangan', 0);
+                $this->db->execute();
+
+                //GET acc number
+                $this->db->query("SELECT ID AS ID_Detail, ProductCode AS 'Kode_Tarif', ProductName AS Nama_Tarif, isnull(Qty,0) as QtyRealisasi, Harga, Discount  FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_dtl WHERE TransactionCode = :dataaptk1");
+                $this->db->bind('dataaptk1', $dataaptk);
+                $dataaptk_dtl =  $this->db->resultSet();
+                foreach ($dataaptk_dtl as $key) {
+                    if ($data['GROUP_JAMINAN'] == "1") {
+                        $kekurangan = $key['QtyRealisasi'] * $key['Harga'];
+                        $klaim = "0";
+                        $bayar = "0";
+                    } else {
+                        $kekurangan = "0";
+                        $klaim = $key['QtyRealisasi'] * $key['Harga'];
+                        $bayar = "0";
+                    }
+
+                    // insert ke tabel FO_T_Billing_1
+                    $this->db->query("INSERT INTO  Billing_Pasien.dbo.FO_T_BILLING_1
+                        (ID_BILL,[NO_TRS_BILLING],[TGL_BILLING] ,[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[KODE_TARIF],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],
+                        [NAMA_TARIF],[GROUP_TARIF],[KD_KELAS],[QTY],[NILAI_TARIF],[SUB_TOTAL],[DISC],[DISC_RP],[SUB_TOTAL_2],[GRANDTOTAL],[KODE_REF],[KD_DR],[NM_DR],
+                        [BATAL],[PETUGAS_BATAL],[GROUP_ENTRI], [KEKURANGAN], [KLAIM], [BAYAR])
+                        SELECT :dataaptk2,:notrsbill , :datenowcreatex as datenow,:namauserx as namauserx,:nomr AS NoMR, :noeps AS xNoEpisode,:noreg as NoReg,:Rad_Kode_Tarif as kodetarif,UNIT,GROUP_JAMINAN,KODE_JAMINAN,:Rad_Nama_Tarif as namatarif,'Farmasi' as far, :kdkelas, :Qty as QTY, :Rad_Nilai as nilai, :Rad_Nilai2 as nilai2,:Discount as DISC,:Discount_RP as DISC_RP, :Rad_Nilai3 as nilai3, :Rad_Nilai4 as nilai4,:ID_Detail, :Farm_Dokter, null as namadokter, 0 as batal,null as petugasbatal,'BEBAS', :kekurangan, :klaim, :bayar
+                        FROM Billing_Pasien.dbo.FO_T_BILLING
+                        WHERE NO_TRS_BILLING=:notrsbill2 AND Batal='0'");
+                    $this->db->bind('dataaptk2', $dataaptk);
+                    $this->db->bind('ID_Detail', $key['ID_Detail']);
+                    $this->db->bind('notrsbill', $noreg);
+                    $this->db->bind('notrsbill2', $noreg);
+                    $this->db->bind('datenowcreatex', $datenowcreatex1);
+                    $this->db->bind('namauserx', $namauserx);
+                    $this->db->bind('nomr', $nomr);
+                    $this->db->bind('noeps', $noeps);
+                    $this->db->bind('noreg', $noreg);
+                    $this->db->bind('Rad_Kode_Tarif', $key['Kode_Tarif']);
+                    $this->db->bind('Rad_Nama_Tarif', $key['Nama_Tarif']);
+                    $this->db->bind('kdkelas', $kelas);
+                    $this->db->bind('Qty',  $key['QtyRealisasi']);
+                    $this->db->bind('Rad_Nilai',  $key['Harga']);
+                    $this->db->bind('Rad_Nilai2', $key['QtyRealisasi'] * $key['Harga']);
+                    $this->db->bind('Discount', $key['Discount']);
+                    $this->db->bind('Discount_RP', $key['Discount'] * $key['Harga']);
+                    $this->db->bind('Rad_Nilai3', ($key['Harga'] * $key['QtyRealisasi']) * (1 - $key['Discount']));
+                    $this->db->bind('Rad_Nilai4', ($key['Harga'] * $key['QtyRealisasi']) * (1 - $key['Discount']));
+                    $this->db->bind('Farm_Dokter', '0');
+                    $this->db->bind('kekurangan', $kekurangan);
+                    $this->db->bind('klaim', $klaim);
+                    $this->db->bind('bayar', $bayar);
+                    $this->db->execute();
+                }
+
+                // var_dump('masukkk');
+                // exit;
+                //Insert ke tabel FO_T_Billing_2
+                $this->db->query("INSERT INTO Billing_Pasien.DBO.FO_T_BILLING_2
+                SELECT ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
+                A1.NAMA_TARIF AS NAMA_TARIF, 
+                A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
+                A1.NILAI_TARIF AS NILAI_TARIF  ,
+                A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
+                A1.DISC AS DISC,
+                (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+                ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+                (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
+                (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ) as NILAI_PDP,
+                A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING,'' as kd_posting_diskon, 0 as ID_TR_TARIF_PAKET
+                FROM Billing_Pasien.DBO.FO_T_BILLING A
+                inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
+                ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
+                INNER JOIN [Apotik_V1.1SQL].dbo.Products CC 
+                ON CC.ID = A1.KODE_TARIF
+                INNER JOIN Keuangan.DBO.BO_M_PDP2 B
+                ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
+                INNER JOIN Keuangan.DBO.BO_M_PDP CX
+                ON CX.KD_PDP = B.KD_PDP
+                WHERE A1.GROUP_ENTRI='BEBAS' and a.BATAL='0' and A1.BATAL='0' and B.KD_TIPE_PDP='OBT1' and a.NO_TRS_BILLING=:notrsbill2");
+                $this->db->bind('notrsbill2', $noreg);
+                $this->db->execute();
+
+                //UPDATE TOTAL KE FO_T_BILLING
+                $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
+                    SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
+                    FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                    INNER JOIN
+                    (
+                        SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(isnull(QTY,0)) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                        SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                        FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                        WHERE NO_REGISTRASI=:noreg and Batal='0'
+                        GROUP BY NO_TRS_BILLING
+                    ) B
+                    ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                    WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
+                    ");
+                $this->db->bind('noreg', $noreg);
+                $this->db->bind('noreg2', $noreg);
+                $this->db->bind('notrsbill', $noreg);
+                $this->db->execute();
+
+
+                //INSERT RECORD SYSLOG
+                $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                (noregistrasi, nama_biling, petugas_entry, tgl_entry)
+                VALUES (:NoRegRecord, 'APPROVE PENJUALAN BEBAS', :USER_KASIRRecord, :TGL_TRSRecord)");
+                $this->db->bind('NoRegRecord', $noreg);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->execute();
+            } else if ($idbtn == 'cb_btlapprovefarmasiall') {
+
+                $this->db->query("SELECT COUNT(ID) AS CEK1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'BEBAS' AND NO_TRS_BILLING = :notrsbill");
+                $this->db->bind('notrsbill', $noreg);
+                $data_CEK1 =  $this->db->single();
+                $CEK1 = $data_CEK1['CEK1'];
+
+                if ($CEK1 == '0') {
+                    $callback = array(
+                        'status' => "error",
+                        'message' => "GAGAL BATAL APPROVE, Order Ini Belum Di Approve Sebelumnya!",
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                // var_dump($data);
+                // exit;
+
+                $this->db->query("SELECT COUNT(ID) AS CEK1payment FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a AND ID_TRS_Payment IS NOT NULL ");
+                $this->db->bind('dataaptk1a', $dataaptk);
+                $data_CEKpayment =  $this->db->single();
+                $CEKpayment = $data_CEKpayment['CEK1payment'];
+
+                if ($CEKpayment != '0') {
+                    $callback = array(
+                        'status' => "error",
+                        'message' => "GAGAL BATAL APPROVE, Order Ini Sudah Di Payment!",
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                // $this->db->query("SELECT ID from [Apotik_V1.1SQL].dbo.[Order Details] where [Order ID]=:dataaptk1a");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // $data_kodetarif =  $this->db->single();
+                // $IDdetail = $data_kodetarif['ID'];
+
+
+                // $query = "UPDATE [Apotik_V1.1SQL].dbo.Orders SET [Status ID]=1, TotalBayar=null, TglDikerjakanAwal=:datenowcreate, 
+                // PetugasMengerjakanAwal=:namauserx WHERE [Order ID] = :iddata and [Status ID] = 2";
+                // $datenowcreate = null;
+                // $namauserx = null;
+
+                // $querydtl = "UPDATE  a
+                // SET a.[Status ID]=1
+                // from [Apotik_V1.1SQL].dbo.[Order Details] a
+                // inner join [Apotik_V1.1SQL].dbo.Orders b on a.[Order ID]=b.[Order ID]
+                // WHERE a.[Order ID] = :iddata and b.[Status ID]=2";
+
+                // $this->db->query("SELECT KODE_TARIF, NO_TRS_BILLING from Billing_Pasien.dbo.FO_T_BILLING_1 where ID_BILL = :dataaptk1 and KODE_REF = :IDdetail1a and batal = '0'");
+                // $this->db->bind('dataaptk1', $dataaptk);
+                // $this->db->bind('IDdetail1a', $IDdetail);
+                // $data_kodetarifar =  $this->db->single();
+                // $kodetrffar = $data_kodetarifar['KODE_TARIF'];
+                // $trsfar = $data_kodetarifar['NO_TRS_BILLING'];
+                // var_dump($noreg);
+                // var_dump($trsfar);
+                // exit;
+                // exit;
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET BATAL = '1' WHERE ID_BILL = :dataaptk1a --AND KODE_REF = :IDdetail1b");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // // $this->db->bind('IDdetail1b', $IDdetail);
+                // $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET BATAL = '1' WHERE ID_BILL = :dataaptk1b --AND KODE_TARIF = :kodetrfrad1a");
+                // $this->db->bind('dataaptk1b', $dataaptk);
+                // // $this->db->bind('kodetrfrad1a', $kodetrfrad);
+                // $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfinis AND NO_TRS_BILLING=:trsfar1");
+                // $this->db->bind('noregfinis', $noreg);
+                // $this->db->bind('trsfar1', $trsfar);
+                // $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
+                //     SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL,
+                //     FB_VERIF_JURNAL='0' 
+                //     FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                //     INNER JOIN
+                //     (
+                //         SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                //         SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                //         FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                //         WHERE NO_REGISTRASI=:noreg and Batal='0'
+                //         GROUP BY NO_TRS_BILLING
+                //     ) B
+                //     ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                //     WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
+                //     ");
+                // $this->db->bind('noreg', $noreg);
+                // $this->db->bind('noreg2', $noreg);
+                // $this->db->bind('notrsbill', $trsfar);
+                // $this->db->execute();
+
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING WHERE NO_TRS_BILLING = :noregbilling");
+                $this->db->bind('noregbilling', $noreg);
+                $this->db->execute();
+
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_TRS_BILLING = :noregbilling1");
+                $this->db->bind('noregbilling1', $noreg);
+                $this->db->execute();
+
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING_2 WHERE NO_TRS_BILLING = :noregbilling2");
+                $this->db->bind('noregbilling2', $noreg);
+                $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfini and NO_TRS_BILLING=:trsfar1a");
+                // $this->db->bind('noregfini', $noreg);
+                // $this->db->bind('trsfar1a', $trsfar);
+                //UPDATE RECORD SYSLOG
+                $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = 'BATAL APPROVE PENJUALAN BEBAS', tgl_batal = :TGL_TRSRecord
+                WHERE NoRegistrasi = :NoRegRecord AND petugas_batal IS NULL");
+                $this->db->bind('NoRegRecord', $noreg);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->execute();
+            } else {
+                $callback = array(
+                    'status' => "warning",
+                    'errorname' => "Something Wrong !",
+                );
+                return $callback;
+                exit;
+            }
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Simpan Berhasil',
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+
+    public function SaveTrsPayment_closing_Bebas($data)
+    {
+        try {
+            $this->db->transaksi();
+            $count_array = count($data['tipepembayaran']);
+            $terimapembayaran = array_sum(str_replace(".", "", $data['totalinput']));
+            $totalhargadumi = str_replace(".", "", $data['totalharga']);
+            $yangharusdibayar = str_replace(".", "", $data['totalbayar']);
+            if ($terimapembayaran <> $yangharusdibayar) {
+                $callback = array(
+                    'status' => 'eror',
+                    'message' => 'Hasil input tidak matching dengan total harga !',
+                );
+                return $callback;
+                exit;
+            }
+
+            $totalklaimdumi = str_replace(".", "", $data['totalklaim2']);
+            $klaimyangharusdibayar = str_replace(".", "", $data['totalklaim1']);
+            if ($klaimyangharusdibayar <> $totalklaimdumi) {
+                $callback = array(
+                    'status' => 'eror',
+                    'message' => 'Hasil input piutang tidak matching dengan total klaim !',
+                );
+                return $callback;
+                exit;
+            }
+
+            $totalkurangdumi = str_replace(".", "", $data['totalkekurangan1']);
+            $kurangyangharusdibayar = str_replace(".", "", $data['totalkekurangan2']);
+            if ($totalkurangdumi <> $kurangyangharusdibayar) {
+                $callback = array(
+                    'status' => 'eror',
+                    'message' => 'Hasil input harga tidak matching dengan harga !',
+                );
+                return $callback;
+                exit;
+            }
+
+            $totalinput = str_replace(".", "", $data['totalinput']);
+            $tipepembayaran = $data['tipepembayaran'];
+            $tipepembayarandummi = $data['tipepembayaran'][0];
+
+            $NoMR = $data['NoMR'];
+            $NoEpisode = $data['NoEpisode'];
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $tgl_payment = $data['tglpayment_closing'];
+            $TypePatientID = $data['TypePatientID'];
+            $bilito2 = $data['billto'][0];
+
+            $datenowcreate = Utils::seCurrentDateTime();
+            $session = SessionManager::getCurrentSession();
+            $namauserx = $session->name;
+            $iduserx = $session->IDEmployee;
+            $timenow = Date('H:i:s');
+            $totalinput = str_replace(".", "", $data['totalinput']);
+            $tipepembayaran = $data['tipepembayaran'];
+            $bilito1 = $data['billtox'];
+            $kodejaminan = $data['kodejaminan'];
+            $kd_rekening = $data['kd_rekening'];
+            $expired = $data['expired'];
+            $nokartu = $data['nokartu'];
+            $bilito = $data['billto'];
+
+            $this->db->query("SELECT
+	                CASE
+	                WHEN b.NO_TRS_BILLING IS NOT NUll AND c.NO_TRS IS NOT NULL AND d.NOREG_FIRST IS NOT NULL THEN 'close'
+	                ELSE 'open' END AS statusclose
+	                FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+	                LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING b on b.NO_REGISTRASI = a.TransactionCode
+					LEFT JOIN Billing_Pasien.dbo.FO_T_KASIR c on c.NO_REGISTRASI = a.TransactionCode
+					LEFT JOIN Billing_Pasien.dbo.CLOSING_BILL d on d.NOREG_FIRST = a.TransactionCode
+                    WHERE TransactionCode = :norega1a");
+            $this->db->bind('norega1a', $data['NoRegistrasi']);
+            $statuscek =  $this->db->single();
+            $statuspasien = $statuscek['statusclose'];
+
+            if ($statuspasien == 'close') {
+                $callback = array(
+                    'status' => 'eror', // Set array nama
+                    'message' => 'Gagal Closing, Status Transaksi Pembelian Sudah Close'
+                );
+                return $callback;
+                exit;
+            }
+
+            if ($tipepembayarandummi == "Pasien Kabur") {
+                // var_dump($tipepembayaran, 'kabur');
+                // exit;
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :noreg1a AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+                $this->db->bind('noreg1a', $NoRegistrasi);
+                $datasd1 =  $this->db->single();
+                $TotalBayaridtrs = $datasd1['TotalBayar'];
+                $TotalKlaimidtrs = $datasd1['TotalKlaim'];
+                $TotalKekuranganidtrs = $datasd1['TotalKekurangan'];
+
+                $this->db->query("SELECT SUM(GRANDTOTAL) AS GrandTotal, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :noreg2a AND BATAL = '0' AND ID_TRS_Payment IS NULL");
+                $this->db->bind('noreg2a', $NoRegistrasi);
+                $datasd2 =  $this->db->single();
+                $TotalBayarnoidtrs = $datasd2['GrandTotal'];
+                $TotalKlaimnoidtrs = $datasd2['TotalKlaim'];
+                $TotalKekurangannoidtrs = $datasd2['TotalKekurangan'];
+                $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
+                ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
+                VALUES ( 
+                :NoReg1, 'PASIEN KABUR', :TotalBayar1, '', :NoMR1)");
+                $this->db->bind('NoReg1', $NoRegistrasi);
+                $this->db->bind('TotalBayar1', $TotalBayar);
+                $this->db->bind('NoMR1', $NoMR);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSE_RO
+                ([NOREG], [TOTAL_BILL], [KLAIM], [KEKURANGAN])
+                VALUES ( 
+                :NoReg2, :TotalBayar2, :TotalKlaim2, :TotalKekurangan2)");
+                $this->db->bind('NoReg2', $NoRegistrasi);
+                $this->db->bind('TotalBayar2', $TotalBayar);
+                $this->db->bind('TotalKlaim2', $TotalKlaimnoidtrs);
+                $this->db->bind('TotalKekurangan2', $TotalKekurangannoidtrs);
+                $this->db->execute();
+
+                $this->db->query("SELECT COUNT(*) AS CEKHUTANG FROM Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_REFF = :noreg3a");
+                $this->db->bind('noreg3a', $NoRegistrasi);
+                $datasd3 =  $this->db->single();
+                $CEKHUTANGS = $datasd3['CEKHUTANG'];
+
+                if ($CEKHUTANGS <> 0) {
+                    $this->db->query("UPDATE Billing_Pasien.dbo.CLOSING_BILL SET NOREG_REFF = '' WHERE NOREG_REFF = :NoReg4a");
+                    $this->db->bind('NoReg4a', $NoRegistrasi);
+                    $this->db->execute();
+                }
+            } elseif ($tipepembayarandummi == "Piutang Rawat Inap") {
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :noreg1a AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+                $this->db->bind('noreg1a', $NoRegistrasi);
+                $datasd1 =  $this->db->single();
+                $TotalBayaridtrs = $datasd1['TotalBayar'];
+                $TotalKlaimidtrs = $datasd1['TotalKlaim'];
+                $TotalKekuranganidtrs = $datasd1['TotalKekurangan'];
+
+                $this->db->query("SELECT SUM(GRANDTOTAL) AS GrandTotal, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :noreg2a AND BATAL = '0' AND ID_TRS_Payment IS NULL");
+                $this->db->bind('noreg2a', $NoRegistrasi);
+                $datasd2 =  $this->db->single();
+                $TotalBayarnoidtrs = $datasd2['GrandTotal'];
+                $TotalKlaimnoidtrs = $datasd2['TotalKlaim'];
+                $TotalKekurangannoidtrs = $datasd2['TotalKekurangan'];
+                $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
+                ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
+                VALUES ( 
+                :NoReg1, 'PIUTANG RANAP', :TotalBayar1, '', :NoMR1)");
+                $this->db->bind('NoReg1', $NoRegistrasi);
+                $this->db->bind('TotalBayar1', $TotalBayar);
+                $this->db->bind('NoMR1', $NoMR);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSE_RO
+                ([NOREG], [TOTAL_BILL], [KLAIM], [KEKURANGAN])
+                VALUES ( 
+                :NoReg2, :TotalBayar2, :TotalKlaim2, :TotalKekurangan2)");
+                $this->db->bind('NoReg2', $NoRegistrasi);
+                $this->db->bind('TotalBayar2', $TotalBayar);
+                $this->db->bind('TotalKlaim2', $TotalKlaimnoidtrs);
+                $this->db->bind('TotalKekurangan2', $TotalKekurangannoidtrs);
+                $this->db->execute();
+
+                $this->db->query("SELECT COUNT(*) AS CEKHUTANG FROM Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_REFF = :noreg3a");
+                $this->db->bind('noreg3a', $NoRegistrasi);
+                $datasd3 =  $this->db->single();
+                $CEKHUTANGS = $datasd3['CEKHUTANG'];
+
+                if ($CEKHUTANGS <> 0) {
+                    $this->db->query("UPDATE Billing_Pasien.dbo.CLOSING_BILL SET NOREG_REFF = '' WHERE NOREG_REFF = :NoReg4a");
+                    $this->db->bind('NoReg4a', $NoRegistrasi);
+                    $this->db->execute();
+                }
+            } else {
+
+                $datenowlis = date('dmy', strtotime($datenowcreate));
+                $this->db->query("SELECT  max(NO_TRS) as nourut from Billing_Pasien.dbo.FO_T_KASIR WHERE SUBSTRING(NO_TRS, 4, 6)=:datenowlis ");
+                $this->db->bind('datenowlis',   $datenowlis);
+                $data =  $this->db->single();
+                $nourut = $data['nourut'];
+                $substringlis = substr($nourut, 9);
+                if ($substringlis == null) {
+                    $substringlis = 0;
+                }
+                $substringlis++;
+                if (strlen($substringlis) == 1) {
+                    $nourutfixLis = "00" . $substringlis;
+                } else if (strlen($substringlis) == 2) {
+                    $nourutfixLis = "0" . $substringlis;
+                } else if (strlen($substringlis) == 3) {
+                    $nourutfixLis = $substringlis;
+                }
+
+                $ID_TR_TARIF = 'TRS' . $datenowlis . $nourutfixLis;
+                //#END GENERATE NO TRS HDR
+
+                //GENERATE NO KWITANSI
+
+                //untuk kode awal no NoKwitansi
+                if ($TypePatientID == "1") {
+                    $kodeawal = "KUJ";
+                } else {
+                    $kodeawal = "PRJ";
+                }
+                // $kodetengah = date('dmy');//untuk kode tengah no NoKwitansi
+                $kodetengah = date('dmy', strtotime($tgl_payment));
+
+                //cek no urut kwitansi
+
+                //GET URUT
+                $this->db->query("SELECT  TOP 1 NO_KWITANSI,right(NO_KWITANSI,4) as urutkwitansi
+                FROM Billing_Pasien.dbo.FO_T_KASIR
+                WHERE replace(CONVERT(VARCHAR(11), TGL_TRS, 111), '/','-')=:tgl_payment AND LEFT(NO_KWITANSI,3)=:kodeawal ORDER BY right(NO_KWITANSI,4) DESC");
+                $this->db->bind('tgl_payment',   $tgl_payment);
+                $this->db->bind('kodeawal',   $kodeawal);
+                $data =  $this->db->single();
+                $nourutkwitansi = $data['urutkwitansi'];
+
+                if (empty($nourutkwitansi)) {
+                    //jika gk ada record
+                    $nourutkwitansi = "0001";
+                } else {
+                    //jika ada record
+                    $nourutkwitansi++;
+                }
+
+                if (strlen($nourutkwitansi) == 1) {
+                    $nourutfixKwitansi = "000" . $nourutkwitansi;
+                } else if (strlen($nourutkwitansi) == 2) {
+                    $nourutfixKwitansi = "00" . $nourutkwitansi;
+                } else if (strlen($nourutkwitansi) == 3) {
+                    $nourutfixKwitansi = "0" . $nourutkwitansi;
+                } else if (strlen($nourutkwitansi) == 4) {
+                    $nourutfixKwitansi = $nourutkwitansi;
+                }
+
+                $nofinalkwitansi = $kodeawal . '-' . $kodetengah . '-' . $nourutfixKwitansi;
+
+                //#END GENERATE KWITANSI
+
+                //INSERT TABEL PAYMENT HDR
+                // Update FO_T_BILLING_1
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.FO_T_KASIR (
+                    [NO_TRS]
+                   ,[NO_KWITANSI]
+                    ,[NO_EPISODE]
+                    ,[NO_REGISTRASI]
+                    ,[NO_MR]
+                   ,[TGL_TRS]
+                   ,[KODE_KASIR]
+                   ,[USER_KASIR]
+                   ,[NOMINAL_BAYAR]
+                   ,[CASH]
+                   ,[DEBIT]
+                   ,[PIUTANG]
+                   ,[KREDIT]
+                   ,[QRIS]
+                   ,[BATAL]
+                   ,[TGL_BATAL]
+                   ,[USER_BATAL]
+                   ,[ALASAN_BATAL]
+                   ,[USER_LAST]
+                    ,[TGL_TRS_LAST]
+                   ,[BILLTO]
+                    ) values (
+                    :NO_TRS
+                    ,:NO_KWITANSI
+                    ,:NO_EPISODE
+                    ,:NO_REGISTRASI
+                    ,:NO_MR
+                    ,:TGL_TRS
+                    ,:KODE_KASIR
+                    ,:USER_KASIR
+                    ,:NOMINAL_BAYAR
+                    ,:CASH
+                    ,:DEBIT
+                    ,:PIUTANG
+                    ,:KREDIT
+                    ,:QRIS
+                    ,:BATAL
+                    ,:TGL_BATAL
+                    ,:USER_BATAL
+                    ,:ALASAN_BATAL
+                    ,:USER_LAST
+                    ,:TGL_TRS_LAST
+                    ,:BILLTO
+                    )");
+                $this->db->bind('NO_TRS', $ID_TR_TARIF);
+                $this->db->bind('NO_KWITANSI', $nofinalkwitansi);
+                $this->db->bind('NO_EPISODE', $NoEpisode);
+                $this->db->bind('NO_REGISTRASI', $NoRegistrasi);
+                $this->db->bind('NO_MR', $NoMR);
+                $this->db->bind('TGL_TRS', $datenowcreate);
+                $this->db->bind('KODE_KASIR', $iduserx);
+                $this->db->bind('USER_KASIR', $namauserx);
+                $this->db->bind('NOMINAL_BAYAR', $terimapembayaran);
+                $this->db->bind('CASH', 0);
+                $this->db->bind('DEBIT', 0);
+                $this->db->bind('PIUTANG', 0);
+                $this->db->bind('KREDIT', 0);
+                $this->db->bind('QRIS', 0);
+                $this->db->bind('BATAL', '0');
+                $this->db->bind('TGL_BATAL', '');
+                $this->db->bind('USER_BATAL', '');
+                $this->db->bind('ALASAN_BATAL', '');
+                $this->db->bind('USER_LAST', $iduserx);
+                $this->db->bind('TGL_TRS_LAST', $datenowcreate);
+                $this->db->bind('BILLTO', $bilito1);
+                $this->db->execute();
+
+                // var_dump($tipepembayaran);
+                // var_dump($timenow);
+                // exit;
+
+                //INSERT TABEL PAYMENT DTL
+                for ($i = 0; $i < $count_array; $i++) {
+
+                    //GENERATE NO TRS DTL
+                    //GET URUT
+                    $datenowlis = date('dmy', strtotime($datenowcreate));
+                    $this->db->query("SELECT  max(NO_TRS) as nourut from Billing_Pasien.dbo.FO_T_KASIR_2 WHERE SUBSTRING(NO_TRS, 5, 6)=:datenowlis ");
+                    $this->db->bind('datenowlis',   $datenowlis);
+                    $data =  $this->db->single();
+                    $nourut = $data['nourut'];
+                    $substringlis = substr($nourut, 10);
+                    if ($substringlis == null) {
+                        $substringlis = 0;
+                    }
+                    $substringlis++;
+                    if (strlen($substringlis) == 1) {
+                        $nourutfixLis = "00" . $substringlis;
+                    } else if (strlen($substringlis) == 2) {
+                        $nourutfixLis = "0" . $substringlis;
+                    } else if (strlen($substringlis) == 3) {
+                        $nourutfixLis = $substringlis;
+                    }
+
+                    $ID_TR_TARIF_DTL = 'TRSD' . $datenowlis . $nourutfixLis;
+                    //#END GENERATE NO TRS DTL
+
+                    $this->db->query("INSERT INTO Billing_Pasien.[dbo].[FO_T_KASIR_2]
+                    ([NO_TRS], [NO_TRS_REFF], [NOMINAL_BAYAR], [TIPE_PEMBAYARAN], [kode_Tipe_Reff] , [NAMA_TIPE_PEMBAYARAN], [NO_KARTU_REFRENSI], [EXPIRED_DATE])
+                    VALUES (:NO_TRS, :NO_TRS_REFF, :NOMINAL_BAYAR, :TIPE_PEMBAYARAN, :kode_Tipe_Reff, :NAMA_TIPE_PEMBAYARAN, :NO_KARTU_REFRENSI, :EXPIRED_DATE)");
+                    $this->db->bind('NO_TRS', $ID_TR_TARIF_DTL);
+                    $this->db->bind('NO_TRS_REFF', $ID_TR_TARIF);
+                    $this->db->bind('NOMINAL_BAYAR', $totalinput[$i]);
+                    $this->db->bind('TIPE_PEMBAYARAN', $tipepembayaran[$i]);
+                    $this->db->bind('kode_Tipe_Reff', $kodejaminan[$i]);
+                    // $this->db->bind('kode_Tipe_Reff', $kd_rekening[$i]);
+                    $this->db->bind('NAMA_TIPE_PEMBAYARAN', $bilito[$i]);
+                    $this->db->bind('NO_KARTU_REFRENSI', $nokartu[$i]);
+                    $this->db->bind('EXPIRED_DATE', $expired[$i]);
+                    $this->db->execute();
+                }
+
+                // update fo
+                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET BAYAR = GRANDTOTAL, ID_TRS_Payment = :ID_TR_TARIFx WHERE NO_REGISTRASI = :NoRegistrasix AND BATAL = '0' AND ID_TRS_Payment IS NULL");
+                $this->db->bind('NoRegistrasix', $NoRegistrasi);
+                $this->db->bind('ID_TR_TARIFx', $ID_TR_TARIF);
+                $this->db->execute();
+
+                //update bill hutang
+                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1
+                SET BAYAR = GRANDTOTAL, ID_TRS_Payment = :ID_TR_TARIFxd
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                LEFT JOIN Billing_Pasien.dbo.CLOSING_BILL b on a.NO_REGISTRASI=b.NOREG_FIRST
+                WHERE BATAL='0' and NOREG_REFF=:NoRegistrasixd
+                and ID_TRS_Payment is null ");
+                $this->db->bind('NoRegistrasixd', $NoRegistrasi);
+                $this->db->bind('ID_TR_TARIFxd', $ID_TR_TARIF);
+                $this->db->execute();
+                //end update bill hutang
+
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :NoReg AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+                $this->db->bind('NoReg', $NoRegistrasi);
+                $datasd =  $this->db->single();
+                $TotalBayar = $datasd['TotalBayar'];
+                $TotalKlaim = $datasd['TotalKlaim'];
+                $TotalKekurangan = $datasd['TotalKekurangan'];
+
+                //total hutang
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan 
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                INNER JOIN Billing_Pasien.dbo.CLOSING_BILL b on a.NO_REGISTRASI=b.NOREG_FIRST
+                WHERE BATAL='0' and NOREG_REFF=:NoRegxd
+                and ID_TRS_Payment is null ");
+                $this->db->bind('NoRegxd', $NoRegistrasi);
+                $dataxd =  $this->db->single();
+                $TotalBayarxd = $dataxd['TotalBayar'];
+                $TotalKlaimxd = $dataxd['TotalKlaim'];
+                $TotalKekuranganxd = $dataxd['TotalKekurangan'];
+                // total hutang
+
+                $TotalBayarall = $TotalBayar + $TotalBayarxd;
+                $TotalKlaimall = $TotalKlaim + $TotalKlaimxd;
+                $TotalKekuranganall = $TotalKekurangan + $TotalKekuranganxd;
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
+                ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
+                VALUES ( 
+                :NoReg1, 'CLOSEBILL', :TotalBayar1, '', :NoMR1)");
+                $this->db->bind('NoReg1', $NoRegistrasi);
+                $this->db->bind('TotalBayar1', $TotalBayarall);
+                $this->db->bind('NoMR1', $NoMR);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSE_RO
+                ([NOREG], [TOTAL_BILL], [KLAIM], [KEKURANGAN])
+                VALUES ( 
+                :NoReg2, :TotalBayar2, :TotalKlaim2, :TotalKekurangan2)");
+                $this->db->bind('NoReg2', $NoRegistrasi);
+                $this->db->bind('TotalBayar2', $TotalBayarall);
+                $this->db->bind('TotalKlaim2', $TotalKlaimall);
+                $this->db->bind('TotalKekurangan2', $TotalKekuranganall);
+                $this->db->execute();
+
+
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF1 AND TIPE_PEMBAYARAN = 'TUNAI'");
+                $this->db->bind('ID_TR_TARIF1', $ID_TR_TARIF);
+                $dataxc =  $this->db->single();
+                $total_bayar_cash = $dataxc['totalbayar'];
+
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF2 AND TIPE_PEMBAYARAN = 'Kartu Debit'");
+                $this->db->bind('ID_TR_TARIF2', $ID_TR_TARIF);
+                $dataxd =  $this->db->single();
+                $total_bayar_debit = $dataxd['totalbayar'];
+
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF3 AND TIPE_PEMBAYARAN = 'Kartu Kredit'");
+                $this->db->bind('ID_TR_TARIF3', $ID_TR_TARIF);
+                $dataxk =  $this->db->single();
+                $total_bayar_kredit = $dataxk['totalbayar'];
+                // 22/08/2024x
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF4 AND TIPE_PEMBAYARAN like '%Piutang%' ");
+                $this->db->bind('ID_TR_TARIF4', $ID_TR_TARIF);
+                $dataxp =  $this->db->single();
+                $total_bayar_piutang = $dataxp['totalbayar'];
+
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF4 AND TIPE_PEMBAYARAN = 'QRIS' ");
+                $this->db->bind('ID_TR_TARIF4', $ID_TR_TARIF);
+                $dataxp =  $this->db->single();
+                $total_bayar_qris = $dataxp['totalbayar'];
+                // 22/08/2024
+
+                if ($total_bayar_cash == NULL) {
+                    $total_bayar_cash = 0;
+                }
+                if ($total_bayar_debit == NULL) {
+                    $total_bayar_debit = 0;
+                }
+                if ($total_bayar_kredit == NULL) {
+                    $total_bayar_kredit = 0;
+                }
+                if ($total_bayar_piutang == NULL) {
+                    $total_bayar_piutang = 0;
+                }
+                if ($total_bayar_qris == NULL) {
+                    $total_bayar_qris = 0;
+                }
+
+                //INSERT TABEL PAYMENT HDR
+                // Update FO_T_BILLING_1
+                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET CASH = :CASH, DEBIT = :DEBIT, KREDIT = :KREDIT, PIUTANG = :PIUTANG, QRIS = :QRIS where NO_TRS = :NO_TRSx");
+                $this->db->bind('NO_TRSx', $ID_TR_TARIF);
+                $this->db->bind('CASH', $total_bayar_cash);
+                $this->db->bind('DEBIT', $total_bayar_debit);
+                $this->db->bind('KREDIT', $total_bayar_kredit);
+                $this->db->bind('PIUTANG', $total_bayar_piutang);
+                $this->db->bind('QRIS', $total_bayar_qris);
+                $this->db->execute();
+
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.TEMP_INA_CBG
+                SELECT 
+                NO_REGISTRASI
+                ,isnull(ProsedurNonBedah,0) as ProsedurNonBedah
+                ,isnull(ProsedurBedah,0) as ProsedurBedah
+                ,isnull(Konsultasi,0) as Konsultasi
+                ,0 as TenagaAhli
+                ,isnull(Keperawatan,0) as Keperawatan
+                ,0 as Penunjang
+                ,isnull(Laboratorium,0) as Laboratorium
+                ,isnull(Radiologi,0) as Radiologi
+                ,isnull(PelayananDarah,0) as PelayananDarah
+                ,isnull(Rehabilitasi,0) as Rehabilitasi
+                ,isnull(Kamar,0) as Kamar_Akomodasi
+                ,0 as RawatIntensif
+                ,isnull(Obat,0) as Obat
+                ,0 as ObatKronis
+                ,0 as ObatKemoterapi
+                ,0 as Alkes
+                ,0 as BMHP
+                ,0 as SewaAlat
+                ,isnull(ProsedurNonBedah,0)
+                +isnull(ProsedurBedah,0)
+                +isnull(Konsultasi,0)
+                +isnull(Laboratorium,0)
+                +isnull(Radiologi,0)
+                +isnull(PelayananDarah,0)
+                +isnull(Rehabilitasi,0)
+                +isnull(Kamar,0)
+                +isnull(Obat,0) as TOTAL
+                FROM (
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurNonBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3a and GROUP_TARIF ='Tindakan' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3b and GROUP_TARIF ='Operasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Konsultasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3c and GROUP_TARIF ='Konsultasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Keperawatan' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3d and GROUP_TARIF ='Administrasi' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Laboratorium' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3e and GROUP_TARIF ='Laboratorium'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Radiologi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3f and GROUP_TARIF ='Radiologi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'PelayananDarah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3g and GROUP_TARIF ='BankDarah'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Rehabilitasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3h and GROUP_TARIF ='Fisioterapi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Kamar' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3i and GROUP_TARIF ='Kamar'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Obat' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3j and GROUP_TARIF ='Farmasi'
+                Group by NO_REGISTRASI
+                )AS QPivot
+                PIVOT( SUM(TotalTarif)   
+                FOR GROUP_TARIF IN ([ProsedurNonBedah],[ProsedurBedah],[Konsultasi],[Keperawatan],[Laboratorium],[Radiologi],[PelayananDarah],[Rehabilitasi],[Kamar],[Obat])) AS QPivot");
+                $this->db->bind('NoReg3a', $NoRegistrasi);
+                $this->db->bind('NoReg3b', $NoRegistrasi);
+                $this->db->bind('NoReg3c', $NoRegistrasi);
+                $this->db->bind('NoReg3d', $NoRegistrasi);
+                $this->db->bind('NoReg3e', $NoRegistrasi);
+                $this->db->bind('NoReg3f', $NoRegistrasi);
+                $this->db->bind('NoReg3g', $NoRegistrasi);
+                $this->db->bind('NoReg3h', $NoRegistrasi);
+                $this->db->bind('NoReg3i', $NoRegistrasi);
+                $this->db->bind('NoReg3j', $NoRegistrasi);
+                $this->db->execute();
+            }
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Simpan Berhasil',
+                // 'paramsid' => $ID_TR_TARIF,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+    public function PrintKuitansiHeaderbyAllBebas($data)
+    {
+        try {
+
+            $session = SessionManager::getCurrentSession();
+            $namauserx = $session->name;
+
+            if ($data['kodereg'] == 'RJ') {
+            } elseif ($data['kodereg'] == 'RI') {
+            } elseif ($data['kodereg'] == 'TS') {
+                $query = "SELECT a.NamaPembeli AS PatientName,  b2.Billto as BILLTO, '-' as NO_MR, a.NoRegistrasi as NO_REGISTRASI, a.NoEpisode as NO_EPISODE, b3.NO_KWITANSI as NO_KWITANSI, '' as USER_KASIR, b4.nominalbayar as NOMINAL_BAYAR, a.UnitOrder AS NamaUnit,
+                case when a.GroupJaminan='2' then asu.NamaPerusahaan else jpk.NamaPerusahaan end AS NamaJaminan, '' AS Id_Kasir,
+                SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) NamaTest , y.nominal_bayar_tunai , z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan, wa.nominal_bayar_Qris
+                FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+                        OUTER APPLY (
+                            SELECT Billto
+                            FROM Billing_Pasien.dbo.FO_T_KASIR b1 
+                            WHERE b1.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            GROUP BY Billto
+                        ) b2 (Billto)
+						OUTER APPLY (
+                            SELECT NO_KWITANSI
+                            FROM Billing_Pasien.dbo.FO_T_KASIR b15 
+                            WHERE b15.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            GROUP BY NO_KWITANSI
+                        ) b3 (NO_KWITANSI)
+                        OUTER APPLY (
+                            SELECT SUM(NOMINAL_BAYAR) as nominalbayar
+                            FROM Billing_Pasien.dbo.FO_T_KASIR b3 
+                            WHERE b3.NO_REGISTRASI = a.TransactionCode AND b3.BATAL='0' COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            GROUP BY Billto
+                        ) b4 (nominalbayar)
+                        OUTER APPLY (
+                            SELECT NAMA_TARIF + ', '
+                            FROM Billing_Pasien.dbo.FO_T_BILLING_1 b5
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b6 on b6.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b5.ID_TRS_Payment = b6.NO_TRS AND b5.BATAL = '0'
+                            FOR XML PATH('')
+                        ) x (nama_test)
+                        OUTER APPLY (
+                            SELECT SUM(b7.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b7
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b8 on b8.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b7.NO_TRS_REFF = b8.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai' AND b8.BATAL='0'
+                        ) y (nominal_bayar_tunai)
+                        OUTER APPLY (
+                            SELECT SUM(b9.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b9
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b10 on b10.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b9.NO_TRS_REFF = b10.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit'  AND b10.BATAL='0'
+                        ) z (nominal_bayar_Debit)
+                        OUTER APPLY (
+                            SELECT SUM(b11.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b11
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b12 on b12.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b11.NO_TRS_REFF = b12.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan' AND b12.BATAL='0'
+                        ) w (nominal_bayar_PiuangPerushaan)
+						OUTER APPLY (
+                            SELECT SUM(b13.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b13
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b14 on b14.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b13.NO_TRS_REFF = b14.NO_TRS AND TIPE_PEMBAYARAN = 'QRIS' AND b14.BATAL='0'
+                        ) wa (nominal_bayar_Qris)
+                  left join MasterdataSQL.dbo.MstrPerusahaanJPK jpk on a.KodeJaminan=jpk.ID
+                  left join MasterdataSQL.dbo.MstrPerusahaanAsuransi asu on a.KodeJaminan=asu.ID
+                WHERE a.TransactionCode = :noreg1";
+            } else {
+                $pasing['NoKwitansi'] = '';
+                $pasing['NoRegistrasi'] = '';
+                $pasing['NoMR'] = '';
+                $pasing['billto'] = '';
+                $pasing['PatientName'] = '';
+                $pasing['NamaJaminan'] = '';
+                $pasing['NamaUnit'] = '';
+                $pasing['Kasir'] = '';
+                $pasing['Terbilang'] = '';
+                $pasing['TotalPaid'] = '';
+                $pasing['Id_Kasir'] = '';
+                $pasing['Cetakan_Ke'] = '';
+                $pasing['ID'] = '';
+                return $pasing;
+            }
+            $this->db->query($query);
+            $this->db->bind('noreg1', $data['notrs']);
+            $datas =  $this->db->single();
+
+            $terbilang = $this->terbilang($datas['NOMINAL_BAYAR']);
+            $pasing['billto'] = $datas['BILLTO'];
+            $pasing['NoMR'] = $datas['NO_MR'];
+            $pasing['NoRegistrasi'] = $datas['NO_REGISTRASI'];
+            $pasing['NO_EPISODE'] = $datas['NO_EPISODE'];
+            $pasing['NoKwitansi'] = $datas['NO_KWITANSI'];
+            $pasing['PatientName'] = $datas['PatientName'];
+            $pasing['NamaJaminan'] = $datas['NamaJaminan'];
+            $pasing['NamaUnit'] = $datas['NamaUnit'];
+            $pasing['NamaTest'] = $datas['NamaTest'];
+            $pasing['Kasir'] = $namauserx;
+            $pasing['Id_Kasir'] = $datas['Id_Kasir'];
+            $pasing['Terbilang'] = $terbilang;
+            $pasing['TotalPaid'] = number_format($datas['NOMINAL_BAYAR'], 0, ',', '.');
+
+            return $pasing;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function PrintKuitansiDetailbyAllBebas($data)
+    {
+        try {
+
+            if ($data['kodereg'] == 'RJ' || $data['kodereg'] == 'TS') {
+                $query = "SELECT b.TIPE_PEMBAYARAN, b.NOMINAL_BAYAR FROM Billing_Pasien.dbo.FO_T_KASIR a
+                INNER JOIN Billing_Pasien.dbo.FO_T_KASIR_2 b ON b.NO_TRS_REFF = a.NO_TRS
+                WHERE a.NO_REGISTRASI = :noreg";
+            } elseif ($data['kodereg'] == 'RI') {
+                $query = "SELECT TipePembayaran,TotalBayar as TotalPaid FROM RawatInapSQL.dbo.DepositDetails Where IDDeposit=:id";
+            } else {
+                $pasing['No'] = '';
+                $pasing['TipePembayaran'] = '';
+                $pasing['TotalPaid'] = '';
+                $rows[] = $pasing;
+                return $rows;
+            }
+
+            $this->db->query($query);
+            $this->db->bind('noreg', $data['notrs']);
+            // $this->db->bind('notrskasir', $data['lang']);
+            $data =  $this->db->resultSet();
+
+            $rows = array();
+            $no = 1;
+            foreach ($data as $key) {
+                $pasing['No'] = $no++;
+                $pasing['TipePembayaran'] = $key['TIPE_PEMBAYARAN'];
+                $pasing['TotalPaid'] = number_format($key['NOMINAL_BAYAR'], 0, ',', '.');
                 $rows[] = $pasing;
             }
             return $rows;
@@ -554,6 +1730,409 @@ class  B_Billing_Model
             die($e->getMessage());
         }
     }
+
+    public function PrintRincianHeaderbyRegAllBebas($data)
+    {
+        try {
+            if ($data['kodereg'] == 'RJ') {
+            } elseif ($data['kodereg'] == 'RI') {
+            } elseif ($data['kodereg'] == 'TS') {
+                $query = "SELECT a.TglPeriode AS TglKunjungan, '-' AS NoRegistrasi, a.TransactionCode AS NoReff, '-' AS NoMR, a.NamaPembeli AS PatientName, a.Discount AS  ValueDiscount, a.UnitOrder AS IdUnit, a.NamaUnit,
+'-' AS NamaDokter, a.TglLahirPembeli AS DateOfBirth, a.NamaJaminan, a.TglPeriode AS TglPulang, '-' AS NoSEP, a.GenderPembeli AS Gander, '-' AS NoRegisRWJ, a.AlamatPembeli AS Address,
+'-' AS NamaCOB, '-' AS NamaUnit_RWJ, 0 AS BiayaAdm, a.Discount AS Discount, '-' AS materai
+FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+LEFT JOIN MasterdataSQL.dbo.MstrUnitPerwatan b ON b.NamaUnit = a.NamaUnit
+WHERE TransactionCode = :id";
+            } else {
+                $pasing['NoRegistrasi'] = '';
+                $pasing['NoReff'] = '';
+                $pasing['NoMR'] = '';
+                $pasing['PatientName'] = '';
+                $pasing['TglKunjungan'] = '';
+                $pasing['ValueDiscount'] = 0;
+                $pasing['IdUnit'] = '';
+                $pasing['NamaUnit'] = '';
+                $pasing['NamaDokter'] = '';
+                $pasing['DateOfBirth'] = '';
+                $pasing['NamaJaminan'] = '';
+                $pasing['TglPulang'] = '';
+                $pasing['NoSEP'] = '';
+                $pasing['Gander'] = '';
+                $pasing['NoRegisRWJ'] = '';
+                $pasing['Address'] = '';
+                $pasing['NamaCOB'] = '';
+                $pasing['NamaUnit_RWJ'] = '';
+                $pasing['BiayaAdm'] = '';
+                $pasing['Discount'] = '';
+                $pasing['materai'] = '';
+                return $pasing;
+            }
+            $this->db->query($query);
+            $this->db->bind('id', $data['notrs']);
+            // $this->db->bind('id2', $data['notrs']);
+            $datas =  $this->db->single();
+
+            $pasing['TglKunjungan'] = ($datas['TglKunjungan'] != null) ? date('d/m/Y', strtotime($datas['TglKunjungan'])) : '';
+            $pasing['NoRegistrasi'] = $datas['NoRegistrasi'];
+            $pasing['NoReff'] = $datas['NoReff'];
+            $pasing['NoMR'] = $datas['NoMR'];
+            $pasing['PatientName'] = $datas['PatientName'];
+            $pasing['ValueDiscount'] = $datas['ValueDiscount'];
+            $pasing['IdUnit'] = $datas['IdUnit'];
+            $pasing['NamaUnit'] = $datas['NamaUnit'];
+            $pasing['NamaDokter'] = $datas['NamaDokter'];
+            $pasing['DateOfBirth'] = ($datas['DateOfBirth'] != null) ? date('d/m/Y', strtotime($datas['DateOfBirth'])) : '';
+            $pasing['NamaJaminan'] = $datas['NamaJaminan'];
+            $pasing['TglPulang'] = ($datas['TglPulang'] != null) ? date('d/m/Y', strtotime($datas['TglPulang'])) : '';
+            $pasing['NoSEP'] = $datas['NoSEP'];
+            $pasing['Gander'] = $datas['Gander'];
+            $pasing['NoRegisRWJ'] = $datas['NoRegisRWJ'];
+            $pasing['Address'] = $datas['Address'];
+            $pasing['NamaCOB'] = $datas['NamaCOB'];
+            $pasing['NamaUnit_RWJ'] = $datas['NamaUnit_RWJ'];
+            $pasing['BiayaAdm'] = $datas['BiayaAdm'];
+            $pasing['Discount'] = $datas['Discount'];
+            $pasing['materai'] = $datas['materai'];
+
+            return $pasing;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function PrintRincianpaybyRegidtrsALLBebas($data)
+    {
+
+        try {
+            $query = "SELECT NAMA_TARIF AS Keterangan,GROUP_TARIF as jenis_tarif, a.GRANDTOTAL AS BILL,KEKURANGAN AS Kekurangan, KLAIM, NO_KWITANSI AS NoBayar,replace(CONVERT(VARCHAR(11), a.TGL_BILLING, 111), '/','-') as TglOrder
+            from Billing_Pasien.dbo.FO_T_BILLING_1 a
+            inner join Billing_Pasien.dbo.FO_T_BILLING b on a.NO_TRS_BILLING= b.NO_TRS_BILLING
+            left join Billing_Pasien.dbo.FO_T_KASIR c on a.ID_TRS_Payment = c.NO_TRS
+            WHERE a.NO_REGISTRASI=:noreg1 AND a.batal='0' AND a.ID_TRS_Payment IS NOT NULL AND c.NO_REGISTRASI = :noreg4
+UNION ALL
+SELECT (NAMA_TARIF + ' (Hutang)') AS Keterangan,GROUP_TARIF as jenis_tarif, a.GRANDTOTAL AS BILL,KEKURANGAN AS Kekurangan, KLAIM, NO_KWITANSI AS NoBayar,replace(CONVERT(VARCHAR(11), a.TGL_BILLING, 111), '/','-') as TglOrder
+            from Billing_Pasien.dbo.FO_T_BILLING_1 a
+            inner join Billing_Pasien.dbo.FO_T_BILLING b on a.NO_TRS_BILLING= b.NO_TRS_BILLING
+            inner join Billing_Pasien.dbo.FO_T_KASIR c on a.ID_TRS_Payment = c.NO_TRS
+			inner join Billing_Pasien.dbo.CLOSING_BILL d ON d.NOREG_FIRST = a.NO_REGISTRASI
+            WHERE d.NOREG_REFF=:noreg2 AND a.BATAL='0' AND c.NO_REGISTRASI = :noreg3";
+
+            $this->db->query($query);
+            $this->db->bind('noreg1', $data['notrs']);
+            $this->db->bind('noreg2', $data['notrs']);
+            $this->db->bind('noreg3', $data['notrs']);
+            $this->db->bind('noreg4', $data['notrs']);
+            // $this->db->bind('idtrspayment', $data['lang']);
+            $datas =  $this->db->resultSet();
+
+            $rows = array();
+            $no = 1;
+            foreach ($datas as $key) {
+                // $diskon_value = $key['TarifSatuan'] * $key['Discount'];
+                $pasing['No'] = $no++;
+                $pasing['Keterangan'] = $key['Keterangan'];
+                $pasing['jenis_tarif'] = $key['jenis_tarif'];
+                $pasing['BILL'] = $key['BILL'];
+                $pasing['Kekurangan'] = $key['Kekurangan'];
+                $pasing['ASURANSI'] = $key['KLAIM'];
+                $pasing['NoBayar'] = $key['NoBayar'];
+                $pasing['TglOrder'] = ($key['TglOrder'] != null) ? date('d/m/Y', strtotime($key['TglOrder'])) : '';
+                // $diskon = $key['Discount'] * 100;
+                // $pasing['diskon_persen'] = ($diskon != 0) ? number_format($diskon, 0, ',', '.') . '%' : '';
+                $rows[] = $pasing;
+            }
+
+            return $rows;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function SetSaveBatalRiwayatPembayaranBebas($data)
+    {
+        try {
+            $this->db->transaksi();
+
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // DATA PASING
+            $noreg = $data['noreg'];
+            $notrs = $data['notrs'];
+            $alasanBtlPayment = $data['alasanBtlPayment'];
+
+            $this->db->query("SELECT Count(id) AS StatusID FROM Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_FIRST = :norega1");
+            $this->db->bind('norega1', $noreg);
+            $dataStatusId =  $this->db->single();
+            $statusID = $dataStatusId['StatusID'];
+
+            if ($alasanBtlPayment == '') {
+                $callback = array(
+                    'status' => "warning",
+                    'errorname' => "Silahkan isi alasan terlebih dahulu", // Set array nama 
+
+                );
+                return $callback;
+                exit;
+            }
+
+            if ($statusID <> 0) {
+                $callback = array(
+                    'status' => "warning",
+                    'errorname' => "Pasien sudah close, silahkan open bill untuk melakukan pembatalan pembayaran", // Set array nama 
+                );
+                return $callback;
+                exit;
+            }
+
+            // BATAL KASIR
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET BATAL = '1', TGL_BATAL = :datenowx1, USER_BATAL= :namauserx1, ALASAN_BATAL = :alasanBtlPayment1 WHERE NO_TRS = :notrs1");
+            // $this->db->bind('noreg1', $noreg);
+            $this->db->bind('datenowx1', $datenowx);
+            $this->db->bind('namauserx1', $namauserx);
+            $this->db->bind('alasanBtlPayment1', $alasanBtlPayment);
+            $this->db->bind('notrs1', $notrs);
+            $this->db->execute();
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR_2 SET BATAL = '1' WHERE NO_TRS_REFF = :notrs2");
+            $this->db->bind('notrs2', $notrs);
+            $this->db->execute();
+
+            // BATAL FOT_BILL
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET ID_TRS_Payment = NULL, BAYAR = 0 WHERE ID_TRS_Payment = :notrs3");
+            $this->db->bind('notrs3', $notrs);
+            // $this->db->bind('noreg3', $noreg);
+            $this->db->execute();
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                // 'ket_respons' => $respons_ket,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+
+    public function setSaveCloseOrOpenBillBebas($data)
+    {
+        try {
+            $this->db->transaksi();
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // exit;
+            // DATA PASING
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $Ket_btn_closeoropenbill = $data['Ket_btn_closeoropenbill'];
+            $NoMR = $data['NoMR'];
+
+            if ($Ket_btn_closeoropenbill == 'close') {
+                // var_dump($Ket_btn_closeoropenbill);
+                // var_dump('yuu');
+                // exit;
+
+                $this->db->query("DELETE Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_FIRST = :NoRegistrasi1");
+                $this->db->bind('NoRegistrasi1', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("DELETE Billing_Pasien.dbo.CLOSE_RO WHERE NOREG = :NoRegistrasi2");
+                $this->db->bind('NoRegistrasi2', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("DELETE Billing_Pasien.dbo.TEMP_INA_CBG WHERE NO_REGISTRASI = :NoRegistrasi3");
+                $this->db->bind('NoRegistrasi3', $NoRegistrasi);
+                $this->db->execute();
+                $respons_ket = 'Open Bill';
+            } else {
+                // var_dump($Ket_btn_closeoropenbill);
+
+                // var_dump('yeee');
+                // exit;
+
+                $this->db->query("SELECT COUNT(ID) AS cekDataBill1 from Billing_Pasien.dbo.FO_T_BILLING_1 where BATAL='0' and NO_REGISTRASI=:noreg1 and ID_TRS_Payment is null");
+                $this->db->bind('noreg1', $NoRegistrasi);
+                $dataStatusBill1 =  $this->db->single();
+                $cekDataBill1 = $dataStatusBill1['cekDataBill1'];
+
+                if ($cekDataBill1 <> 0) {
+                    $callback = array(
+                        'status' => "warning",
+                        'errorname' => "Gagal Closing Bill, Ada Bilingan Yang Belum Dibayar", // Set array nama 
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :NoReg3 AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+                $this->db->bind('NoReg3', $NoRegistrasi);
+                $datasd =  $this->db->single();
+                $TotalBayar = $datasd['TotalBayar'];
+                $TotalKlaim = $datasd['TotalKlaim'];
+                $TotalKekurangan = $datasd['TotalKekurangan'];
+
+                //total hutang
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan 
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                INNER JOIN Billing_Pasien.dbo.CLOSING_BILL b on a.NO_REGISTRASI=b.NOREG_FIRST
+                WHERE BATAL='0' and NOREG_REFF=:NoRegxd
+                and ID_TRS_Payment is null ");
+                $this->db->bind('NoRegxd', $NoRegistrasi);
+                $dataxd =  $this->db->single();
+                $TotalBayarxd = $dataxd['TotalBayar'];
+                $TotalKlaimxd = $dataxd['TotalKlaim'];
+                $TotalKekuranganxd = $dataxd['TotalKekurangan'];
+                // total hutang
+
+                $TotalBayarall = $TotalBayar + $TotalBayarxd;
+                $TotalKlaimall = $TotalKlaim + $TotalKlaimxd;
+                $TotalKekuranganall = $TotalKekurangan + $TotalKekuranganxd;
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
+                ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
+                VALUES ( 
+                :NoRegxd1a, 'CLOSEBILL', :TotalBayar1a, '', :NoMR1a)");
+                $this->db->bind('NoRegxd1a', $NoRegistrasi);
+                $this->db->bind('TotalBayar1a', $TotalBayarall);
+                $this->db->bind('NoMR1a', $NoMR);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSE_RO
+                ([NOREG], [TOTAL_BILL], [KLAIM], [KEKURANGAN])
+                VALUES ( 
+                :NoRegxd2a, :TotalBayar2a, :TotalKlaim2a, :TotalKekurangan2a)");
+                $this->db->bind('NoRegxd2a', $NoRegistrasi);
+                $this->db->bind('TotalBayar2a', $TotalBayarall);
+                $this->db->bind('TotalKlaim2a', $TotalKlaimall);
+                $this->db->bind('TotalKekurangan2a', $TotalKekuranganall);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.TEMP_INA_CBG
+                SELECT 
+                NO_REGISTRASI
+                ,isnull(ProsedurNonBedah,0) as ProsedurNonBedah
+                ,isnull(ProsedurBedah,0) as ProsedurBedah
+                ,isnull(Konsultasi,0) as Konsultasi
+                ,0 as TenagaAhli
+                ,isnull(Keperawatan,0) as Keperawatan
+                ,0 as Penunjang
+                ,isnull(Laboratorium,0) as Laboratorium
+                ,isnull(Radiologi,0) as Radiologi
+                ,isnull(PelayananDarah,0) as PelayananDarah
+                ,isnull(Rehabilitasi,0) as Rehabilitasi
+                ,isnull(Kamar,0) as Kamar_Akomodasi
+                ,0 as RawatIntensif
+                ,isnull(Obat,0) as Obat
+                ,0 as ObatKronis
+                ,0 as ObatKemoterapi
+                ,0 as Alkes
+                ,0 as BMHP
+                ,0 as SewaAlat
+                ,isnull(ProsedurNonBedah,0)
+                +isnull(ProsedurBedah,0)
+                +isnull(Konsultasi,0)
+                +isnull(Laboratorium,0)
+                +isnull(Radiologi,0)
+                +isnull(PelayananDarah,0)
+                +isnull(Rehabilitasi,0)
+                +isnull(Kamar,0)
+                +isnull(Obat,0) as TOTAL
+                FROM (
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurNonBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3a and GROUP_TARIF ='Tindakan' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3b and GROUP_TARIF ='Operasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Konsultasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3c and GROUP_TARIF ='Konsultasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Keperawatan' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3d and GROUP_TARIF ='Administrasi' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Laboratorium' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3e and GROUP_TARIF ='Laboratorium'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Radiologi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3f and GROUP_TARIF ='Radiologi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'PelayananDarah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3g and GROUP_TARIF ='BankDarah'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Rehabilitasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3h and GROUP_TARIF ='Fisioterapi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Kamar' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3i and GROUP_TARIF ='Kamar'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Obat' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3j and GROUP_TARIF ='Farmasi'
+                Group by NO_REGISTRASI
+                )AS QPivot
+                PIVOT( SUM(TotalTarif)   
+                FOR GROUP_TARIF IN ([ProsedurNonBedah],[ProsedurBedah],[Konsultasi],[Keperawatan],[Laboratorium],[Radiologi],[PelayananDarah],[Rehabilitasi],[Kamar],[Obat])) AS QPivot");
+                $this->db->bind('NoReg3a', $NoRegistrasi);
+                $this->db->bind('NoReg3b', $NoRegistrasi);
+                $this->db->bind('NoReg3c', $NoRegistrasi);
+                $this->db->bind('NoReg3d', $NoRegistrasi);
+                $this->db->bind('NoReg3e', $NoRegistrasi);
+                $this->db->bind('NoReg3f', $NoRegistrasi);
+                $this->db->bind('NoReg3g', $NoRegistrasi);
+                $this->db->bind('NoReg3h', $NoRegistrasi);
+                $this->db->bind('NoReg3i', $NoRegistrasi);
+                $this->db->bind('NoReg3j', $NoRegistrasi);
+                $this->db->execute();
+
+                $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET [Status ID] = 4 WHERE NoRegistrasi = :NoRegistrasi ");
+                $this->db->bind('NoRegistrasi', $NoRegistrasi);
+                $this->db->execute();
+
+                $respons_ket = 'Close Bill';
+            }
+
+            $this->db->commit();
+
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                'ket_respons' => $respons_ket,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+    // Penjualan Obat Bebas
 
     // 20/08/2024
     public function getDataDetailBilling($data)
@@ -579,40 +2158,55 @@ class  B_Billing_Model
                 $filter = null;
             }
 
-            if ($getreg == 'RI') {
-                $this->db->query("SELECT a.*,b.NamaKelas,
-                replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
-                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
-                left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
-                inner join MasterdataSQL.dbo.MstrUnitPerwatan c
-                on c.id = a.UNIT
-                WHERE NO_REGISTRASI=:noreg AND BATAL='0' and replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') between :tglawal and :tglakhir $filter
-                 ");
-                $this->db->bind('noreg', $noreg);
-                $this->db->bind('tglawal', $tglawal);
-                $this->db->bind('tglakhir', $tglakhir);
-                $data =  $this->db->resultSet();
-                $rows = array();
-                $no = 1;
-                // var_dump('ri');
-                // exit;
-            } else {
-                $this->db->query("SELECT a.*,NamaKelas = 'NULL' ,
-                replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
-                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
-                inner join MasterdataSQL.dbo.MstrUnitPerwatan c
-                on c.id = a.UNIT
-                WHERE NO_REGISTRASI=:noreg AND BATAL='0' and replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') between :tglawal and :tglakhir $filter
-                 ");
-                $this->db->bind('noreg', $noreg);
-                $this->db->bind('tglawal', $tglawal);
-                $this->db->bind('tglakhir', $tglakhir);
-                $data =  $this->db->resultSet();
-                $rows = array();
-                $no = 1;
-                // var_dump('rj');
-                // exit;
-            }
+            $this->db->query("SELECT a.*,b.NamaKelas,
+            replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
+            FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+            left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
+            inner join MasterdataSQL.dbo.MstrUnitPerwatan c
+            on c.id = a.UNIT
+            WHERE NO_REGISTRASI=:noreg AND BATAL='0' and replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') between :tglawal and :tglakhir $filter
+            ");
+            $this->db->bind('noreg', $noreg);
+            $this->db->bind('tglawal', $tglawal);
+            $this->db->bind('tglakhir', $tglakhir);
+            $data =  $this->db->resultSet();
+            $rows = array();
+            $no = 1;
+
+            // if ($getreg == 'RI') {
+            //     $this->db->query("SELECT a.*,b.NamaKelas,
+            //     replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
+            //     FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+            //     left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
+            //     inner join MasterdataSQL.dbo.MstrUnitPerwatan c
+            //     on c.id = a.UNIT
+            //     WHERE NO_REGISTRASI=:noreg AND BATAL='0' and replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') between :tglawal and :tglakhir $filter
+            //      ");
+            //     $this->db->bind('noreg', $noreg);
+            //     $this->db->bind('tglawal', $tglawal);
+            //     $this->db->bind('tglakhir', $tglakhir);
+            //     $data =  $this->db->resultSet();
+            //     $rows = array();
+            //     $no = 1;
+            //     // var_dump('ri');
+            //     // exit;
+            // } else {
+            //     $this->db->query("SELECT a.*,NamaKelas = 'NULL' ,
+            //     replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
+            //     FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+            //     inner join MasterdataSQL.dbo.MstrUnitPerwatan c
+            //     on c.id = a.UNIT
+            //     WHERE NO_REGISTRASI=:noreg AND BATAL='0' and replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') between :tglawal and :tglakhir $filter
+            //      ");
+            //     $this->db->bind('noreg', $noreg);
+            //     $this->db->bind('tglawal', $tglawal);
+            //     $this->db->bind('tglakhir', $tglakhir);
+            //     $data =  $this->db->resultSet();
+            //     $rows = array();
+            //     $no = 1;
+            //     // var_dump('rj');
+            //     // exit;
+            // }
             foreach ($data as $key) {
                 $pasing['No'] = $no++;
                 $pasing['ID'] = $key['ID'];
@@ -820,8 +2414,9 @@ class  B_Billing_Model
     {
         try {
 
-            var_dump('lagi di perbaiki');
-            exit;
+            // var_dump('Masih Tahap Perbaikan');
+            // exit;
+
             $this->db->transaksi();
             $notrsbill = $data['Idbilling'];
             $noreg = $data['bilNOreg'];
@@ -834,6 +2429,8 @@ class  B_Billing_Model
             $row_hidden_subtotal_ = $data['hidden_subtotal_'];
             $row_hidden_diskon_ = $data['hidden_diskon_'];
             $hidden_subtotal2_ = $data['hidden_subtotal2_'];
+
+            $ID_UNIT = $data['ID_UNIT'];
 
             $jumlahdata = count($row_data_id);
 
@@ -853,47 +2450,47 @@ class  B_Billing_Model
             $GROUP_JAMINANNO = $data['GROUP_JAMINANNO'];
             $penjamin_kodex = $data['penjamin_kodex'];
 
-
+            // var_dump($row_hidden_nama_tarif_[2]);
+            // var_dump(substr($row_hidden_nama_tarif_[2], 0, 10));
+            // exit;
 
             for ($i = 0; $i < $jumlahdata; $i++) {
                 $gruptarif = $gruptarifx[$i];
 
-                // var_dump($penjamin_kodex);
-                // exit;
-
                 if ($gruptarif == "LABORATORIUM") {
 
-                    // $this->db->query("SELECT c.IDTes as ID,c.NamaTes as namatarif, b.NILAI, b.ID_TARIF, b.GROUP_TARIF, B.KLSID , D.KD_INSTALASI
-                    // FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3  a JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                    // INNER JOIN LaboratoriumSQL.dbo.tblGrouping C ON C.IDTes = B.ID_TARIF INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.IDTes
-                    // WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                    // AND C.IDTes = :kdtarifb  AND B.GROUP_TARIF = :groupjaminanb AND B.KLSID = '1' AND D.KD_INSTALASI = 'LAB'
-                    // order by 1 desc");
-                    // $this->db->bind('groupjaminanb', $groupjaminan);
-                    // $this->db->bind('kdtarifb', $row_hidden_kode_tarif[$i]);
-                    // $dataradb =  $this->db->single();
-                    // $hargabaru = $dataradb['NILAI'];
 
-                    $this->db->query("SELECT  COUNT(*) as cektarif
-                    FROM LaboratoriumSQL.dbo.tblGrouping_3 a JOIN LaboratoriumSQL.dbo.tblGrouping_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                    INNER JOIN LaboratoriumSQL.dbo.tblGrouping C ON C.IDTes = B.ID_TARIF 
-                    WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                    and  b.GROUP_TARIF=:groupjaminana and c.IDTes = :kdtarifa
-                    order by 1 desc");
+                    // var_dump($groupjaminan);
+                    // var_dump($row_hidden_kode_tarif);
+                    // var_dump($row_hidden_kode_tarif);
+                    // exit;
+                    $row_hidden_nama_tarif_tgl = substr($row_hidden_nama_tarif_[2], 0, 10);
+
+
+                    $this->db->query("SELECT COUNT(*) AS cektarif
+                        FROM LaboratoriumSQL.dbo.tblGrouping_3 A
+                        INNER JOIN LaboratoriumSQL.dbo.tblGrouping_4 B ON a.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN LaboratoriumSQL.dbo.tblGrouping C ON C.IDTes = B.ID_TARIF
+                        WHERE :kdtgla between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-') 
+                        AND B.GROUP_TARIF = :groupjaminana AND A.KD_INSTALASI = 'LAB' AND C.IDTes = :kdtarifa order by 1 desc");
                     $this->db->bind('groupjaminana', $groupjaminan);
                     $this->db->bind('kdtarifa', $row_hidden_kode_tarif[$i]);
+                    $this->db->bind('kdtgla', $row_hidden_nama_tarif_tgl);
                     $datarada =  $this->db->single();
                     $cek = $datarada['cektarif'];
 
                     if ($cek <> "0") {
-                        $this->db->query("SELECT  c.IDTes as ID,c.NamaTes as namatarif, b.NILAI
-                    FROM LaboratoriumSQL.dbo.tblGrouping_3 a JOIN LaboratoriumSQL.dbo.tblGrouping_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                    INNER JOIN LaboratoriumSQL.dbo.tblGrouping C ON C.IDTes = B.ID_TARIF 
-                    WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                    and  b.GROUP_TARIF=:groupjaminanb and c.IDTes = :kdtarifb
-                    order by 1 desc");
+                        $this->db->query("SELECT  C.IDTes as ID,C.NamaTes as namatarif, B.NILAI
+                        FROM LaboratoriumSQL.dbo.tblGrouping_3 A
+                        INNER JOIN LaboratoriumSQL.dbo.tblGrouping_4 B ON a.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN LaboratoriumSQL.dbo.tblGrouping C ON C.IDTes = B.ID_TARIF
+                        WHERE :kdtglb between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-') 
+                        AND B.GROUP_TARIF = :groupjaminanb AND A.KD_INSTALASI = 'LAB' AND C.IDTes = :kdtarifb
+                        order by 1 desc");
                         $this->db->bind('groupjaminanb', $groupjaminan);
                         $this->db->bind('kdtarifb', $row_hidden_kode_tarif[$i]);
+                        $this->db->bind('kdtglb', $row_hidden_nama_tarif_tgl);
+
                         $dataradb =  $this->db->single();
                         $hargabaru = $dataradb['NILAI'];
 
@@ -926,6 +2523,11 @@ class  B_Billing_Model
                         exit;
                     }
                 } else if ($gruptarif == "RADIOLOGI") {
+
+                    $row_hidden_nama_tarif_tgl = substr($row_hidden_nama_tarif_[2], 0, 10);
+                    // var_dump($groupjaminan);
+                    // var_dump($row_hidden_kode_tarif);
+                    // var_dump($row_hidden_nama_tarif_tgl);
                     // var_dump($gruptarif, '2');
                     // exit;
                     $this->db->query("SELECT ID from RadiologiSQL.dbo.ProcedureRadiology 
@@ -935,27 +2537,33 @@ class  B_Billing_Model
                     $idpro = $datarada['ID'];
 
                     $this->db->query("SELECT COUNT(*) as cektarif
-                    FROM RadiologiSQL.dbo.ProcedureRadiology_3  a JOIN RadiologiSQL.dbo.ProcedureRadiology_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                    INNER JOIN RadiologiSQL.dbo.ProcedureRadiology C ON C.ID = B.ID_TARIF 
-                    WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                    and  b.GROUP_TARIF=:groupjaminanb1
-                    and c.ID = :idprob1
+                        FROM RadiologiSQL.dbo.ProcedureRadiology_3 A
+                        INNER JOIN RadiologiSQL.dbo.ProcedureRadiology_4 B ON a.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN RadiologiSQL.dbo.ProcedureRadiology C ON C.ID = B.ID_TARIF
+                        WHERE :kdtgla between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-') 
+                        AND B.GROUP_TARIF = :groupjaminanb1 AND A.KD_INSTALASI = 'RAD' AND C.ID = :idprob1
                     order by 1 desc");
                     $this->db->bind('groupjaminanb1', $groupjaminan);
                     $this->db->bind('idprob1', $idpro);
+                    $this->db->bind('kdtgla', $row_hidden_nama_tarif_tgl);
                     $dataradb1 =  $this->db->single();
                     $cek = $dataradb1['cektarif'];
 
+                    // var_dump($cek);
+                    // exit;
+
                     if ($cek <> "0") {
+
                         $this->db->query("SELECT c.ID as ID,c.Proc_Description as namatarif, b.NILAI
-                        FROM RadiologiSQL.dbo.ProcedureRadiology_3  a JOIN RadiologiSQL.dbo.ProcedureRadiology_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                        INNER JOIN RadiologiSQL.dbo.ProcedureRadiology C ON C.ID = B.ID_TARIF 
-                        WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                        and  b.GROUP_TARIF=:groupjaminanb
-                        and c.ID = :idprob
+                            FROM RadiologiSQL.dbo.ProcedureRadiology_3 A
+                            INNER JOIN RadiologiSQL.dbo.ProcedureRadiology_4 B ON a.ID_TR_TARIF = B.ID_TR_TARIF
+                            INNER JOIN RadiologiSQL.dbo.ProcedureRadiology C ON C.ID = B.ID_TARIF
+                            WHERE :kdtglb between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-') 
+                            AND B.GROUP_TARIF = :groupjaminanb AND A.KD_INSTALASI = 'RAD' AND C.ID = :idprob
                         order by 1 desc");
                         $this->db->bind('groupjaminanb', $groupjaminan);
                         $this->db->bind('idprob', $idpro);
+                        $this->db->bind('kdtglb', $row_hidden_nama_tarif_tgl);
                         $dataradb =  $this->db->single();
                         $hargabaru = $dataradb['NILAI'];
 
@@ -995,6 +2603,13 @@ class  B_Billing_Model
                     // $this->db->bind('kdtarifb', $row_hidden_kode_tarif[$i]);
                     // $dataradb =  $this->db->single();
                     // $hargabaru = $dataradb['NILAI'];
+
+                    $callback = array(
+                        'status' => "warning",
+                        'message' => "Pergantian Tarif Untuk Orderan Farmasi Belum Tersedia", // Set array nama 
+                    );
+                    return $callback;
+                    exit;
 
                     $this->db->query("SELECT COUNT(*) as cektarif
                     FROM [Apotik_V1.1SQL].dbo.Products_3 a JOIN [Apotik_V1.1SQL].dbo.Products_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
@@ -1041,6 +2656,13 @@ class  B_Billing_Model
                     //
                 } else if ($gruptarif == "BANKDARAH") {
 
+                    $callback = array(
+                        'status' => "warning",
+                        'message' => "Pergantian Tarif Untuk Orderan Bank Darah Belum Tersedia", // Set array nama 
+                    );
+                    return $callback;
+                    exit;
+
                     $this->db->query("SELECT COUNT(*) as cektarif
                     FROM LaboratoriumSQL.dbo.MasterBloodBanks_3 a JOIN LaboratoriumSQL.dbo.MasterBloodBanks_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
                     INNER JOIN LaboratoriumSQL.dbo.MasterBloodBanks C ON C.ID = B.ID_TARIF 
@@ -1078,7 +2700,6 @@ class  B_Billing_Model
                         $callback = array(
                             'status' => "warning",
                             'message' => "Pergantian tarif gagal, karena tidak ada tindakan dengan jaminan ini", // Set array nama 
-
                         );
                         return $callback;
                         exit;
@@ -1086,36 +2707,59 @@ class  B_Billing_Model
                     //
                 } else {
 
-                    $this->db->query("SELECT COUNT(*) as cektarif
-                    FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3  a JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
-                    WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                    AND C.ID = :kdtarifa  AND B.GROUP_TARIF = :groupjaminana AND B.KLSID = '1' AND B.KD_INSTALASI = 'RJ' AND id_layanan='55'
-                    order by 1 desc");
+                    $row_hidden_nama_tarif_tgl = substr($row_hidden_nama_tarif_[2], 0, 10);
+
+                    // var_dump($groupjaminan);
+                    // var_dump($row_hidden_kode_tarif[$i]);
+                    // var_dump($row_hidden_nama_tarif_tgl);
+                    // var_dump($ID_UNIT);
+                    // exit;
+
+                    if ($ID_UNIT == '1') {
+                        $kelastemp = '2';
+                        $this->db->query("SELECT  COUNT(*) as cektarif FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                        WHERE :kdtgla between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED,          111), '/','-')  
+                        and b.KD_INSTALASI='RJ' and b.GROUP_TARIF=:groupjaminana
+                        and id_layanan=:ID_UNITa and C.ID = :kdtarifa and KLSID = '2' order by 1 desc");
+                    } else {
+                        $kelastemp = '3';
+                        $this->db->query("SELECT  COUNT(*) as cektarif FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                        WHERE :kdtgla between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED,          111), '/','-')  
+                        and b.KD_INSTALASI='RJ' and b.GROUP_TARIF=:groupjaminana
+                        and id_layanan=:ID_UNITa and C.ID = :kdtarifa and KLSID = '3' order by 1 desc");
+                    }
                     $this->db->bind('groupjaminana', $groupjaminan);
                     $this->db->bind('kdtarifa', $row_hidden_kode_tarif[$i]);
+                    $this->db->bind('kdtgla', $row_hidden_nama_tarif_tgl);
+                    $this->db->bind('ID_UNITa', $ID_UNIT);
                     $datarja =  $this->db->single();
                     $cek = $datarja['cektarif'];
 
-
-
-
                     if ($cek <> "0") {
-                        $this->db->query("SELECT c.ID as ID,c.[Product Name] as namatarif, b.NILAI, b.ID_TARIF, b.GROUP_TARIF, B.KLSID , D.KD_INSTALASI
-                        FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3  a JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
-                        WHERE '2023-10-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-                        AND C.ID = :kdtarifb  AND B.GROUP_TARIF = :groupjaminanb AND B.KLSID = '1' AND B.KD_INSTALASI = 'RJ' AND id_layanan='55'
-                        order by 1 desc");
+                        $this->db->query("SELECT  C.ID as ID, C.[Product Name] as namatarif, B.NILAI as NILAI, B.ID_TARIF, B.GROUP_TARIF, B.KLSID, D.KD_INSTALASI  FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                        INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                        WHERE :kdtglb between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED,          111), '/','-')  
+                        and b.KD_INSTALASI='RJ' and b.GROUP_TARIF=:groupjaminanb
+                        and id_layanan=:ID_UNITb and C.ID = :kdtarifb and KLSID = :kelastemp order by 1 desc");
                         $this->db->bind('groupjaminanb', $groupjaminan);
                         $this->db->bind('kdtarifb', $row_hidden_kode_tarif[$i]);
+                        $this->db->bind('ID_UNITb', $ID_UNIT);
+                        $this->db->bind('kdtglb', $row_hidden_nama_tarif_tgl);
+                        $this->db->bind('kelastemp', $kelastemp);
                         $datarjb =  $this->db->single();
                         $hargabaru = $datarjb['NILAI'];
                     } else {
                         $callback = array(
                             'status' => "warning",
                             'message' => "Pergantian tarif gagal, karena tidak ada tindakan dengan jaminan ini", // Set array nama 
-
                         );
                         return $callback;
                         exit;
@@ -1123,7 +2767,6 @@ class  B_Billing_Model
                 }
 
                 $hargadisc = $row_hidden_diskon_[$i] * $hargabaru;
-
                 $subtotal2 = $hargabaru - $hargadisc;
                 $subtotalxx = $hargabaru * $row_hidden_qty_[$i];
                 $grttl = $subtotalxx - $hargadisc;
@@ -1148,6 +2791,16 @@ class  B_Billing_Model
                 $this->db->execute();
 
 
+                if ($data['GROUP_JAMINANNO'] == "1") {
+                    $kekurangan = $grttl;
+                    $klaim = "0";
+                    $bayar = "0";
+                } else {
+                    $kekurangan = "0";
+                    $klaim = $grttl;
+                    $bayar = "0";
+                }
+
                 // var_dump($hargabaru);
                 // var_dump($subtotal2);
                 // var_dump($subtotalxx);
@@ -1158,20 +2811,9 @@ class  B_Billing_Model
                 // var_dump($notrsbill);
                 // var_dump($GROUP_JAMINANNO);
                 // var_dump($penjamin_kodex);
+                // var_dump($kekurangan);
+                // var_dump($klaim);
                 // exit;
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET GROUP_JAMINAN = :GROUP_JAMINANNO1, KODE_JAMINAN = :penjamin_kodex1, NILAI_TARIF = :hargabaru, SUB_TOTAL = :subtotalxx, SUB_TOTAL_2 = :subtotal2, GRANDTOTAL = :grttl, KLAIM = :grandtotal
-                WHERE NO_TRS_BILLING = :notrsbill1 AND KODE_TARIF = :kdtarif1 AND GROUP_ENTRI = :gruptarif1");
-                $this->db->bind('hargabaru', $hargabaru);
-                $this->db->bind('subtotal2', $subtotal2);
-                $this->db->bind('subtotalxx', $subtotalxx);
-                $this->db->bind('grttl', $grttl);
-                $this->db->bind('grandtotal', $grandtotal);
-                $this->db->bind('gruptarif1', $gruptarif);
-                $this->db->bind('kdtarif1', $row_hidden_kode_tarif[$i]);
-                $this->db->bind('notrsbill1', $notrsbill);
-                $this->db->bind('GROUP_JAMINANNO1', $GROUP_JAMINANNO);
-                $this->db->bind('penjamin_kodex1', $penjamin_kodex);
-                $this->db->execute();
 
                 // UPDATE FO_2
                 $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET GROUP_JAMINAN= :GROUP_JAMINANNO2, KODE_JAMINAN= :penjamin_kodex2, NILAI_TARIF = :hargabaru2, SUB_TOTAL = :subtotalxx2, SUB_TOTAL_2 = :subtotal22
@@ -1183,6 +2825,23 @@ class  B_Billing_Model
                 $this->db->bind('notrsbill2', $notrsbill);
                 $this->db->bind('GROUP_JAMINANNO2', $GROUP_JAMINANNO);
                 $this->db->bind('penjamin_kodex2', $penjamin_kodex);
+                $this->db->execute();
+
+                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET GROUP_JAMINAN = :GROUP_JAMINANNO1, KODE_JAMINAN = :penjamin_kodex1, NILAI_TARIF = :hargabaru, SUB_TOTAL = :subtotalxx, SUB_TOTAL_2 = :subtotal2, GRANDTOTAL = :grttl, 
+                KLAIM = :klaim, KEKURANGAN = :kekurangan
+                WHERE NO_TRS_BILLING = :notrsbill1 AND KODE_TARIF = :kdtarif1 AND GROUP_ENTRI = :gruptarif1");
+                $this->db->bind('hargabaru', $hargabaru);
+                $this->db->bind('subtotal2', $subtotal2);
+                $this->db->bind('subtotalxx', $subtotalxx);
+                $this->db->bind('grttl', $grttl);
+                // $this->db->bind('grandtotal', $grandtotal);
+                $this->db->bind('kekurangan', $kekurangan);
+                $this->db->bind('klaim', $klaim);
+                $this->db->bind('gruptarif1', $gruptarif);
+                $this->db->bind('kdtarif1', $row_hidden_kode_tarif[$i]);
+                $this->db->bind('notrsbill1', $notrsbill);
+                $this->db->bind('GROUP_JAMINANNO1', $GROUP_JAMINANNO);
+                $this->db->bind('penjamin_kodex1', $penjamin_kodex);
                 $this->db->execute();
 
                 // UPDATE FO
@@ -1251,6 +2910,8 @@ class  B_Billing_Model
             // $row_hidden_kode_tarif = $data['hidden_kode_tarif'];
 
             $jumlahdata = count($row_data_id);
+
+            $ID_UNIT = $data['ID_UNIT'];
 
             $totaltarif = 0;
             $totalqty = 0;
@@ -1381,11 +3042,20 @@ class  B_Billing_Model
                         exit;
                     }
                 } else {
-                    // var_dump($gruptarif, '4');
-                    // exit;
-                    $this->db->query("SELECT COUNT(*) as cektarif FROM PerawatanSQL.dbo.Tarif_RJ_UGD where ID=:kodetarifA and Group_Jaminan = :groupjaminanA");
+                    var_dump('TARIF RAJAL');
+                    exit;
+                    // $ID_UNIT
+                    $this->db->query("SELECT  c.ID,c.[Product Name] as namatarif, b.NILAI, id_layanan, b.GROUP_TARIF, C.ID
+                    FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                    WHERE '2024-09-09' between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED,             111), '/','-')  
+                    and b.KD_INSTALASI='RJ' and b.GROUP_TARIF='BS'
+                    and id_layanan='22'");
                     $this->db->bind('kodetarifA', $row_hidden_kode_tarif[$i]);
                     $this->db->bind('groupjaminanA', $groupjaminan);
+                    $this->db->bind('ID_UNIT', $ID_UNIT);
                     $dataxa =  $this->db->single();
                     $cekTarif = $dataxa['cektarif'];
                     // var_dump($cekTarif);
@@ -1595,39 +3265,25 @@ class  B_Billing_Model
             $tglakhir = $data['tglakhir'];
             $substr = substr($noreg, 0, 2);
 
-            // if($substr=='RI'){
-            // $query = "SELECT a.[Order ID] as orderid,tglResep,'' NamaDokter,NoResep,TotalObat,[Status Name] as StatusName,a.[Status ID] as StatusID ,a.JenisResep
-            // from  [Apotik_V1.1SQL].dbo.Orders a INNER JOIN
-            // [Apotik_V1.1SQL].dbo.View_TotalOrder b ON a.[Order ID] = b.[Order ID] INNER JOIN
-            // [Apotik_V1.1SQL].dbo.[Orders Status] c ON a.[Status ID] = c.[Status ID]
-            // where NoRegistrasi=:noreg and
-            // replace(CONVERT(VARCHAR(11), tglResep, 111), '/','-') Between :tglawal AND :tglakhir";
-            // }else{
-            //     $query ="SELECT [Order ID] as orderid,tglResep,NamaDokter,NoResep,TotalObat,[Status Name] as StatusName,[Status ID] as StatusID,a.JenisResep  from [Apotik_V1.1SQL].dbo.View_ListOrder_Farmasi where NoRegistrasi=:noreg and
-            //      replace(CONVERT(VARCHAR(11), tglResep, 111), '/','-') Between :tglawal AND :tglakhir";
-            // }
-
             // Badrul
             // Start Data Approve
-
-            $query = "SELECT a.NoResep AS orderid, b.TglResep AS tglResep, b.NamaUserOrder AS NamaDokter, a.TransactionCode AS NoResep, SUBSTRING(x.TotalObat,1, LEN(x.TotalObat) - 0) TotalObat, 
-            d.[Status Name] AS StatusName, d.[Status ID] AS StatusID, 
-            CASE WHEN b.JenisResep = 1 THEN 'CITO' WHEN b.JenisResep = 2 THEN 'OBAT RUTIN' 
+            $query = "SELECT a.NoResep AS orderid, a.TransactionDate AS tglResep, b.NamaUserOrder AS NamaDokter, a.TransactionCode AS NoResep, a.Grandtotal AS TotalObat,
+d.[Status Name] AS StatusName, d.[Status ID] AS StatusID, 
+            CASE 
+            WHEN b.JenisResep = 1 THEN 'CITO' WHEN b.JenisResep = 2 THEN 'OBAT RUTIN' 
             WHEN b.JenisResep = 3 THEN 'OBAT PULANG' WHEN b.JenisResep = 4 THEN 'TAMBAHAN' 
-            WHEN b.JenisResep  = 5 THEN 'TERAPI BARU' ELSE '' END AS JenisResep
+            WHEN b.JenisResep  = 5 THEN 'TERAPI BARU' ELSE '' END AS JenisResep,
+			CASE 
+            WHEN a.TransactionCode is not NUll AND c.NO_TRS_BILLING IS NULL THEN 'Review'
+            WHEN a.TransactionCode is not NUll AND c.NO_TRS_BILLING IS not NULL THEN 'Approve'
+			ELSE 'New' END AS StatusResep
             FROM [Apotik_V1.1SQL].dbo.Sales a
             INNER JOIN [Apotik_V1.1SQL].dbo.OrderResep b on a.NoResep = b.ID
-            OUTER APPLY (
-            SELECT Grandtotal + '00' FROM [Apotik_V1.1SQL].dbo.SalesDetails c
-            WHERE c.TransactionCode = a.TransactionCode 
-            FOR XML PATH('')
-            ) x (TotalObat)
             INNER JOIN [Apotik_V1.1SQL].dbo.[Orders Status] d ON b.StatusResep = d.[Status ID]
-            WHERE a.NoRegistrasi =:noreg AND replace(CONVERT(VARCHAR(11), b.tglResep, 111), '/','-') Between :tglawal AND :tglakhir";
-
+			LEFT JOIN Billing_Pasien.dbo.FO_T_BILLING c on c.NO_TRS_BILLING = a.TransactionCode
+            WHERE a.NoRegistrasi = :noreg AND a.Void = '0' AND replace(CONVERT(VARCHAR(11), a.TransactionDate, 111), '/','-') Between :tglawal AND :tglakhir";
             // End Data Approve
             // Badrul
-
             $this->db->query($query);
             $this->db->bind('noreg', $noreg);
             $this->db->bind('tglawal', $tglawal);
@@ -1643,6 +3299,7 @@ class  B_Billing_Model
                 $pasing['NoResep'] = $key['NoResep'];
                 $pasing['StatusName'] = $key['StatusName'];
                 $pasing['StatusID'] = $key['StatusID'];
+                $pasing['StatusResep'] = $key['StatusResep'];
                 $pasing['Jumlah'] = number_format($key['TotalObat'], 0, ',', '.');
                 //$rows[] = $pasing;
                 $rows[] = $pasing;
@@ -1680,13 +3337,19 @@ class  B_Billing_Model
             $idbtn = $_POST['idbtn'];
             $getREG = $data['getreg'];
 
-            $kelas = 'NULL';
+            $kelas = NULL;
 
             if ($getREG == 'RI') {
                 $this->db->query("SELECT KlsID FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :noregri");
                 $this->db->bind('noregri', $noreg);
                 $klsiddata =  $this->db->single();
                 $kelas = $klsiddata['KlsID'];
+            } else {
+                if ($data['IDUnit'] == '1') {
+                    $kelas = '2';
+                } else {
+                    $kelas = '3';
+                }
             }
 
             $this->db->query("SELECT [Status ID] AS statuspasien FROM PerawatanSQL.dbo.visit WHERE NoRegistrasi = :norega1
@@ -1721,55 +3384,53 @@ class  B_Billing_Model
                     exit;
                 }
 
-                $this->db->query("SELECT ID as odid
-                FROM [Apotik_V1.1SQL].dbo.OrderResep
-                WHERE (StatusResep >= 2) AND ID =:iddata");
-                $this->db->bind('iddata', $dataaptk);
-                $data_cek1 =  $this->db->single();
-                if ($data_cek1) {
+                $this->db->query("SELECT TransactionCode FROM [Apotik_V1.1SQL].dbo.Sales WHERE NoRegistrasi = :noregsales AND NoResep = :noresepsales AND Void = '0'");
+                $this->db->bind('noresepsales', $dataaptk);
+                $this->db->bind('noregsales', $noreg);
+                $data_ceksales =  $this->db->single();
+                $trscodesales = $data_ceksales['TransactionCode'];
+
+                $this->db->query("SELECT COUNT(id) AS cekApproved FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_TRS_BILLING = :trscodesalesapprove AND BATAL ='0' ");
+                $this->db->bind('trscodesalesapprove', $trscodesales);
+                $data_cekApprove =  $this->db->single();
+                $cekApprove = $data_cekApprove['cekApproved'];
+
+                if ($cekApprove <> 0) {
                     $callback = array(
                         'status' => "error",
-                        'message' => "Gagal Approve !, Status order saat ini lunas silahkan batal approve untuk approve ulang orderan",
+                        'message' => "Gagal Approve !, Status order saat ini sudah pernah di approve, silahkan batal approve untuk approve ulang orderan",
                     );
                     return $callback;
                     exit;
                 }
 
-                $query = "UPDATE [Apotik_V1.1SQL].dbo.OrderResep SET StatusResep = 2, TglReview = :datenowcreate, NamaPetugasReview = :namauserx
-                WHERE ID = :iddata AND StatusResep = 1";
                 $datenowcreate = Utils::seCurrentDateTime();
                 $datenowcreate1 = date('Y-m-d', strtotime($datenowcreate));
                 $datenowcreate2 = date('dmy', strtotime($datenowcreate));
                 $session = SessionManager::getCurrentSession();
                 $namauserx = $session->name;
 
-                // $querydtl = "UPDATE a
-                // SET a.[Status ID]=2
-                // from [Apotik_V1.1SQL].dbo.[Order Details] a
-                // inner join [Apotik_V1.1SQL].dbo.Orders b on a.[Order ID]=b.[Order ID]
-                // WHERE a.[Order ID] = :iddata and b.[Status ID]=1";
-
                 if ($getREG == 'RJ') {
-                    $this->db->query("SELECT TOP 1 NO_TRS_BILLING,right( REPLACE(NO_TRS_BILLING,'-','0')  ,5) as urut FROM Billing_Pasien.dbo.FO_T_BILLING  WHERE replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-')=:datenow2  ORDER BY urut DESC");
-                    $this->db->bind('datenow2', $datebill);
-                    $datax =  $this->db->single();
-                    //no urut reg
-                    $nexturut = $datax['urut'];
-                    $nexturut++;
+                    // $this->db->query("SELECT TOP 1 NO_TRS_BILLING,right( REPLACE(NO_TRS_BILLING,'-','0')  ,5) as urut FROM Billing_Pasien.dbo.FO_T_BILLING  WHERE replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-')=:datenow2  ORDER BY urut DESC");
+                    // $this->db->bind('datenow2', $datebill);
+                    // $datax =  $this->db->single();
+                    // //no urut reg
+                    // $nexturut = $datax['urut'];
+                    // $nexturut++;
 
-                    $nourutfix = Utils::generateAutoNumber($nexturut);
-                    $kodeawal = "BIL";
-                    $notrsbill = $kodeawal . $datebills . $nourutfix;
+                    // $nourutfix = Utils::generateAutoNumber($nexturut);
+                    // $kodeawal = "BIL";
+                    // $notrsbill = $kodeawal . $datebills . $nourutfix;
 
                     // $this->db->query("SELECT [Order ID] as orderid FROM [Apotik_V1.1SQL].dbo.[Order Details] WHERE [Order ID] = :dataOrderid");
                     // $this->db->bind('dataOrderid', $dataaptk);
                     // $datafo =  $this->db->single();
                     // $dataaccnumber = $datafo['orderid'];
 
-                    $this->db->query("SELECT COUNT(*) as FOBILLING1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID_BILL = :dataaptk AND GROUP_ENTRI = 'FARMASI'");
-                    $this->db->bind('dataaptk', $dataaptk);
-                    $datafo =  $this->db->single();
-                    $datafoo = $datafo['FOBILLING1'];
+                    // $this->db->query("SELECT COUNT(*) as FOBILLING1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID_BILL = :dataaptk AND GROUP_ENTRI = 'FARMASI'");
+                    // $this->db->bind('dataaptk', $dataaptk);
+                    // $datafo =  $this->db->single();
+                    // $datafoo = $datafo['FOBILLING1'];
 
                     // if ($datafoo == "0") {
                     //get data visit
@@ -1786,27 +3447,31 @@ class  B_Billing_Model
                 if ($getREG == 'RI') {
                     // var_dump($datenowcreate);
                     // exit;
-                    $this->db->query("SELECT TOP 1 NO_TRS_BILLING,right( REPLACE(NO_TRS_BILLING,'-','0')  ,5) as urut FROM Billing_Pasien.dbo.FO_T_BILLING  WHERE replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-')=:datenow2a  ORDER BY urut DESC");
-                    $this->db->bind('datenow2a', $datenowcreate1);
-                    $datax =  $this->db->single();
 
-                    //no urut reg
-                    $nexturut = $datax['urut'];
-                    $nexturut++;
+                    // var_dump($getREG);
+                    // exit;
 
-                    $nourutfix = Utils::generateAutoNumber($nexturut);
-                    $kodeawal = "BIL";
-                    $notrsbill = $kodeawal . $datenowcreate2 . $nourutfix;
+                    // $this->db->query("SELECT TOP 1 NO_TRS_BILLING,right( REPLACE(NO_TRS_BILLING,'-','0')  ,5) as urut FROM Billing_Pasien.dbo.FO_T_BILLING  WHERE replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-')=:datenow2a  ORDER BY urut DESC");
+                    // $this->db->bind('datenow2a', $datenowcreate1);
+                    // $datax =  $this->db->single();
+
+                    // //no urut reg
+                    // $nexturut = $datax['urut'];
+                    // $nexturut++;
+
+                    // $nourutfix = Utils::generateAutoNumber($nexturut);
+                    // $kodeawal = "BIL";
+                    // $notrsbill = $kodeawal . $datenowcreate2 . $nourutfix;
 
                     // $this->db->query("SELECT [Order ID] as orderid FROM [Apotik_V1.1SQL].dbo.[Order Details] WHERE [Order ID] = :dataOrderid");
                     // $this->db->bind('dataOrderid', $dataaptk);
                     // $datafo =  $this->db->single();
                     // $dataaccnumber = $datafo['orderid'];
 
-                    $this->db->query("SELECT COUNT(*) as FOBILLING1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID_BILL = :dataaptk AND GROUP_ENTRI = 'FARMASI'");
-                    $this->db->bind('dataaptk', $dataaptk);
-                    $datafo =  $this->db->single();
-                    $datafoo = $datafo['FOBILLING1'];
+                    // $this->db->query("SELECT COUNT(*) as FOBILLING1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID_BILL = :dataaptk AND GROUP_ENTRI = 'FARMASI'");
+                    // $this->db->bind('dataaptk', $dataaptk);
+                    // $datafo =  $this->db->single();
+                    // $datafoo = $datafo['FOBILLING1'];
 
                     // if ($datafoo == "0") {
                     //get data visit
@@ -1820,9 +3485,15 @@ class  B_Billing_Model
                     $IdGrupPerawatan = $datax['ID'];
                     $JenisBayar = $datax['TypePatient'];
                     $perusahaanid = $datax['perusahaanid'];
-
                     $datenowcreatex1 = $datenowcreate;
                 }
+
+                // var_dump($data);
+                // exit;
+                // $this->db->query("SELECT TransactionCode FROM [Apotik_V1.1SQL].dbo.Sales WHERE NoResep = :dataaptknoresep");
+                // $this->db->bind('dataaptknoresep', $dataaptk);
+                // $datafo =  $this->db->single();
+                // $trscode = $datafo['TransactionCode'];
 
                 // insert ke tabel FO_T_Billing
                 // var_dump($notrsbill);
@@ -1832,7 +3503,8 @@ class  B_Billing_Model
                     VALUES
                     (:notrsbill,:datenowx,:namauserx,:NoMrfix,:NoEpisode,:nofixReg,:IdGrupPerawatan,:JenisBayar,:perusahaanid,:totaltarif,:totalqty,:subtotal,:totaldiscount,:totaldiscountrp,:subtotal2,:grandtotal,:batal,:closekeuangan,:verifkeuangan)");
 
-                $this->db->bind('notrsbill', $notrsbill);
+                $this->db->bind('notrsbill', $trscodesales);
+                // $this->db->bind('notrsbill', $notrsbill);
                 $this->db->bind('datenowx', $datenowcreatex1);
                 $this->db->bind('namauserx', $namauserx);
                 $this->db->bind('NoMrfix', $nomr);
@@ -1854,19 +3526,13 @@ class  B_Billing_Model
                 $this->db->execute();
 
                 //GET acc number
-                $this->db->query("SELECT a.ID as ID_Detail, a.KodeBarang as 'Kode_Tarif', a.NamaBarang as Nama_Tarif, isnull(a.QryRealisasi,0) as QtyRealisasi, c.Harga, c.Discount
-                FROM [Apotik_V1.1SQL].dbo.OrderResepDetail a
-                INNER JOIN [Apotik_V1.1SQL].dbo.Sales b on b.NoResep = a.IdOrderResep
+                $this->db->query("SELECT b.NoResep as ID_Detail,c.ProductCode 'Kode_Tarif', c.ProductName as Nama_Tarif, isnull(c.Qty,0) as QtyRealisasi, c.Harga, c.Discount
+                FROM  [Apotik_V1.1SQL].dbo.Sales b 
                 INNER JOIN [Apotik_V1.1SQL].dbo.SalesDetails c on c.TransactionCode = b.TransactionCode
-                WHERE IdOrderResep =:dataaptk");
+                WHERE b.NoResep =:dataaptk AND c.Void = '0' AND b.TransactionCode = :trscodesales");
                 $this->db->bind('dataaptk', $dataaptk);
+                $this->db->bind('trscodesales', $trscodesales);
 
-                //$dataacc =  $this->db->single();
-                // $Accession_No = $dataacc['ACCESSION_NO'];
-                // $Kode_Tarif = $dataacc['SCHEDULED_PROC_ID'];
-                // $Nama_Tarif = $dataacc['SCHEDULED_PROC_DESC'];
-                // $Tarif_Servis = $dataacc['Service_Charge'];
-                // $Dokter_Radiology = $dataacc['DokterRadiologi'];
                 $dataaptk_dtl =  $this->db->resultSet();
                 foreach ($dataaptk_dtl as $key) {
                     if ($data['GROUP_JAMINAN'] == "1") {
@@ -1888,8 +3554,11 @@ class  B_Billing_Model
                         WHERE NO_TRS_BILLING=:notrsbill2 AND Batal='0'");
                     $this->db->bind('dataaptk', $dataaptk);
                     $this->db->bind('ID_Detail', $key['ID_Detail']);
-                    $this->db->bind('notrsbill', $notrsbill);
-                    $this->db->bind('notrsbill2', $notrsbill);
+                    // $this->db->bind('notrsbill', $notrsbill);
+                    // $this->db->bind('notrsbill2', $notrsbill);
+                    $this->db->bind('notrsbill', $trscodesales);
+                    $this->db->bind('notrsbill2', $trscodesales);
+
                     $this->db->bind('datenowcreatex', $datenowcreatex1);
                     $this->db->bind('namauserx', $namauserx);
                     $this->db->bind('nomr', $nomr);
@@ -1920,8 +3589,10 @@ class  B_Billing_Model
                 A1.NILAI_TARIF AS NILAI_TARIF  ,
                 A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
                 A1.DISC AS DISC,
-                (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-                ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+                --(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+                (A1.NILAI_TARIF - (A1.NILAI_TARIF * (1 - A1.DISC))) AS DISC_RP,
+                --((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+				(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ) as SUB_TOTAL_PDP_2,
                 (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
                 (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ) as NILAI_PDP,
                 A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING,'' as kd_posting_diskon, 0 as ID_TR_TARIF_PAKET
@@ -1935,7 +3606,8 @@ class  B_Billing_Model
                 INNER JOIN Keuangan.DBO.BO_M_PDP CX
                 ON CX.KD_PDP = B.KD_PDP
                 WHERE A1.GROUP_ENTRI='FARMASI' and a.BATAL='0' and A1.BATAL='0' and B.KD_TIPE_PDP='OBT1' and a.NO_TRS_BILLING=:notrsbill2");
-                $this->db->bind('notrsbill2', $notrsbill);
+                // $this->db->bind('notrsbill2', $notrsbill);
+                $this->db->bind('notrsbill2', $trscodesales);
                 $this->db->execute();
                 //UPDATE TOTAL KE FO_T_BILLING
                 $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
@@ -1954,7 +3626,9 @@ class  B_Billing_Model
                     ");
                 $this->db->bind('noreg', $noreg);
                 $this->db->bind('noreg2', $noreg);
-                $this->db->bind('notrsbill', $notrsbill);
+                // $this->db->bind('notrsbill', $notrsbill);
+                $this->db->bind('notrsbill', $trscodesales);
+
                 $this->db->execute();
                 //Generate
                 // } else {
@@ -1962,13 +3636,40 @@ class  B_Billing_Model
                 //         'status' => "warning",
                 //         'message' => "Order Sudah Ada !",
                 //     );
-                //     return $callback;
+                //     return $callback;    
                 //     exit;
                 // }
+
+                // var_dump($datenowcreate);
+                // exit;
+
+                $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                (noregistrasi, nama_biling, petugas_entry, tgl_entry, idtrs)
+                VALUES (:NoRegRecord, 'APPROVE FARMASI', :USER_KASIRRecord, :TGL_TRSRecord, :trscoderecord)");
+                $this->db->bind('NoRegRecord', $noreg);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('trscoderecord', $dataaptk);
+                $this->db->execute();
+
+
+                // var_dump($data);
+                // var_dump($trscodesales);
+                // exit;
+
             } else if ($idbtn == 'btn_btlapprove') {
 
-                $this->db->query("SELECT COUNT(ID) AS CEK1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a");
+                $this->db->query("SELECT TransactionCode FROM [Apotik_V1.1SQL].dbo.Sales WHERE NoRegistrasi = :noregsales AND NoResep = :noresepsales AND Void = '0'");
+                $this->db->bind('noresepsales', $dataaptk);
+                $this->db->bind('noregsales', $noreg);
+                $data_ceksales =  $this->db->single();
+                $trscodesales = $data_ceksales['TransactionCode'];
+
+                // var_dump($data);
+                // exit;
+                $this->db->query("SELECT COUNT(ID) AS CEK1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a AND NO_TRS_BILLING = :trscodesalescek1");
                 $this->db->bind('dataaptk1a', $dataaptk);
+                $this->db->bind('trscodesalescek1', $trscodesales);
                 $data_CEK1 =  $this->db->single();
                 $CEK1 = $data_CEK1['CEK1'];
 
@@ -1981,9 +3682,9 @@ class  B_Billing_Model
                     exit;
                 }
 
-
-                $this->db->query("SELECT COUNT(ID) AS CEK1payment FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a AND ID_TRS_Payment IS NOT NULL ");
+                $this->db->query("SELECT COUNT(ID) AS CEK1payment FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a AND BATAL = '0' AND NO_TRS_BILLING = :trscodesalescekpayment AND ID_TRS_Payment IS NOT NULL ");
                 $this->db->bind('dataaptk1a', $dataaptk);
+                $this->db->bind('trscodesalescekpayment', $trscodesales);
                 $data_CEKpayment =  $this->db->single();
                 $CEKpayment = $data_CEKpayment['CEK1payment'];
 
@@ -1996,16 +3697,16 @@ class  B_Billing_Model
                     exit;
                 }
 
-                $this->db->query("SELECT ID from [Apotik_V1.1SQL].dbo.[Order Details] where [Order ID]=:dataaptk1a");
-                $this->db->bind('dataaptk1a', $dataaptk);
-                $data_kodetarif =  $this->db->single();
-                $IDdetail = $data_kodetarif['ID'];
+                // $this->db->query("SELECT ID from [Apotik_V1.1SQL].dbo.[Order Details] where [Order ID]=:dataaptk1a");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // $data_kodetarif =  $this->db->single();
+                // $IDdetail = $data_kodetarif['ID'];
 
 
-                $query = "UPDATE [Apotik_V1.1SQL].dbo.Orders SET [Status ID]=1, TotalBayar=null, TglDikerjakanAwal=:datenowcreate, 
-                PetugasMengerjakanAwal=:namauserx WHERE [Order ID] = :iddata and [Status ID] = 2";
-                $datenowcreate = null;
-                $namauserx = null;
+                // $query = "UPDATE [Apotik_V1.1SQL].dbo.Orders SET [Status ID]=1, TotalBayar=null, TglDikerjakanAwal=:datenowcreate, 
+                // PetugasMengerjakanAwal=:namauserx WHERE [Order ID] = :iddata and [Status ID] = 2";
+                // $datenowcreate = null;
+                // $namauserx = null;
 
                 // $querydtl = "UPDATE  a
                 // SET a.[Status ID]=1
@@ -2013,55 +3714,122 @@ class  B_Billing_Model
                 // inner join [Apotik_V1.1SQL].dbo.Orders b on a.[Order ID]=b.[Order ID]
                 // WHERE a.[Order ID] = :iddata and b.[Status ID]=2";
 
-                $this->db->query("SELECT KODE_TARIF, NO_TRS_BILLING from Billing_Pasien.dbo.FO_T_BILLING_1 where ID_BILL = :dataaptk1 and KODE_REF = :IDdetail1a and batal = '0'");
-                $this->db->bind('dataaptk1', $dataaptk);
-                $this->db->bind('IDdetail1a', $IDdetail);
-                $data_kodetarifar =  $this->db->single();
-                $kodetrffar = $data_kodetarifar['KODE_TARIF'];
-                $trsfar = $data_kodetarifar['NO_TRS_BILLING'];
+                // $this->db->query("SELECT KODE_TARIF, NO_TRS_BILLING from Billing_Pasien.dbo.FO_T_BILLING_1 where ID_BILL = :dataaptk1 and KODE_REF = :IDdetail1a and batal = '0'");
+                // $this->db->bind('dataaptk1', $dataaptk);
+                // $this->db->bind('IDdetail1a', $IDdetail);
+                // $data_kodetarifar =  $this->db->single();
+                // $kodetrffar = $data_kodetarifar['KODE_TARIF'];
+                // $trsfar = $data_kodetarifar['NO_TRS_BILLING'];
                 // var_dump($noreg);
                 // var_dump($trsfar);
                 // exit;
                 // exit;
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET BATAL = '1' WHERE ID_BILL = :dataaptk1a --AND KODE_REF = :IDdetail1b");
-                $this->db->bind('dataaptk1a', $dataaptk);
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET BATAL = '1' WHERE ID_BILL = :dataaptk1a --AND KODE_REF = :IDdetail1b");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // // $this->db->bind('IDdetail1b', $IDdetail);
+                // $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET BATAL = '1' WHERE ID_BILL = :dataaptk1b --AND KODE_TARIF = :kodetrfrad1a");
+                // $this->db->bind('dataaptk1b', $dataaptk);
+                // // $this->db->bind('kodetrfrad1a', $kodetrfrad);
+                // $this->db->execute();
+
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfinis AND NO_TRS_BILLING=:trsfar1");
+                // $this->db->bind('noregfinis', $noreg);
+                // $this->db->bind('trsfar1', $trsfar);
+                // $this->db->execute();
+
+
+                // $this->db->query("SELECT TransactionCode FROM [Apotik_V1.1SQL].dbo.Sales WHERE NoResep = :dataaptknoresep");
+                // $this->db->bind('dataaptknoresep', $dataaptk);
+                // $datafo =  $this->db->single();
+                // $trscode = $datafo['TransactionCode'];
+
+                // $this->db->query("SELECT COUNT(ID) AS CEK1 FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // $data_CEK1 =  $this->db->single();
+                // $CEK1 = $data_CEK1['CEK1'];
+
+                // if ($CEK1 == '0') {
+                //     $callback = array(
+                //         'status' => "error",
+                //         'message' => "GAGAL BATAL APPROVE, Order Ini Belum Di Approve Sebelumnya!",
+                //     );
+                //     return $callback;
+                //     exit;
+                // }
+
+                // $this->db->query("SELECT COUNT(ID) AS CEK1payment FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'FARMASI' AND ID_BILL = :dataaptk1a AND ID_TRS_Payment IS NOT NULL ");
+                // $this->db->bind('dataaptk1a', $dataaptk);
+                // $data_CEKpayment =  $this->db->single();
+                // $CEKpayment = $data_CEKpayment['CEK1payment'];
+
+                // if ($CEKpayment != '0') {
+                //     $callback = array(
+                //         'status' => "error",
+                //         'message' => "GAGAL BATAL APPROVE, Order Ini Sudah Di Payment!",
+                //     );
+                //     return $callback;
+                //     exit;
+                // }
+
+
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_TRS_BILLING = :trscode1 --AND KODE_REF = :IDdetail1b");
+                $this->db->bind('trscode1', $trscodesales);
                 // $this->db->bind('IDdetail1b', $IDdetail);
                 $this->db->execute();
 
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET BATAL = '1' WHERE ID_BILL = :dataaptk1b --AND KODE_TARIF = :kodetrfrad1a");
-                $this->db->bind('dataaptk1b', $dataaptk);
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING_2 WHERE NO_TRS_BILLING = :trscode2 --AND KODE_TARIF = :kodetrfrad1a");
+                $this->db->bind('trscode2', $trscodesales);
                 // $this->db->bind('kodetrfrad1a', $kodetrfrad);
                 $this->db->execute();
 
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfinis AND NO_TRS_BILLING=:trsfar1");
-                $this->db->bind('noregfinis', $noreg);
-                $this->db->bind('trsfar1', $trsfar);
+                $this->db->query("DELETE Billing_Pasien.dbo.FO_T_BILLING WHERE NO_TRS_BILLING=:trscode3");
+                $this->db->bind('trscode3', $trscodesales);
                 $this->db->execute();
 
-                $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
-                    SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL,
-                    FB_VERIF_JURNAL='0' 
-                    FROM Billing_Pasien.DBO.FO_T_BILLING A 
-                    INNER JOIN
-                    (
-                        SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
-                        SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
-                        FROM Billing_Pasien.DBO.FO_T_BILLING_1
-                        WHERE NO_REGISTRASI=:noreg and Batal='0'
-                        GROUP BY NO_TRS_BILLING
-                    ) B
-                    ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
-                    WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
-                    ");
-                $this->db->bind('noreg', $noreg);
-                $this->db->bind('noreg2', $noreg);
-                $this->db->bind('notrsbill', $trsfar);
+
+
+                // $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
+                //     SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL,
+                //     FB_VERIF_JURNAL='0' 
+                //     FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                //     INNER JOIN
+                //     (
+                //         SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                //         SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                //         FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                //         WHERE NO_REGISTRASI=:noreg and Batal='0'
+                //         GROUP BY NO_TRS_BILLING
+                //     ) B
+                //     ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                //     WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
+                //     ");
+                // $this->db->bind('noreg', $noreg);
+                // $this->db->bind('noreg2', $noreg);
+                // $this->db->bind('notrsbill', $trsfar);
+                // $this->db->execute();
+
+
+                $this->db->query("UPDATE  [Apotik_V1.1SQL].dbo.OrderResep SET StatusResep = '1' WHERE ID = :dataaptkstatus");
+                $this->db->bind('dataaptkstatus', $dataaptk);
                 $this->db->execute();
 
+                // var_dump('wait');
+                // exit;
 
                 // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfini and NO_TRS_BILLING=:trsfar1a");
                 // $this->db->bind('noregfini', $noreg);
                 // $this->db->bind('trsfar1a', $trsfar);
+
+                $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = 'BATAL APPROVE', tgl_batal = :TGL_TRSRecord
+                WHERE NoRegistrasi = :NoRegRecord AND idtrs = :dataaptk1 AND petugas_batal IS NULL");
+                $this->db->bind('NoRegRecord', $noreg);
+                // $this->db->bind('trscoderecord', $trscode);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('dataaptk1', $dataaptk);
+                $this->db->execute();
             } else {
                 $callback = array(
                     'status' => "warning",
@@ -2077,11 +3845,11 @@ class  B_Billing_Model
             // $this->db->execute();
 
             // Update HDR
-            $this->db->query($query);
-            $this->db->bind('iddata', $dataaptk);
-            $this->db->bind('datenowcreate', $datenowcreate);
-            $this->db->bind('namauserx', $namauserx);
-            $this->db->execute();
+            // $this->db->query($query);
+            // $this->db->bind('iddata', $dataaptk);
+            // $this->db->bind('datenowcreate', $datenowcreate);
+            // $this->db->bind('namauserx', $namauserx);
+            // $this->db->execute();
 
             $this->db->commit();
             $callback = array(
@@ -2179,7 +3947,7 @@ class  B_Billing_Model
             return $callback;
         }
     }
-
+    //10/09/2024
     public function getDataApproveLabo($data)
     {
         try {
@@ -2198,7 +3966,7 @@ class  B_Billing_Model
                         WHERE d.LabID=a.LabID AND d.Batal = '0'
                         FOR XML PATH('')
                         ) x (nama_test)
-            where NoRegRI = :noreg and replace(CONVERT(VARCHAR(11), LabDate, 111), '/','-') Between :tglawal AND :tglakhir";
+            where NoRegRI = :noreg and replace(CONVERT(VARCHAR(11), LabDate, 111), '/','-') Between :tglawal AND :tglakhir AND a.Batal = '0'";
 
             $this->db->query($query);
             $this->db->bind('noreg', $noreg);
@@ -2227,7 +3995,7 @@ class  B_Billing_Model
             die($e->getMessage());
         }
     }
-
+    //10/09/2024
     public function getDataApproveLabodetail($data)
     {
         try {
@@ -2344,7 +4112,7 @@ class  B_Billing_Model
             return $callback;
         }
     }
-
+    //10/09/2024
     public function ApproveAllLab($data)
     {
 
@@ -2396,26 +4164,27 @@ class  B_Billing_Model
                 exit;
             }
 
-            $kelas = 'NULL';
+            $kelas = NULL;
 
             if ($getREG == 'RI') {
                 $this->db->query("SELECT KlsID FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :noregri");
                 $this->db->bind('noregri', $noreg);
                 $klsiddata =  $this->db->single();
                 $kelas = $klsiddata['KlsID'];
+            } else {
+                if ($data['IDUnit'] == '1') {
+                    $kelas = '2';
+                } else {
+                    $kelas = '3';
+                }
             }
 
-
             if ($idbtn == 'cb_approveLaboall') {
-
                 // var_dump($data);
                 // exit;
 
-
                 $labiddtl = implode(',', $data['idorderapprovelab']);
                 $countlabiddtl = count($data['idorderapprovelab']);
-
-
 
                 //update ke Lab
                 $this->db->query("UPDATE LaboratoriumSQL.dbo.tblLab SET StatusID = '3' WHERE LabID = :labID1");
@@ -2626,12 +4395,6 @@ class  B_Billing_Model
                     // $datenowcreatex1 = $datenowcreatex;
                 }
 
-
-                // var_dump($notrsbill);
-                // var_dump($datenowcreatex1);
-                // exit;
-
-
                 if ($datafoo == "0") {
                     //GET Data from tabel visit
 
@@ -2732,8 +4495,10 @@ class  B_Billing_Model
                     A1.NILAI_TARIF AS NILAI_TARIF  ,
                     A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
                     A1.DISC AS DISC,
-                    (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-                    ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+                    --(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+					(A1.NILAI_TARIF - (A1.NILAI_TARIF * (1 - A1.DISC))) AS DISC_RP,
+                    --((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+					(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as SUB_TOTAL_PDP_2,
                     (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
                     (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
                     A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,null as ID_TR_TARIF_PAKET
@@ -2753,7 +4518,6 @@ class  B_Billing_Model
                     $this->db->execute();
                     // var_dump($dataLabnumber);
                     // exit;
-
 
                     //UPDATE TOTAL KE FO_T_BILLING
                     $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
@@ -2798,13 +4562,16 @@ class  B_Billing_Model
                     $this->db->execute();
                 }
 
-                // var_dump($notrsbill);
-                // var_dump($datenowcreatex1);
-                // exit;
+                $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                (noregistrasi, nama_biling, petugas_entry, tgl_entry, idtrs)
+                VALUES (:NoRegRecord, 'APPROVE LAB', :USER_KASIRRecord, :TGL_TRSRecord, :trscoderecord)");
+                $this->db->bind('NoRegRecord', $noreg);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('trscoderecord', $IDHDR);
+                $this->db->execute();
             } else if ($idbtn == 'cb_btlapproveLaboall') {
 
-                // var_dump('TAI');
-                // exit;
                 //$odid = array();
                 $tod = json_decode(json_encode((object) $data['idorderapprovelab']), FALSE);
                 foreach ($tod as $datalabdetail) {
@@ -2823,8 +4590,6 @@ class  B_Billing_Model
                         return $callback;
                         exit;
                     }
-
-
 
                     $this->db->query("SELECT a.NoLAB, b.kode_test, a.LabID FROM LaboratoriumSQL.dbo.tblLab a
                     INNER JOIN LaboratoriumSQL.dbo.tblLabDetail b on b.LabID = a.LabID
@@ -2939,6 +4704,15 @@ class  B_Billing_Model
 
                     $this->db->execute();
                 }
+
+                $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = 'BATAL APPROVE', tgl_batal = :TGL_TRSRecord
+                WHERE NoRegistrasi = :NoRegRecord AND idtrs = :dataaptk1 AND petugas_batal IS NULL");
+                $this->db->bind('NoRegRecord', $noreg);
+                // $this->db->bind('trscoderecord', $trscode);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('dataaptk1', $IDHDR);
+                $this->db->execute();
             } else {
                 $callback = array(
                     'status' => "error",
@@ -2964,6 +4738,8 @@ class  B_Billing_Model
             return $callback;
         }
     }
+
+    //10/09/2024
 
     public function sumAllTarif($data)
     {
@@ -3086,9 +4862,6 @@ class  B_Billing_Model
             $datahdr = $data['idX'];
             $getREG = $data['getreg'];
 
-            // var_dump($dataBDRSid);
-            // exit;
-
             $datebill = $data['datebill'];
             $datebills  = date('dmy', strtotime($datebill));
             $datenowcreatex =  $datebill . ' 00:00:00';
@@ -3124,13 +4897,18 @@ class  B_Billing_Model
                 // var_dump($datahdr, 'approve');
                 // exit;
 
-                $kelas = 'NULL';
-
+                $kelas = NULL;
                 if ($getREG == 'RI') {
                     $this->db->query("SELECT KlsID FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :noregri");
-                    $this->db->bind('noregri', $data['noreg']);
+                    $this->db->bind('noregri', $noreg);
                     $klsiddata =  $this->db->single();
                     $kelas = $klsiddata['KlsID'];
+                } else {
+                    if ($data['IDUnit'] == '1') {
+                        $kelas = '2';
+                    } else {
+                        $kelas = '3';
+                    }
                 }
 
                 $this->db->query("SELECT a.ID,b.ReviewQtyOrder FROM LaboratoriumSQL.dbo.OrderBloods b
@@ -3151,7 +4929,6 @@ class  B_Billing_Model
                 }
 
                 if ($cekUseID != null) {
-
                     $callback = array(
                         'status' => 'warning',
                         'message' => 'Bank Darah Ini Sudah Dalam Pemakaian ! Mohon Konfirmasi Kembali ke Bagian Bank Darah !',
@@ -3159,8 +4936,6 @@ class  B_Billing_Model
                     echo json_encode($callback);
                     exit;
                 }
-
-
 
                 //update ORDER BLOODS
                 $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloods SET StatusOrder=1,DateApproveKasir='$datenowcreatex',PetugasApproveKasir='$namauserx'
@@ -3213,9 +4988,6 @@ class  B_Billing_Model
                     $datenowcreatex1 = $datenowcreate;
                     // $datenowcreatex1 = $datenowcreatex;
                 }
-
-                // var_dump($kelas);
-                // exit;
 
                 if ($datafoo == '0') {
                     //GET data Visit
@@ -3304,34 +5076,6 @@ class  B_Billing_Model
                     $this->db->bind('notrsbill2', $notrsbill);
                     $this->db->execute();
 
-
-                    // var_dump($datahdr);
-                    // exit;
-                    //Insert ke tabel FO_T_Billing_2
-                    // $this->db->query("INSERT INTO Billing_Pasien.DBO.FO_T_BILLING_2
-                    // SELECT '$datahdr' as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,'RS01' as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
-                    // A1.NAMA_TARIF AS NAMA_TARIF, 
-                    // A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
-                    // A1.NILAI_TARIF AS NILAI_TARIF  ,
-                    // A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
-                    // A1.DISC AS DISC,
-                    // (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-                    // ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100)) SUB_TOTAL_PDP_2,
-                    // --(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END )
-                    // 0 as  NILAI_DISKON_PDP,
-                    // --(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) 
-                    // A1.SUB_TOTAL as NILAI_PDP,
-                    // A1.KD_DR AS KD_DR, '' NM_DR,1 as NILAI_PROSEN --b.NILAI_PROSEN 
-                    // ,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, '43100001' AS KD_POSTING, '43100099' as kd_posting_diskon,null as ID_TR_TARIF_PAKET
-                    // FROM Billing_Pasien.DBO.FO_T_BILLING A
-                    // inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
-                    // ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
-                    // INNER JOIN LaboratoriumSQL.dbo.MasterBloodBanks CC ON CC.ID = A1.KODE_TARIF
-                    // --INNER JOIN Keuangan.DBO.BO_M_PDP2 BON CC collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
-                    // --INNER JOIN Keuangan.DBO.BO_M_PDP CX ON CX.KD_PDP = B.KD_PDP
-                    // WHERE A1.GROUP_ENTRI='BANKDARAH' and a.BATAL='0' and A1.BATAL='0' --and B.KD_TIPE_PDP='RS01'
-                    //  and a.NO_TRS_BILLING=:notrsbill and A1.KODE_TARIF not in (select KODE_TARIF from Billing_Pasien.dbo.FO_T_BILLING_2 where NO_TRS_BILLING=:notrsbill2 and Batal='0')");
-
                     $this->db->query("INSERT INTO Billing_Pasien.DBO.FO_T_BILLING_2
                     SELECT '$datahdr' as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
                     A1.NAMA_TARIF AS NAMA_TARIF, 
@@ -3339,8 +5083,10 @@ class  B_Billing_Model
                     A1.NILAI_TARIF AS NILAI_TARIF  ,
                     A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
                     A1.DISC AS DISC,
-                    (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-                    ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+                    --(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+					(A1.NILAI_TARIF - (A1.NILAI_TARIF * (1 - A1.DISC))) AS DISC_RP,
+					--((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+					(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as SUB_TOTAL_PDP_2,
                     (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
                     (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
                     A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon, null as ID_TR_TARIF_PAKET
@@ -3384,23 +5130,20 @@ class  B_Billing_Model
                 } else {
                     $callback = array(
                         'status' => "warning",
-                        'message' => "Order Yang Dipilih Sudah Pernah Ditambahkan atau Sudah Di approve",
+                        'message' => "Order Yang Dipilih Sudah Pernah Ditambahkan atau Sudah Di approve sebelumnya, jika ada status batal maka sudah pernah dilakukan transaksi batal pada orderan tersebut",
                     );
                     return $callback;
                     exit;
                 }
 
-                //update di visit nya
-                //if noregis == rj
-                // if ($getREG == 'RJ') {
-                //     $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET LabLunas=1 WHERE NoRegistrasi = :noregvisit1");
-                //     $this->db->bind('noregvisit1', $noreg);
-                //     $this->db->execute();
-                // } elseif ($getREG == 'RI') {
-                //     $this->db->query("UPDATE RawatInapSQL.dbo.Inpatient SET LabFlag=1 WHERE NoRegistrasi = :noregvisit1");
-                //     $this->db->bind('noregvisit1', $noreg);
-                //     $this->db->execute();
-                // }
+                $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                (noregistrasi, nama_biling, petugas_entry, tgl_entry, idtrs)
+                VALUES (:NoRegRecord, 'APPROVE BANK DARAH', :USER_KASIRRecord, :TGL_TRSRecord, :trscoderecord)");
+                $this->db->bind('NoRegRecord', $noreg);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('trscoderecord', $datahdr);
+                $this->db->execute();
             } else if ($idbtn == 'cb_btlapproveBankDarahall') {
                 // var_dump($datahdr, 'btl');
                 // exit;
@@ -3425,17 +5168,31 @@ class  B_Billing_Model
                     exit;
                 }
 
+                $this->db->query("SELECT COUNT(*) AS CEKDATAUSEBLOODS FROM LaboratoriumSQL.dbo.UseBloods WHERE IDOrder = :dataheader12 AND Batal = '0'");
+                $this->db->bind('dataheader12', $datahdr);
+                $data_CEKUSE =  $this->db->single();
+                $CEK_USE = $data_CEKUSE['CEKDATAUSEBLOODS'];
 
+                if ($CEK_USE != '0') {
+                    $callback = array(
+                        'status' => "warning",
+                        'message' => "Bank Darah Ini Sudah Dalam Pemakaian ! Mohon Konfirmasi Kembali ke Bagian Bank Darah!",
+                    );
+                    return $callback;
+                    exit;
+                }
 
-                $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloods SET StatusOrder=1,DateApproveKasir='$datenowcreatex',PetugasApproveKasir='$namauserx'
+                // CEK USE BLOODS
+
+                $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloods SET StatusOrder=0,DateApproveKasir=NULL,PetugasApproveKasir=NULL
                 WHERE ID=:datahdrx1");
                 $this->db->bind('datahdrx1', $datahdr);
                 $this->db->execute();
 
                 //update ORDER BATAL
-                $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloodDetails SET Batal='0', DateBatal = '$datenowcreatex', PetugasBatal = '$namauserx' WHERE ID IN ($orderbloodsiddtl) AND IDHdr = :datahdrx2 AND Batal='0'");
-                $this->db->bind('datahdrx2', $datahdr);
-                $this->db->execute();
+                // $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloodDetails SET Batal='0', DateBatal = '$datenowcreatex', PetugasBatal = '$namauserx' WHERE ID IN ($orderbloodsiddtl) AND IDHdr = :datahdrx2 AND Batal='0'");
+                // $this->db->bind('datahdrx2', $datahdr);
+                // $this->db->execute();
 
                 //update ORDER BATAL
                 $this->db->query("UPDATE LaboratoriumSQL.dbo.OrderBloodDetails SET Batal='1', DateBatal = '$datenowcreatex', PetugasBatal = '$namauserx' WHERE ID IN ($orderbloodsiddtl) AND IDHdr = :datahdrx2 AND Batal='0'");
@@ -3470,6 +5227,15 @@ class  B_Billing_Model
                     $this->db->bind('noregx6', $noreg);
                     $this->db->execute();
                 }
+
+                $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = 'BATAL APPROVE', tgl_batal = :TGL_TRSRecord
+                WHERE NoRegistrasi = :NoRegRecord AND idtrs = :dataaptk1 AND petugas_batal IS NULL");
+                $this->db->bind('NoRegRecord', $noreg);
+                // $this->db->bind('trscoderecord', $trscode);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('dataaptk1', $datahdr);
+                $this->db->execute();
             } else {
                 $callback = array(
                     'status' => "warning",
@@ -3545,7 +5311,7 @@ class  B_Billing_Model
         }
     }
 
-
+    //10/09/2024
     public function ApproveRad($data)
     {
         try {
@@ -3575,7 +5341,7 @@ class  B_Billing_Model
             $datenowcreate2 = date('dmy', strtotime($datenowcreate));
 
 
-            $kelas = 'NULL';
+            $kelas = NULL;
 
             // var_dump($data);
             // exit;
@@ -3993,6 +5759,7 @@ class  B_Billing_Model
             return $callback;
         }
     }
+    //10/09/2024
 
 
     public function ApproveAllRad($data)
@@ -4004,6 +5771,8 @@ class  B_Billing_Model
             $token = $session->token;
             $namauserx = $session->name;
             $datenowx = Utils::datenowcreateNotFull();
+
+            $TRIGGER_DTTM = date('YmdHis');
 
             $idbtn = $data['idbtn'];
             $noreg = $data['noreg'];
@@ -4026,22 +5795,19 @@ class  B_Billing_Model
 
             // $data['GROUP_JAMINAN'];
 
-
-
-            $kelas = 'NULL';
-
+            $kelas = NULL;
             if ($getREG == 'RI') {
                 $this->db->query("SELECT KlsID FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :noregri");
                 $this->db->bind('noregri', $noreg);
                 $klsiddata =  $this->db->single();
                 $kelas = $klsiddata['KlsID'];
+            } else {
+                if ($data['IDUnit'] == '1') {
+                    $kelas = '2';
+                } else {
+                    $kelas = '3';
+                }
             }
-
-            // var_dump($datenowcreate);
-            // var_dump($datenowcreatex);
-            // var_dump($datebill);
-            // var_dump($datenowx);
-            // exit;
 
             //CEk Status Order
             // $this->db->query("SELECT StatusID, PaymentStatus FROM RadiologiSQL.dbo.WO_RADIOLOGY WHERE WOID=:datawoid");
@@ -4074,8 +5840,6 @@ class  B_Billing_Model
                 return $callback;
                 exit;
             }
-
-
 
             if ($idbtn == 'cb_approveRadiologyall') {
 
@@ -4114,10 +5878,6 @@ class  B_Billing_Model
                         $this->db->bind('datawoid1b', $datawo);
                         $this->db->execute();
                     }
-
-                    //Generate no trs billing
-                    // $datenowx = Utils::datenowcreateNotFull();
-                    // $datenow = date('dmy', strtotime($datenowcreate));
 
                     if ($getREG == 'RJ') {
                         $this->db->query("SELECT  TOP 1 NO_TRS_BILLING,right( REPLACE(NO_TRS_BILLING,'-','0')  ,5) as urut FROM Billing_Pasien.dbo.FO_T_BILLING  WHERE replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-')=:datenow2  ORDER BY urut DESC");
@@ -4224,7 +5984,6 @@ class  B_Billing_Model
                         $this->db->bind('verifkeuangan', 0);
                         $this->db->execute();
 
-
                         //GET acc number
                         $this->db->query("SELECT ACCESSION_NO, SCHEDULED_PROC_ID, SCHEDULED_PROC_DESC, Service_Charge, DokterRadiologi FROM RadiologiSQL.dbo.WO_RADIOLOGY where WOID = :idwo");
                         $this->db->bind('idwo', $datawo);
@@ -4267,10 +6026,6 @@ class  B_Billing_Model
                         $this->db->bind('Rad_DokterRadiologi', $Dokter_Radiology);
                         $this->db->execute();
 
-
-                        // var_dump($notrsbill);
-                        // exit;
-
                         //Insert ke tabel FO_T_Billing_2
                         $this->db->query("INSERT INTO Billing_Pasien.DBO.FO_T_BILLING_2
                         SELECT '$Accession_No',A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
@@ -4279,8 +6034,10 @@ class  B_Billing_Model
                         A1.NILAI_TARIF AS NILAI_TARIF  ,
                         A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
                         A1.DISC AS DISC,
-                        ((A1.QTY * A1.NILAI_TARIF)-(A1.QTY * A1.NILAI_TARIF * (1-A1.DISC))) AS DISC_RP,
-                        ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100)) SUB_TOTAL_PDP_2,
+						--(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+						(A1.NILAI_TARIF - (A1.NILAI_TARIF * (1 - A1.DISC))) AS DISC_RP,
+						--((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+						(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as SUB_TOTAL_PDP_2,
                         (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
                         (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
                         A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING,'' as kd_posting_diskon, 0 as ID_TR_TARIF_PAKET
@@ -4297,27 +6054,35 @@ class  B_Billing_Model
                         $this->db->bind('notrsbill2', $notrsbill);
                         $this->db->execute();
 
-
                         //UPDATE TOTAL KE FO_T_BILLING
                         $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
-                    SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
-                    FROM Billing_Pasien.DBO.FO_T_BILLING A 
-                    INNER JOIN
-                    (
-                    SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
-                    SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
-                    FROM Billing_Pasien.DBO.FO_T_BILLING_1
-                    WHERE NO_REGISTRASI=:noreg and Batal='0'
-                    GROUP BY NO_TRS_BILLING
-                    ) B
-                    ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
-                    WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
-                    ");
+                        SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
+                        FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                        INNER JOIN
+                        (
+                        SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                        SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                        FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                        WHERE NO_REGISTRASI=:noreg and Batal='0'
+                        GROUP BY NO_TRS_BILLING
+                        ) B
+                        ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                        WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
+                        ");
                         $this->db->bind('noreg', $noreg);
                         $this->db->bind('noreg2', $noreg);
                         $this->db->bind('notrsbill', $notrsbill);
                         $this->db->execute();
                     }
+
+                    $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                    (noregistrasi, nama_biling, petugas_entry, tgl_entry, idtrs)
+                    VALUES (:NoRegRecord, 'APPROVE RADIOLOGI', :USER_KASIRRecord, :TGL_TRSRecord, :trscoderecord)");
+                    $this->db->bind('NoRegRecord', $noreg);
+                    $this->db->bind('USER_KASIRRecord', $namauserx);
+                    $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                    $this->db->bind('trscoderecord', $datawo);
+                    $this->db->execute();
                 }
                 //update di visit nya
                 $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET RadiologiLunas=1 WHERE NoRegistrasi = :noregvisit1");
@@ -4328,7 +6093,6 @@ class  B_Billing_Model
                 //$odid = array();
                 $tod = json_decode(json_encode((object) $data['idorderapproveRad']), FALSE);
                 foreach ($tod as $datawo) {
-
 
                     $this->db->query("SELECT COUNT(ID) AS CEK1payment FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE GROUP_ENTRI = 'RADIOLOGI' AND KODE_REF = :dataref12 AND ID_TRS_Payment IS NOT NULL");
                     $this->db->bind('dataref12', $datawo);
@@ -4358,14 +6122,35 @@ class  B_Billing_Model
                     if ($COUNT_RIS == "0") {
                         //update di visit nya
                         $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET RadiologiLunas=0
-                WHERE NoRegistrasi = :noregvisit2a");
+                    WHERE NoRegistrasi = :noregvisit2a");
                         $this->db->bind('noregvisit2a', $noreg);
                         $this->db->execute();
 
+                        // var_dump($TRIGGER_DTTM);
+                        // exit;
+
                         //update ke WO_radiology nya
-                        $this->db->query("UPDATE RadiologiSQL.dbo.WO_RADIOLOGY SET PaymentStatus=0
-                WHERE WOID=:datawoid2a");
+                        $this->db->query("UPDATE RadiologiSQL.dbo.WO_RADIOLOGY SET PaymentStatus = 0, Batal = '1', TglBatal = :TGL_TRSx, PetugasBatal = :USER_KASIRx WHERE WOID=:datawoid2a");
                         $this->db->bind('datawoid2a', $datawo);
+                        $this->db->bind('USER_KASIRx', $namauserx);
+                        $this->db->bind('TGL_TRSx', $datenowcreate);
+                        $this->db->execute();
+
+                        //batal radiology
+
+                        // MWLWL
+                        $this->db->query("UPDATE RadiologiSQL.DBO.MWLWL 
+                    SET REPLICA_DTTM = 'ANY', SCHEDULED_PROC_STATUS ='0'
+                    WHERE  ACCESSION_NO=:accession_no ");
+                        $this->db->bind('accession_no', $ACC_Number);
+                        $this->db->execute();
+
+                        // INSERT 
+                        $this->db->query("INSERT INTO RadiologiSQL.DBO.MWLWL ( TRIGGER_DTTM, REPLICA_DTTM, EVENT_TYPE, CHARACTER_SET, SCHEDULED_AETITLE, SCHEDULED_DTTM, SCHEDULED_MODALITY, SCHEDULED_STATION, SCHEDULED_LOCATION,         SCHEDULED_PROC_ID, SCHEDULED_PROC_DESC, SCHEDULED_ACTION_CODES, SCHEDULED_PROC_STATUS, PREMEDICATION, CONTRAST_AGENT, REQUESTED_PROC_ID, REQUESTED_PROC_DESC, REQUESTED_PROC_CODES, REQUESTED_PROC_PRIORITY,        REQUESTED_PROC_REASON, REQUESTED_PROC_COMMENTS, STUDY_INSTANCE_UID, PROC_PLACER_ORDER_NO, PROC_FILLER_ORDER_NO, ACCESSION_NO, ATTEND_DOCTOR, PERFORM_DOCTOR, CONSULT_DOCTOR, REQUEST_DOCTOR, REFER_DOCTOR,      REQUEST_DEPARTMENT, IMAGING_REQUEST_REASON, IMAGING_REQUEST_COMMENTS, IMAGING_REQUEST_DTTM, ISR_PLACER_ORDER_NO, ISR_FILLER_ORDER_NO, ADMISSION_ID, PATIENT_TRANSPORT, PATIENT_LOCATION, PATIENT_RESIDENCY,      PATIENT_NAME, PATIENT_ID, OTHER_PATIENT_NAME, OTHER_PATIENT_ID, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_WEIGHT, PATIENT_SIZE, PATIENT_STATE, CONFIDENTIALITY, PREGNANCY_STATUS, MEDICAL_ALERTS,     CONTRAST_ALLERGIES, SPECIAL_NEEDS, SPECIALTY, DIAGNOSIS, ADMIT_DTTM, REGISTER_DTTM, [Match], ORDERCODE, EXPERTISE )
+                    SELECT '$TRIGGER_DTTM', 'ANY' AS REPLICA_DTTM, EVENT_TYPE, CHARACTER_SET, SCHEDULED_AETITLE, SCHEDULED_DTTM, SCHEDULED_MODALITY, SCHEDULED_STATION, SCHEDULED_LOCATION, SCHEDULED_PROC_ID,      SCHEDULED_PROC_DESC, SCHEDULED_ACTION_CODES, '120'AS SCHEDULED_PROC_STATUS, PREMEDICATION, CONTRAST_AGENT, REQUESTED_PROC_ID, REQUESTED_PROC_DESC, REQUESTED_PROC_CODES, REQUESTED_PROC_PRIORITY,       REQUESTED_PROC_REASON, REQUESTED_PROC_COMMENTS, STUDY_INSTANCE_UID, PROC_PLACER_ORDER_NO, PROC_FILLER_ORDER_NO, ACCESSION_NO, ATTEND_DOCTOR, PERFORM_DOCTOR, CONSULT_DOCTOR, REQUEST_DOCTOR, REFER_DOCTOR,         REQUEST_DEPARTMENT, IMAGING_REQUEST_REASON, IMAGING_REQUEST_COMMENTS, IMAGING_REQUEST_DTTM, ISR_PLACER_ORDER_NO, ISR_FILLER_ORDER_NO, ADMISSION_ID, PATIENT_TRANSPORT, PATIENT_LOCATION, PATIENT_RESIDENCY,         PATIENT_NAME, PATIENT_ID, OTHER_PATIENT_NAME, OTHER_PATIENT_ID, PATIENT_BIRTH_DATE, PATIENT_SEX, PATIENT_WEIGHT, PATIENT_SIZE, PATIENT_STATE, CONFIDENTIALITY, PREGNANCY_STATUS, MEDICAL_ALERTS,        CONTRAST_ALLERGIES, SPECIAL_NEEDS, SPECIALTY, DIAGNOSIS, ADMIT_DTTM, REGISTER_DTTM, Match, ORDERCODE, EXPERTISE
+                    FROM RadiologiSQL.DBO.MWLWL
+                    WHERE ACCESSION_NO=:accession_no");
+                        $this->db->bind('accession_no', $ACC_Number);
                         $this->db->execute();
                     } else {
                         $callback = array(
@@ -4415,7 +6200,15 @@ class  B_Billing_Model
                     $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING SET BATAL = '1' WHERE NO_REGISTRASI = :noregfinis and NO_TRS_BILLING=:trsrad1");
                     $this->db->bind('noregfinis', $noreg);
                     $this->db->bind('trsrad1', $trsrad);
+                    $this->db->execute();
 
+                    $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = 'BATAL APPROVE', tgl_batal = :TGL_TRSRecord
+                    WHERE NoRegistrasi = :NoRegRecord AND idtrs = :dataaptk1 AND petugas_batal IS NULL");
+                    $this->db->bind('NoRegRecord', $noreg);
+                    // $this->db->bind('trscoderecord', $trscode);
+                    $this->db->bind('USER_KASIRRecord', $namauserx);
+                    $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                    $this->db->bind('dataaptk1', $datawo);
                     $this->db->execute();
                 }
             } else {
@@ -5018,7 +6811,8 @@ class  B_Billing_Model
             $namauserx = $session->name;
             $iduserx = $session->IDEmployee;
             $kodereg = $data['kodereg'];
-            // var_dump($kodereg);
+
+            // var_dump($tgl_payment);
             // exit;
 
             $this->db->query("SELECT [Status ID] AS statuspasien FROM PerawatanSQL.dbo.visit WHERE NoRegistrasi = :norega1 UNION ALL SELECT StatusID AS statuspasien FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :norega2");
@@ -5036,7 +6830,8 @@ class  B_Billing_Model
                 exit;
             }
 
-            //alim
+
+
             $this->db->query("SELECT StatusActive FROM RawatInapSQL.dbo.Inpatient_in_out a
             INNER JOIN Billing_Pasien.dbo.FO_T_BILLING_1 b ON a.ID = b.ID_BILL 
             WHERE NO_REGISTRASI=:NoRegistrasi AND GROUP_TARIF='Kamar' AND b.ID IN ($notrsfo)");
@@ -5053,10 +6848,6 @@ class  B_Billing_Model
                 return $callback;
                 exit;
             }
-            //alim
-
-            // var_dump($notrsfo);
-            // exit;
 
             // $kodebank = $data['kodebank'];
             // $nokartu = $data['nokartu'];
@@ -5189,7 +6980,7 @@ class  B_Billing_Model
             $this->db->bind('NO_EPISODE', $NoEpisode);
             $this->db->bind('NO_REGISTRASI', $NoRegistrasi);
             $this->db->bind('NO_MR', $NoMR);
-            $this->db->bind('TGL_TRS', $datenowcreate);
+            $this->db->bind('TGL_TRS', $tgl_payment);
             $this->db->bind('KODE_KASIR', $iduserx);
             $this->db->bind('USER_KASIR', $namauserx);
             $this->db->bind('NOMINAL_BAYAR', $terimapembayaran);
@@ -5230,7 +7021,6 @@ class  B_Billing_Model
                     $nourutfixLis = $substringlis;
                 }
 
-
                 $ID_TR_TARIF_DTL = 'TRSD' . $datenowlis . $nourutfixLis;
                 //#END GENERATE NO TRS DTL
 
@@ -5267,6 +7057,16 @@ class  B_Billing_Model
             $dataxk =  $this->db->single();
             $total_bayar_kredit = $dataxk['totalbayar'];
 
+            $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF4 AND TIPE_PEMBAYARAN LIKE 'Piutang%'");
+            $this->db->bind('ID_TR_TARIF4', $ID_TR_TARIF);
+            $dataxk =  $this->db->single();
+            $total_bayar_piutang = $dataxk['totalbayar'];
+
+            $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF5 AND TIPE_PEMBAYARAN = 'QRIS'");
+            $this->db->bind('ID_TR_TARIF5', $ID_TR_TARIF);
+            $dataxk =  $this->db->single();
+            $total_bayar_qris = $dataxk['totalbayar'];
+
             if ($total_bayar_cash == NULL) {
                 $total_bayar_cash = 0;
             }
@@ -5276,15 +7076,27 @@ class  B_Billing_Model
             if ($total_bayar_kredit == NULL) {
                 $total_bayar_kredit = 0;
             }
+            if ($total_bayar_piutang == NULL) {
+                $total_bayar_piutang = 0;
+            }
+            if ($total_bayar_qris == NULL) {
+                $total_bayar_qris = 0;
+            }
+
 
             //INSERT TABEL PAYMENT HDR
             // Update FO_T_BILLING_1
-            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET CASH = :CASH, DEBIT = :DEBIT, KREDIT = :KREDIT where NO_TRS = :NO_TRSx");
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET CASH = :CASH, DEBIT = :DEBIT, KREDIT = :KREDIT, PIUTANG = :PIUTANG, QRIS = :QRIS where NO_TRS = :NO_TRSx");
             $this->db->bind('NO_TRSx', $ID_TR_TARIF);
             $this->db->bind('CASH', $total_bayar_cash);
             $this->db->bind('DEBIT', $total_bayar_debit);
             $this->db->bind('KREDIT', $total_bayar_kredit);
+            $this->db->bind('PIUTANG', $total_bayar_piutang);
+            $this->db->bind('QRIS', $total_bayar_qris);
             $this->db->execute();
+
+            // var_dump('taiiii');
+            // exit;
 
             foreach ($tod as $idfobill1) {
                 $this->db->query("SELECT NO_TRS_BILLING, ID_TRS_Payment, GRANDTOTAL FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID = :if_FOBill_1");
@@ -5497,6 +7309,8 @@ class  B_Billing_Model
             $NoEpisode = $data['NoEpisode'];
             $NoRegistrasi = $data['NoRegistrasi'];
             $tgl_payment = $data['tglpayment_closing'];
+            // var_dump($tgl_payment);
+            // exit;
             $TypePatientID = $data['TypePatientID'];
 
             $bilito2 = $data['billto'][0];
@@ -5547,7 +7361,6 @@ class  B_Billing_Model
             if ($tipepembayarandummi == "Pasien Kabur") {
                 // var_dump($tipepembayaran, 'kabur');
                 // exit;
-                //alim 27-12-2023
                 $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :noreg1a AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
                 $this->db->bind('noreg1a', $NoRegistrasi);
                 $datasd1 =  $this->db->single();
@@ -5561,11 +7374,9 @@ class  B_Billing_Model
                 $TotalBayarnoidtrs = $datasd2['GrandTotal'];
                 $TotalKlaimnoidtrs = $datasd2['TotalKlaim'];
                 $TotalKekurangannoidtrs = $datasd2['TotalKekurangan'];
-                //alim 27-12-2023
                 $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
                 // $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
                 // $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
-
 
                 $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
                 ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
@@ -5610,7 +7421,6 @@ class  B_Billing_Model
                 $TotalBayarnoidtrs = $datasd2['GrandTotal'];
                 $TotalKlaimnoidtrs = $datasd2['TotalKlaim'];
                 $TotalKekurangannoidtrs = $datasd2['TotalKekurangan'];
-                //alim 27-12-2023
                 $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
                 // $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
                 // $TotalBayar = $TotalBayaridtrs + $TotalBayarnoidtrs;
@@ -5729,6 +7539,7 @@ class  B_Billing_Model
                    ,[DEBIT]
                    ,[PIUTANG]
                    ,[KREDIT]
+                   ,[QRIS]
                    ,[BATAL]
                    ,[TGL_BATAL]
                    ,[USER_BATAL]
@@ -5750,6 +7561,7 @@ class  B_Billing_Model
                     ,:DEBIT
                     ,:PIUTANG
                     ,:KREDIT
+                    ,:QRIS
                     ,:BATAL
                     ,:TGL_BATAL
                     ,:USER_BATAL
@@ -5763,7 +7575,7 @@ class  B_Billing_Model
                 $this->db->bind('NO_EPISODE', $NoEpisode);
                 $this->db->bind('NO_REGISTRASI', $NoRegistrasi);
                 $this->db->bind('NO_MR', $NoMR);
-                $this->db->bind('TGL_TRS', $datenowcreate);
+                $this->db->bind('TGL_TRS', $tgl_payment);
                 $this->db->bind('KODE_KASIR', $iduserx);
                 $this->db->bind('USER_KASIR', $namauserx);
                 $this->db->bind('NOMINAL_BAYAR', $terimapembayaran);
@@ -5771,6 +7583,7 @@ class  B_Billing_Model
                 $this->db->bind('DEBIT', 0);
                 $this->db->bind('PIUTANG', 0);
                 $this->db->bind('KREDIT', 0);
+                $this->db->bind('QRIS', 0);
                 $this->db->bind('BATAL', '0');
                 $this->db->bind('TGL_BATAL', '');
                 $this->db->bind('USER_BATAL', '');
@@ -6013,7 +7826,6 @@ class  B_Billing_Model
                 $this->db->execute();
 
 
-
                 $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF1 AND TIPE_PEMBAYARAN = 'TUNAI'");
                 $this->db->bind('ID_TR_TARIF1', $ID_TR_TARIF);
                 $dataxc =  $this->db->single();
@@ -6033,6 +7845,11 @@ class  B_Billing_Model
                 $this->db->bind('ID_TR_TARIF4', $ID_TR_TARIF);
                 $dataxp =  $this->db->single();
                 $total_bayar_piutang = $dataxp['totalbayar'];
+
+                $this->db->query("SELECT SUM(NOMINAL_BAYAR) as totalbayar FROM Billing_Pasien.[dbo].[FO_T_KASIR_2] WHERE NO_TRS_REFF = :ID_TR_TARIF4 AND TIPE_PEMBAYARAN = 'QRIS' ");
+                $this->db->bind('ID_TR_TARIF4', $ID_TR_TARIF);
+                $dataxp =  $this->db->single();
+                $total_bayar_qris = $dataxp['totalbayar'];
                 // 22/08/2024
 
                 if ($total_bayar_cash == NULL) {
@@ -6047,15 +7864,19 @@ class  B_Billing_Model
                 if ($total_bayar_piutang == NULL) {
                     $total_bayar_piutang = 0;
                 }
+                if ($total_bayar_qris == NULL) {
+                    $total_bayar_qris = 0;
+                }
 
                 //INSERT TABEL PAYMENT HDR
                 // Update FO_T_BILLING_1
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET CASH = :CASH, DEBIT = :DEBIT, KREDIT = :KREDIT, PIUTANG = :PIUTANG where NO_TRS = :NO_TRSx");
+                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET CASH = :CASH, DEBIT = :DEBIT, KREDIT = :KREDIT, PIUTANG = :PIUTANG, QRIS = :QRIS where NO_TRS = :NO_TRSx");
                 $this->db->bind('NO_TRSx', $ID_TR_TARIF);
                 $this->db->bind('CASH', $total_bayar_cash);
                 $this->db->bind('DEBIT', $total_bayar_debit);
                 $this->db->bind('KREDIT', $total_bayar_kredit);
                 $this->db->bind('PIUTANG', $total_bayar_piutang);
+                $this->db->bind('QRIS', $total_bayar_qris);
                 $this->db->execute();
 
 
@@ -6145,12 +7966,22 @@ class  B_Billing_Model
                 $this->db->execute();
             }
 
+            $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+            (noregistrasi, nama_biling, petugas_entry, tgl_entry)
+            VALUES ( 
+            :NoRegRecord, 'CLOSE BILL', :USER_KASIRRecord, :TGL_TRSRecord)");
+            $this->db->bind('NoRegRecord', $NoRegistrasi);
+            $this->db->bind('USER_KASIRRecord', $namauserx);
+            $this->db->bind('TGL_TRSRecord', $datenowcreate);
+            $this->db->execute();
+
             $this->db->commit();
             $callback = array(
                 'status' => 'success',
                 'message' => 'Simpan Berhasil',
                 // 'paramsid' => $ID_TR_TARIF,
             );
+
             return $callback;
         } catch (PDOException $e) {
             $this->db->rollback();
@@ -6638,7 +8469,7 @@ class  B_Billing_Model
             if ($data['kodereg'] == 'RJ') {
                 $query = "SELECT f.PatientName ,  b2.Billto as BILLTO, a.NoMR as NO_MR, a.NoRegistrasi as NO_REGISTRASI, a.NoEpisode as NO_EPISODE, '' as NO_KWITANSI, '' as USER_KASIR, b4.nominalbayar as NOMINAL_BAYAR, f3.NamaUnit,
                 case when a.PatientType='2' then asu.NamaPerusahaan else jpk.NamaPerusahaan end AS NamaJaminan, '' AS Id_Kasir,
-                SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) NamaTest , y.nominal_bayar_tunai , z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan
+                SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) NamaTest , y.nominal_bayar_tunai , z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan, wa.nominal_bayar_Qris
                 FROM PerawatanSQL.dbo.Visit a
                 INNER JOIN MasterdataSQL.dbo.Admision f ON f.NoMR = a.NoMR
                 INNER join MasterdataSQL.dbo.MstrUnitPerwatan f3 on a.Unit= f3.ID
@@ -6646,40 +8477,46 @@ class  B_Billing_Model
                         OUTER APPLY (
                             SELECT Billto
                             FROM Billing_Pasien.dbo.FO_T_KASIR b1 
-                            WHERE b1.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b1.BATAL = '0' AND b1.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
                             GROUP BY Billto
                         ) b2 (Billto)
                         OUTER APPLY (
                             SELECT SUM(NOMINAL_BAYAR) as nominalbayar
                             FROM Billing_Pasien.dbo.FO_T_KASIR b3 
-                            WHERE b3.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b3.BATAL = '0' AND b3.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
                             GROUP BY Billto
                         ) b4 (nominalbayar)
                         OUTER APPLY (
                             SELECT NAMA_TARIF + ', '
                             FROM Billing_Pasien.dbo.FO_T_BILLING_1 b5
                             inner join Billing_Pasien.dbo.FO_T_KASIR b6 on b6.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
-                            WHERE b5.ID_TRS_Payment = b6.NO_TRS AND b5.BATAL = '0'
+                            WHERE b5.ID_TRS_Payment = b6.NO_TRS AND b5.BATAL = '0' AND b6.BATAL = '0'
                             FOR XML PATH('')
                         ) x (nama_test)
                         OUTER APPLY (
                             SELECT SUM(b7.NOMINAL_BAYAR) as bayartunai
                             FROM Billing_Pasien.dbo.FO_T_KASIR_2 b7
                             inner join Billing_Pasien.dbo.FO_T_KASIR b8 on b8.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
-                            WHERE b7.NO_TRS_REFF = b8.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai'
+                            WHERE b7.NO_TRS_REFF = b8.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai' AND b7.BATAL = '0' AND b8.BATAL = '0'
                         ) y (nominal_bayar_tunai)
                         OUTER APPLY (
                             SELECT SUM(b9.NOMINAL_BAYAR) as bayartunai
                             FROM Billing_Pasien.dbo.FO_T_KASIR_2 b9
                             inner join Billing_Pasien.dbo.FO_T_KASIR b10 on b10.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
-                            WHERE b9.NO_TRS_REFF = b10.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit'
+                            WHERE b9.NO_TRS_REFF = b10.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit' AND b9.BATAL = '0' AND b10.BATAL = '0'
                         ) z (nominal_bayar_Debit)
                         OUTER APPLY (
                             SELECT SUM(b11.NOMINAL_BAYAR) as bayartunai
                             FROM Billing_Pasien.dbo.FO_T_KASIR_2 b11
                             inner join Billing_Pasien.dbo.FO_T_KASIR b12 on b12.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
-                            WHERE b11.NO_TRS_REFF = b12.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan'
+                            WHERE b11.NO_TRS_REFF = b12.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan' AND b11.BATAL = '0' AND b12.BATAL = '0'
                         ) w (nominal_bayar_PiuangPerushaan)
+                        OUTER APPLY (
+                            SELECT SUM(b13.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b13
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b14 on b14.NO_REGISTRASI = a.NoRegistrasi COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b13.NO_TRS_REFF = b14.NO_TRS AND TIPE_PEMBAYARAN = 'QRIS' AND b13.BATAL = '0' AND b14.BATAL = '0'
+                        ) wa (nominal_bayar_Qris)
                         --OUTER APPLY (
                         --	SELECT NamaPerusahaan + ', '
                         --	FROM MasterdataSQL.dbo.MstrPerusahaanJPK b13
@@ -6698,11 +8535,57 @@ class  B_Billing_Model
                 FROM RawatInapSQL.dbo.Deposit a
                 left join DashboardData.dbo.dataRWI b on a.NoRegistrasi=b.NoRegistrasi 
                 where a.ID=:id";
-            } elseif ($data['kodereg'] == 'PB') {
-                $query = "SELECT a.ID,NoKwitansi,a.NoRegistrasi,'-' NoMR,case when billto is null then b.[Ship Name] collate Latin1_General_CI_AS else billto end as billto,[Ship Name] as PatientName,'-' NamaJaminan,'PEMBELIAN OBAT BEBAS' as NamaUnit,TotalPaid,Kasir,Id_Kasir,isnull(Cetakan_Ke,0) as Cetakan_Ke
-                FROM PerawatanSQL.dbo.payments a
-                left join [Apotik_V1.1SQL].dbo.Orders b on a.NoRegistrasi=b.NoRegistrasi
-                where a.ID=:id";
+            } elseif ($data['kodereg'] == 'TS') {
+                $query = "SELECT a.NamaPembeli AS PatientName,  b2.Billto as BILLTO, '-' as NO_MR, a.NoRegistrasi as NO_REGISTRASI, a.NoEpisode as NO_EPISODE, '' as NO_KWITANSI, '' as USER_KASIR, b4.nominalbayar as NOMINAL_BAYAR, a.UnitOrder AS NamaUnit,
+                case when a.GroupJaminan='2' then asu.NamaPerusahaan else jpk.NamaPerusahaan end AS NamaJaminan, '' AS Id_Kasir,
+                SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) NamaTest , y.nominal_bayar_tunai , z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan, wa.nominal_bayar_Qris
+                FROM [Apotik_V1.1SQL].dbo.v_transaksi_sales_hdr a
+                        OUTER APPLY (
+                            SELECT Billto
+                            FROM Billing_Pasien.dbo.FO_T_KASIR b1 
+                            WHERE b1.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            GROUP BY Billto
+                        ) b2 (Billto)
+                        OUTER APPLY (
+                            SELECT SUM(NOMINAL_BAYAR) as nominalbayar
+                            FROM Billing_Pasien.dbo.FO_T_KASIR b3 
+                            WHERE b3.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            GROUP BY Billto
+                        ) b4 (nominalbayar)
+                        OUTER APPLY (
+                            SELECT NAMA_TARIF + ', '
+                            FROM Billing_Pasien.dbo.FO_T_BILLING_1 b5
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b6 on b6.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b5.ID_TRS_Payment = b6.NO_TRS AND b5.BATAL = '0'
+                            FOR XML PATH('')
+                        ) x (nama_test)
+                        OUTER APPLY (
+                            SELECT SUM(b7.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b7
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b8 on b8.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b7.NO_TRS_REFF = b8.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai'
+                        ) y (nominal_bayar_tunai)
+                        OUTER APPLY (
+                            SELECT SUM(b9.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b9
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b10 on b10.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b9.NO_TRS_REFF = b10.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit'
+                        ) z (nominal_bayar_Debit)
+                        OUTER APPLY (
+                            SELECT SUM(b11.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b11
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b12 on b12.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b11.NO_TRS_REFF = b12.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan'
+                        ) w (nominal_bayar_PiuangPerushaan)
+						OUTER APPLY (
+                            SELECT SUM(b13.NOMINAL_BAYAR) as bayartunai
+                            FROM Billing_Pasien.dbo.FO_T_KASIR_2 b13
+                            inner join Billing_Pasien.dbo.FO_T_KASIR b14 on b14.NO_REGISTRASI = a.TransactionCode COLLATE  SQL_Latin1_General_CP1_CI_AS
+                            WHERE b13.NO_TRS_REFF = b14.NO_TRS AND TIPE_PEMBAYARAN = 'QRIS'
+                        ) wa (nominal_bayar_Qris)
+                  left join MasterdataSQL.dbo.MstrPerusahaanJPK jpk on a.KodeJaminan=jpk.ID
+                  left join MasterdataSQL.dbo.MstrPerusahaanAsuransi asu on a.KodeJaminan=asu.ID
+                WHERE a.TransactionCode = :noreg1";
             } else {
                 $pasing['NoKwitansi'] = '';
                 $pasing['NoRegistrasi'] = '';
@@ -6720,39 +8603,22 @@ class  B_Billing_Model
                 return $pasing;
             }
             $this->db->query($query);
-            // $this->db->bind('id', $data['notrs']);
             $this->db->bind('noreg1', $data['notrs']);
-            // $this->db->bind('notrskasir1', $data['lang']);
-            // $this->db->bind('noreg2', $data['notrs']);
-            // $this->db->bind('notrskasir2', $data['lang']);
             $datas =  $this->db->single();
-
-            // if ($data['lang'] == 'EN') {
-            //     $terbilang = $this->terbilang_eng($datas['NOMINAL_BAYAR']);
-            // } else {
-            //     $terbilang = $this->terbilang($datas['NOMINAL_BAYAR']);
-            // }
             $terbilang = $this->terbilang($datas['NOMINAL_BAYAR']);
-            // $pasing['TglCreate_sign'] = date('d/m/Y', strtotime($datas['TglCreate']));
             $pasing['billto'] = $datas['BILLTO'];
             $pasing['NoMR'] = $datas['NO_MR'];
             $pasing['NoRegistrasi'] = $datas['NO_REGISTRASI'];
             $pasing['NO_EPISODE'] = $datas['NO_EPISODE'];
             $pasing['NoKwitansi'] = '';
-            // $pasing['Id_Kasir'] = $datas['USER_KASIR'];
-
             $pasing['PatientName'] = $datas['PatientName'];
             $pasing['NamaJaminan'] = $datas['NamaJaminan'];
             $pasing['NamaUnit'] = $datas['NamaUnit'];
+            $pasing['NamaTest'] = $datas['NamaTest'];
             $pasing['Kasir'] = $namauserx;
             $pasing['Id_Kasir'] = $datas['Id_Kasir'];
-            // $pasing['Cetakan_Ke'] = $datas['Cetakan_Ke'];
-            // $pasing['ID'] = $datas['ID'];
             $pasing['Terbilang'] = $terbilang;
             $pasing['TotalPaid'] = number_format($datas['NOMINAL_BAYAR'], 0, ',', '.');
-
-            // var_dump($pasing['TotalPaid']);
-            // exit;
 
             return $pasing;
         } catch (PDOException $e) {
@@ -6871,7 +8737,6 @@ class  B_Billing_Model
     public function PrintKuitansiDetailbyAll($data)
     {
         try {
-
             if ($data['kodereg'] == 'RJ' || $data['kodereg'] == 'PB') {
                 $query = "SELECT b.TIPE_PEMBAYARAN, b.NOMINAL_BAYAR FROM Billing_Pasien.dbo.FO_T_KASIR a
                 INNER JOIN Billing_Pasien.dbo.FO_T_KASIR_2 b ON b.NO_TRS_REFF = a.NO_TRS
@@ -7149,7 +9014,7 @@ class  B_Billing_Model
                 // GROUP BY a.TIPE_PEMBAYARAN, b.TGL_TRS, BILLTO";
                 $query = "SELECT a.TIPE_PEMBAYARAN as TipePembayaran, SUM(a.NOMINAL_BAYAR) as TotalPaid, '' Keterangan
                 FROM Billing_Pasien.dbo.FO_T_KASIR_2 a
-                inner join Billing_Pasien.dbo.FO_T_KASIR b on a.NO_TRS_REFF = b.NO_TRS where b.NO_REGISTRASI=:noreg
+                inner join Billing_Pasien.dbo.FO_T_KASIR b on a.NO_TRS_REFF = b.NO_TRS where b.NO_REGISTRASI=:noreg AND a.BATAL = '0' AND b.BATAL = '0'
                 GROUP BY a.TIPE_PEMBAYARAN";
             } elseif ($data['kodereg'] == 'RI') {
                 $query = "SELECT a.TipePembayaran,a.TotalBayar as TotalPaid,b.Keterangan,replace(CONVERT(VARCHAR(11), b.Paymentdate, 111), '/','-') as Paymentdate,Billto
@@ -7325,144 +9190,144 @@ class  B_Billing_Model
         }
     }
 
-    public function uploadAWS($data)
-    {
-        $notrs = $data['notrs'];
+    // public function uploadAWS($data)
+    // {
+    //     $notrs = $data['notrs'];
 
-        $bytes = random_bytes(20);
-        $nama_file_baru  =     $notrs . bin2hex($bytes) . "-" . date("YmdHis");
-        $nama_file = $data['GrupTransaksi'] . '-' . $notrs . '.pdf';
+    //     $bytes = random_bytes(20);
+    //     $nama_file_baru  =     $notrs . bin2hex($bytes) . "-" . date("YmdHis");
+    //     $nama_file = $data['GrupTransaksi'] . '-' . $notrs . '.pdf';
 
-        /// AWS
-        // Create an S3Client
-        $s3Client = new S3Client([
-            'version' => 'latest',
-            'region'  => 'ap-southeast-1',
-            'http'    => ['verify' => false],
-            'credentials' => [
-                'key'    => 'AKIAYV2M6ERJGUKK4QWQ',
-                'secret' => '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'
-            ]
-        ]);
-        //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
-        $file_name = $_SERVER['DOCUMENT_ROOT'] . 'ESIRYARSI/public/tmp/' . $nama_file;
-        $source =   $file_name;
-        $awsImages = '';
-        $handle = fopen($source, 'r');
-        try {
-            $bucket = 'rsuyarsibucket';
-            $key = basename($nama_file_baru);
-            $result = $s3Client->putObject([
-                'Bucket' => $bucket,
-                //'Key'    => 'digitalfiles/akadijaroh/' . $key,
-                'Key'    => 'digitalfiles/billing/' . $key,
-                'Body'   => $handle,
-                'ACL'    => 'public-read', // make file 'public', 
-            ]);
-            $awsImages = $result->get('ObjectURL');
+    //     /// AWS
+    //     // Create an S3Client
+    //     $s3Client = new S3Client([
+    //         'version' => 'latest',
+    //         'region'  => 'ap-southeast-1',
+    //         'http'    => ['verify' => false],
+    //         'credentials' => [
+    //             'key'    => 'AKIAYV2M6ERJGUKK4QWQ',
+    //             'secret' => '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'
+    //         ]
+    //     ]);
+    //     //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
+    //     $file_name = $_SERVER['DOCUMENT_ROOT'] . 'ESIRYARSI/public/tmp/' . $nama_file;
+    //     $source =   $file_name;
+    //     $awsImages = '';
+    //     $handle = fopen($source, 'r');
+    //     try {
+    //         $bucket = 'rsuyarsibucket';
+    //         $key = basename($nama_file_baru);
+    //         $result = $s3Client->putObject([
+    //             'Bucket' => $bucket,
+    //             //'Key'    => 'digitalfiles/akadijaroh/' . $key,
+    //             'Key'    => 'digitalfiles/billing/' . $key,
+    //             'Body'   => $handle,
+    //             'ACL'    => 'public-read', // make file 'public', 
+    //         ]);
+    //         $awsImages = $result->get('ObjectURL');
 
-            //close filenya
-            fclose($handle);
-            //hapus filenya 
-            unlink($_SERVER["DOCUMENT_ROOT"] . 'ESIRYARSI/public/tmp/' . $nama_file);
+    //         //close filenya
+    //         fclose($handle);
+    //         //hapus filenya 
+    //         unlink($_SERVER["DOCUMENT_ROOT"] . 'ESIRYARSI/public/tmp/' . $nama_file);
 
-            return $this->SaveFile($data, $awsImages);
-        } catch (MultipartUploadException $e) {
+    //         return $this->SaveFile($data, $awsImages);
+    //     } catch (MultipartUploadException $e) {
 
-            return $e->getMessage();
-        }
-    }
+    //         return $e->getMessage();
+    //     }
+    // }
 
-    public function SaveFile($data, $awsImages)
-    {
-        try {
-            $this->db->transaksi();
-            $session = SessionManager::getCurrentSession();
-            $userlogin = $session->IDEmployee;
-            $usernamelogin = $session->name;
+    // public function SaveFile($data, $awsImages)
+    // {
+    //     try {
+    //         $this->db->transaksi();
+    //         $session = SessionManager::getCurrentSession();
+    //         $userlogin = $session->IDEmployee;
+    //         $usernamelogin = $session->name;
 
-            $datenowcreate = Utils::seCurrentDateTime();
-            $uuid = $data['uuid4'];
+    //         $datenowcreate = Utils::seCurrentDateTime();
+    //         $uuid = $data['uuid4'];
 
-            if (substr($data['GrupTransaksi'], 0, 8) == 'KUITANSI') {
-                $DocumentType = 'KUITANSI_BILLING';
-            } else {
-                $DocumentType = 'RINCIAN_BILLING';
-            }
+    //         if (substr($data['GrupTransaksi'], 0, 8) == 'KUITANSI') {
+    //             $DocumentType = 'KUITANSI_BILLING';
+    //         } else {
+    //             $DocumentType = 'RINCIAN_BILLING';
+    //         }
 
-            $query = "UPDATE a
-              SET Active='0' 
-              FROM Billing_Pasien.dbo.TDocumentMasters a
-              inner join Billing_Pasien.dbo.TDocumentBillingPatients b on a.Uuid=b.DocTransactionID
-              WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi
-              ";
-            $this->db->query($query);
-            $this->db->bind('id', $data['notrs']);
-            $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
-            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
-            $this->db->execute();
+    //         $query = "UPDATE a
+    //           SET Active='0' 
+    //           FROM Billing_Pasien.dbo.TDocumentMasters a
+    //           inner join Billing_Pasien.dbo.TDocumentBillingPatients b on a.Uuid=b.DocTransactionID
+    //           WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi
+    //           ";
+    //         $this->db->query($query);
+    //         $this->db->bind('id', $data['notrs']);
+    //         $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
+    //         $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+    //         $this->db->execute();
 
-            $query = "INSERT INTO Billing_Pasien.dbo.TDocumentMasters (Uuid,DateCreate,UserCreate,DocumentType,AwsUrlDocuments,NamaTTD1)
-                Values
-            (:uuid,:datenowcreate,:userlogin,:DocumentType,:AWS_URL,:usernamelogin)";
-            $this->db->query($query);
-            $this->db->bind('uuid', $uuid);
-            $this->db->bind('datenowcreate', $datenowcreate);
-            $this->db->bind('userlogin', $userlogin);
-            $this->db->bind('DocumentType', $DocumentType);
-            $this->db->bind('AWS_URL', $awsImages);
-            $this->db->bind('usernamelogin', $usernamelogin);
-            $this->db->execute();
+    //         $query = "INSERT INTO Billing_Pasien.dbo.TDocumentMasters (Uuid,DateCreate,UserCreate,DocumentType,AwsUrlDocuments,NamaTTD1)
+    //             Values
+    //         (:uuid,:datenowcreate,:userlogin,:DocumentType,:AWS_URL,:usernamelogin)";
+    //         $this->db->query($query);
+    //         $this->db->bind('uuid', $uuid);
+    //         $this->db->bind('datenowcreate', $datenowcreate);
+    //         $this->db->bind('userlogin', $userlogin);
+    //         $this->db->bind('DocumentType', $DocumentType);
+    //         $this->db->bind('AWS_URL', $awsImages);
+    //         $this->db->bind('usernamelogin', $usernamelogin);
+    //         $this->db->execute();
 
-            $query = "UPDATE Billing_Pasien.dbo.TDocumentBillingPatients SET ActiveDocument='0' WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi";
-            $this->db->query($query);
-            $this->db->bind('id', $data['notrs']);
-            $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
-            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
-            $this->db->execute();
+    //         $query = "UPDATE Billing_Pasien.dbo.TDocumentBillingPatients SET ActiveDocument='0' WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi";
+    //         $this->db->query($query);
+    //         $this->db->bind('id', $data['notrs']);
+    //         $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
+    //         $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+    //         $this->db->execute();
 
-            $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentBillingPatients (DocTransactionID,NoTrs_Reff,NoRegistrasi,GrupTransaksi,AwsUrlDocuments,TglCreate,UserCreate)
-                Values
-            (:uuid,:id,:NoRegistrasi,:GrupTransaksi,:AWS_URL,:datenowcreate,:userlogin)";
-            $this->db->query($query);
-            $this->db->bind('uuid', $uuid);
-            $this->db->bind('id', $data['notrs']);
-            $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
-            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
-            $this->db->bind('AWS_URL', $awsImages);
-            $this->db->bind('datenowcreate', $datenowcreate);
-            $this->db->bind('userlogin', $userlogin);
-            $this->db->execute();
-
-
-            $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentHistoryBillingPatients (DocTransactionID,CetakanKe,Alasan_Cetak,UserCreate,DateCreate)
-                Values
-            (:uuid,:CetakanKe,:Alasan_Cetak,:userlogin,:datenowcreate)";
-            $this->db->query($query);
-            $this->db->bind('uuid', $uuid);
-            $this->db->bind('CetakanKe', $data['cetakanke']['CetakanKe']);
-            $this->db->bind('Alasan_Cetak', '');
-            $this->db->bind('userlogin', $userlogin);
-            $this->db->bind('datenowcreate', $datenowcreate);
-            $this->db->execute();
+    //         $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentBillingPatients (DocTransactionID,NoTrs_Reff,NoRegistrasi,GrupTransaksi,AwsUrlDocuments,TglCreate,UserCreate)
+    //             Values
+    //         (:uuid,:id,:NoRegistrasi,:GrupTransaksi,:AWS_URL,:datenowcreate,:userlogin)";
+    //         $this->db->query($query);
+    //         $this->db->bind('uuid', $uuid);
+    //         $this->db->bind('id', $data['notrs']);
+    //         $this->db->bind('NoRegistrasi', $data['listdataheader']['NoRegistrasi']);
+    //         $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+    //         $this->db->bind('AWS_URL', $awsImages);
+    //         $this->db->bind('datenowcreate', $datenowcreate);
+    //         $this->db->bind('userlogin', $userlogin);
+    //         $this->db->execute();
 
 
-            $this->db->Commit();
-            $callback = array(
-                'status' => 200,
-                'message' => 'Generate Upload Data Succesfully.',
-                'aws_url' =>  $awsImages,
-            );
-            return $callback;
-        } catch (PDOException $e) {
-            $this->db->rollback();
-            $callback = array(
-                'status' => 'warning',
-                'message' => $e,
-            );
-            return $callback;
-        }
-    }
+    //         $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentHistoryBillingPatients (DocTransactionID,CetakanKe,Alasan_Cetak,UserCreate,DateCreate)
+    //             Values
+    //         (:uuid,:CetakanKe,:Alasan_Cetak,:userlogin,:datenowcreate)";
+    //         $this->db->query($query);
+    //         $this->db->bind('uuid', $uuid);
+    //         $this->db->bind('CetakanKe', $data['cetakanke']['CetakanKe']);
+    //         $this->db->bind('Alasan_Cetak', '');
+    //         $this->db->bind('userlogin', $userlogin);
+    //         $this->db->bind('datenowcreate', $datenowcreate);
+    //         $this->db->execute();
+
+
+    //         $this->db->Commit();
+    //         $callback = array(
+    //             'status' => 200,
+    //             'message' => 'Generate Upload Data Succesfully.',
+    //             'aws_url' =>  $awsImages,
+    //         );
+    //         return $callback;
+    //     } catch (PDOException $e) {
+    //         $this->db->rollback();
+    //         $callback = array(
+    //             'status' => 'warning',
+    //             'message' => $e,
+    //         );
+    //         return $callback;
+    //     }
+    // }
 
     public function getAWSURL($data)
     {
@@ -8426,23 +10291,76 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
 
     public function gettarifnew($data)
     {
-        // var_dump('lagi di perbaiki');
-        // exit;
         try {
             $idunit = $data['idunit'];
             $groupjaminan = $data['groupjaminan'];
             $tglbill = $data['tglbill'];
             $jenispasien = $data['jenispasien'];
 
-            $this->db->query("SELECT  c.ID,c.[Product Name] as namatarif, b.NILAI
-            FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
-            WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-            and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
-            and id_layanan=:idunit
-            order by 1 desc");
+            if ($jenispasien == 'RJ') {
+                if ($idunit == '1') {
+                    // $this->db->query("SELECT  c.ID,c.[Product Name] as namatarif, b.NILAI
+                    // FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                    // WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                    // and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
+                    // and id_layanan=:idunit and KLSID = '2'
+                    // order by 1 desc");
+
+                    $this->db->query("SELECT 
+                    A.ID_TR_TARIF,c.ID,c.[Product Name] as namatarif , D.id_layanan, SUM(b.NILAI) AS NILAI
+                    FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                    WHERE  :tglbill  between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                    and b.KD_INSTALASI=:jenispasien  AND B.GROUP_TARIF=:groupjaminan
+                    and id_layanan=:idunit and KLSID = '2'
+                    group by  A.ID_TR_TARIF,c.ID,c.[Product Name] ,D.id_layanan
+                    order by 2 asc");
+
+
+                } else {
+                    // $this->db->query("SELECT  c.ID,c.[Product Name] as namatarif, b.NILAI
+                    // FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                    // INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                    // WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                    // and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
+                    // and id_layanan=:idunit and KLSID = '3'
+                    // order by 1 desc");
+
+                    $this->db->query("SELECT 
+                    A.ID_TR_TARIF,c.ID,c.[Product Name] as namatarif , D.id_layanan, SUM(b.NILAI) AS NILAI
+                    FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                    INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                    WHERE  :tglbill  between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                    and b.KD_INSTALASI=:jenispasien  AND B.GROUP_TARIF=:groupjaminan
+                    and id_layanan=:idunit and KLSID = '3'
+                    group by  A.ID_TR_TARIF,c.ID,c.[Product Name] ,D.id_layanan
+                    order by 2 asc");
+                }
+            } else {
+                $IDKelas = $data['IDKelas'];
+                $noreg = $data['noreg'];
+
+                var_dump($noreg);
+                exit;
+
+                // $this->db->query("SELECT First_Name from MasterdataSQL.dbo.Doctors where id = :iddokter");
+                // $this->db->bind('iddokter', $iddokter);
+                // $key =  $this->db->single();
+                // $pasing['First_Name'] = $key['First_Name'];
+
+                // var_dump('WLEEEEEEE');
+                // exit;
+            }
+
             $this->db->bind('idunit', $idunit);
             $this->db->bind('groupjaminan', $groupjaminan);
             $this->db->bind('tglbill', $tglbill);
@@ -8454,6 +10372,7 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                 $pasing['ID'] = $key['ID'];
                 $pasing['ProductName'] = $key['namatarif'];
                 $pasing['NILAI'] = $key['NILAI'];
+                $pasing['ID_TR_TARIF'] = $key['ID_TR_TARIF'];
                 $rows[] = $pasing;
             }
             $callback = array(
@@ -8484,15 +10403,29 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $tarifvalue = $data['tarifvalue'];
             // $this->db->query("SELECT ID,[Product Name],CategoryProduct,TarifRS
             //                 from PerawatanSQL.dbo.Tarif_RJ_UGD where ID=:tarifvalue");
-            $this->db->query("SELECT  c.ID,c.[Product Name] as namatarif, b.NILAI, c.CategoryProduct
-            FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
-            INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
-            WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
-            and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
-            and id_layanan=:idunit and c.ID = :tarifvalue
-            order by 1 desc");
+
+            if ($idunit == '1') {
+                $this->db->query("SELECT A.ID_TR_TARIF,c.ID,c.[Product Name] as namatarif, c.CategoryProduct, sum(b.NILAI) as NILAI
+                FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
+                and id_layanan=:idunit and c.ID = :tarifvalue and KLSID = '2' 
+                group by A.ID_TR_TARIF,c.ID,c.[Product Name], c.CategoryProduct");
+            } else {
+                $this->db->query("SELECT A.ID_TR_TARIF,c.ID,c.[Product Name] as namatarif, c.CategoryProduct, sum(b.NILAI) as NILAI
+                FROM PerawatanSQL.DBO.Tarif_RJ_UGD_3 A
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 B ON A.ID_TR_TARIF = B.ID_TR_TARIF
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD C ON C.ID = B.ID_TARIF
+                INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_2 D ON D.id_tarif = C.ID
+                WHERE :tglbill between  replace(CONVERT(VARCHAR(11),a.TGL_BERLAKU, 111), '/','-')   and replace(CONVERT(VARCHAR(11),a.TGL_EXPIRED, 111), '/','-')  
+                and b.KD_INSTALASI=:jenispasien and b.GROUP_TARIF=:groupjaminan
+                and id_layanan=:idunit and c.ID = :tarifvalue and KLSID = '3' 
+                group by A.ID_TR_TARIF,c.ID,c.[Product Name], c.CategoryProduct");
+            }
+
             $this->db->bind('tarifvalue', $tarifvalue);
             $this->db->bind('idunit', $idunit);
             $this->db->bind('groupjaminan', $groupjaminan);
@@ -8503,7 +10436,8 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $pasing['ProductName'] = $key['namatarif'];
             $pasing['CategoryProduct'] = $key['CategoryProduct'];
             $pasing['GetTarif'] = $key['NILAI'];
-
+            $pasing['ID_TR_TARIF'] = $key['ID_TR_TARIF'];
+            
             $callback = array(
                 'message' => "success", // Set array nama 
                 'data' => $pasing
@@ -8773,6 +10707,19 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                 return $callback;
             }
 
+            if ($data['KDREG'] == 'RJ') {
+                if ($data['UNIT'] == '1') {
+                    $kelas = '2';
+                } else {
+                    $kelas = '3';
+                }
+            } else {
+                //belum
+            }
+
+            // var_dump($kelas);
+            // exit;
+
             $this->db->query("INSERT INTO  Billing_Pasien.dbo.FO_T_BILLING_1
                     ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],
                     [NO_EPISODE],[NO_REGISTRASI],[KODE_TARIF],[UNIT],[GROUP_JAMINAN],
@@ -8805,7 +10752,7 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $this->db->bind('NAMA_TARIF', $data['NAMA_TARIF']);
             $this->db->bind('GROUP_TARIF', $data['GROUP_TARIF']);
 
-            $this->db->bind('KD_KELAS', null);
+            $this->db->bind('KD_KELAS', $kelas);
             $this->db->bind('QTY', $data['QTY']);
             $this->db->bind('NILAI_TARIF', $data['NILAI_TARIF']);
             $this->db->bind('SUB_TOTAL', $data['QTY'] * $data['NILAI_TARIF']);
@@ -8825,50 +10772,53 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
 
             $lastIdBilling1 = $this->db->GetLastID();
 
+            // var_dump($KD_TIPE_JASA);
+            // exit;
+
             // Insert ke tabel FO_T_Billing_2 - jasmed
 
             // baru insert
-            $this->db->query("INSERT INTO  Billing_Pasien.DBO.FO_T_BILLING_2
-            SELECT $lastIdBilling1 as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_JASA as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
-            A1.NAMA_TARIF AS NAMA_TARIF, 
-            A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
-            A1.NILAI_TARIF AS NILAI_TARIF  ,
-            A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
-            A1.DISC AS DISC,
-            (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-            ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
-            (CASE   WHEN  CX.KD_JENIS_JASA='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY else ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))  END ) NILAI_DISKON_PDP,
-            (CASE WHEN  CX.KD_JENIS_JASA='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY ELSE  (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   END ) as NILAI_PDP,
-            A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,'0'
-            FROM Billing_Pasien.DBO.FO_T_BILLING A
-            inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
-            ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
-            INNER JOIN PerawatanSQL.dbo.Tarif_RJ_UGD CC 
-            ON CC.ID = A1.KODE_TARIF
-            INNER JOIN Keuangan.DBO.BO_M_JASA2 B
-            ON CC.KD_JASA collate SQL_Latin1_General_CP1_CI_AS = B.KD_JASA collate SQL_Latin1_General_CP1_CI_AS
-            INNER JOIN Keuangan.DBO.BO_M_JASA CX
-            ON CX.KD_JASA = B.KD_JASA
-            WHERE A1.GROUP_ENTRI='RAJAL' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill and A1.ID = :lastIdBilling1
-			and B.KD_TIPE_JASA=:KD_TIPE_JASA ");
-            $this->db->bind('notrsbill', $data['NO_TRS_BILLING']);
-            $this->db->bind('lastIdBilling1', $lastIdBilling1);
-            $this->db->bind('KD_TIPE_JASA', $KD_TIPE_JASA);
-            $this->db->execute();
 
             //Insert ke tabel FO_T_Billing_2 - PDP
+            // $this->db->query("INSERT INTO  Billing_Pasien.DBO.FO_T_BILLING_2
+            // SELECT $lastIdBilling1 as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
+            // A1.NAMA_TARIF AS NAMA_TARIF, 
+            // A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
+            // A1.NILAI_TARIF AS NILAI_TARIF  ,
+            // A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
+            // A1.DISC AS DISC,
+            // (A1.NILAI_TARIF - (A1.NILAI_TARIF * (1 - A1.DISC))) AS DISC_RP,
+            // (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as SUB_TOTAL_PDP_2,
+            // (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
+            // (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
+            // CASE WHEN B.SHOW_JASA='1' THEN A1.KD_DR ELSE '' END AS KD_DR,
+            // CASE WHEN B.SHOW_JASA='1' THEN A1.NM_DR ELSE '' END AS NM_DR, b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,'0'
+            // FROM Billing_Pasien.DBO.FO_T_BILLING A
+            // inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
+            // ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
+            // INNER JOIN PerawatanSQL.dbo.Tarif_RJ_UGD CC 
+            // ON CC.ID = A1.KODE_TARIF
+            // INNER JOIN Keuangan.DBO.BO_M_PDP2 B
+            // ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
+            // INNER JOIN Keuangan.DBO.BO_M_PDP CX
+            // ON CX.KD_PDP = B.KD_PDP
+            // WHERE A1.GROUP_ENTRI='RAJAL' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill and A1.ID = :lastIdBilling1");
+
             $this->db->query("INSERT INTO  Billing_Pasien.DBO.FO_T_BILLING_2
-            SELECT $lastIdBilling1 as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
+            SELECT     $lastIdBilling1 as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,
+			A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
             A1.NAMA_TARIF AS NAMA_TARIF, 
             A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
             A1.NILAI_TARIF AS NILAI_TARIF  ,
             A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
             A1.DISC AS DISC,
-            (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-            ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
-            (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
-            (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
-            A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,'0'
+            0 AS DISC_RP, 
+            0 as SUB_TOTAL_PDP_2,
+            0 NILAI_DISKON_PDP,
+			dx.NILAI as NILAI_PDP,
+            CASE WHEN B.SHOW_JASA='1' THEN A1.KD_DR ELSE '' END AS KD_DR,
+            CASE WHEN B.SHOW_JASA='1' THEN A1.NM_DR ELSE '' END AS NM_DR, 
+			b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,'0'
             FROM Billing_Pasien.DBO.FO_T_BILLING A
             inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
             ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
@@ -8878,8 +10828,13 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
             INNER JOIN Keuangan.DBO.BO_M_PDP CX
             ON CX.KD_PDP = B.KD_PDP
-            WHERE A1.GROUP_ENTRI='RAJAL' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill and A1.ID = :lastIdBilling1 ");
+			INNER JOIN PerawatanSQL.DBO.Tarif_RJ_UGD_4 DX
+			ON DX.ID_TARIF = CC.ID  and dx.KD_PDP collate Latin1_General_CI_AS =  CC.KD_PDP  collate Latin1_General_CI_AS 
+			AND DX.KD_PDP_DETIL  collate Latin1_General_CI_AS  = b.KD_TIPE_PDP  collate Latin1_General_CI_AS
+			WHERE A1.GROUP_ENTRI='RAJAL' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill and A1.ID =  :lastIdBilling1
+			and dx.ID_TR_TARIF=:idtrstariftdk and DX.GROUP_TARIF = 'UM' and dx.NILAI > '0' ");
             $this->db->bind('notrsbill', $data['NO_TRS_BILLING']);
+            $this->db->bind('idtrstariftdk', $data['idtrstariftdk']);
             $this->db->bind('lastIdBilling1', $lastIdBilling1);
             $this->db->execute();
 
@@ -9139,14 +11094,16 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $idfo1 = $data['idfo1'];
             // $KODE_TARIF = $data['KODE_TARIF'];
 
-            $this->db->query("SELECT ID, NO_TRS_BILLING, TGL_BILLING FROM Billing_Pasien.dbo.FO_T_BILLING_1 
-            WHERE ID=:idfo1 AND BATAL = '0' ");
+            $this->db->query("SELECT ID, NO_TRS_BILLING, TGL_BILLING, KODE_TARIF, NAMA_TARIF, GRANDTOTAL FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE ID = :idfo1 AND BATAL = '0'");
             $this->db->bind('idfo1', $idfo1);
             // $this->db->bind('KODE_TARIF', $KODE_TARIF);
             $key =  $this->db->single();
             $pasing['ID'] = $key['ID'];
             $pasing['NO_TRS_BILLING'] = $key['NO_TRS_BILLING'];
             $pasing['TGL_BILLING'] = $key['TGL_BILLING'];
+            $pasing['KODE_TARIF'] = $key['KODE_TARIF'];
+            $pasing['NAMA_TARIF'] = $key['NAMA_TARIF'];
+            $pasing['GRANDTOTAL'] = $key['GRANDTOTAL'];
 
             $callback = array(
                 'message' => "success", // Set array nama 
@@ -9185,13 +11142,19 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $notrsbillfo1 = $data['notrsbillfo1'];
             $KODE_TARIF = $data['KODE_TARIF'];
 
-            $this->db->query("SELECT ID, KODE_TARIF, NAMA_TARIF, QTY, NILAI_TARIF, NILAI_PDP,SUB_TOTAL, DISC, SUB_TOTAL_2 
-                            FROM Billing_Pasien.dbo.FO_T_BILLING_2 WHERE NO_TRS_BILLING = :notrsbillfo1 AND BATAL = '0' AND KODE_TARIF = :KODE_TARIF");
+            $this->db->query("SELECT a.ID, a.KODE_TARIF, a.NAMA_TARIF, a.QTY, a.NILAI_TARIF, a.SUB_TOTAL, a.DISC, a.DISC_RP, 
+a.NILAI_PROSEN, a.NILAI_DISKON_PDP, a.SUB_TOTAL_2, a.NILAI_PDP, a.KODE_KOMPONEN_TARIF, 
+                            CASE
+                            WHEN  KD_DR IS NULL OR NM_DR IS NULL OR NM_DR ='' OR KD_DR ='' THEN b.NM_TIPE_PDP
+                            ELSE b.NM_TIPE_PDP + ' - ' + NM_DR END  AS JasaBill
+                            FROM Billing_Pasien.dbo.FO_T_BILLING_2 a
+							inner join Keuangan.dbo.BO_M_PDP2 b
+							on a.KODE_KOMPONEN_TARIF = b.KD_TIPE_PDP WHERE NO_TRS_BILLING = :notrsbillfo1 AND BATAL = '0' AND KODE_TARIF = :KODE_TARIF");
             $this->db->bind('notrsbillfo1', $notrsbillfo1);
             $this->db->bind('KODE_TARIF', $KODE_TARIF);
             $data =  $this->db->resultSet();
             $rows = array();
-            $array = array();
+            // $array = array();
             foreach ($data as $key) {
                 $pasing['ID'] = $key['ID'];
                 $pasing['KODE_TARIF'] = $key['KODE_TARIF'];
@@ -9201,7 +11164,12 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                 $pasing['SUB_TOTAL'] = $key['SUB_TOTAL'];
                 $pasing['NILAI_PDP'] = $key['NILAI_PDP'];
                 $pasing['DISC'] = $key['DISC'];
+                $pasing['DISC_RP'] = $key['DISC_RP'];
+                $pasing['NILAI_PROSEN'] = $key['NILAI_PROSEN'];
+                $pasing['NILAI_DISKON_PDP'] = $key['NILAI_DISKON_PDP'];
                 $pasing['SUB_TOTAL_2'] = $key['SUB_TOTAL_2'];
+                $pasing['KODE_KOMPONEN_TARIF'] = $key['KODE_KOMPONEN_TARIF'];
+                $pasing['JasaBill'] = $key['JasaBill'];
                 $rows[] = $pasing;
             }
             return $rows;
@@ -9340,35 +11308,15 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $id_fo2 = $data['id_fo2'];
             $nilaitariffo2 = $data['NILAI_TARIF'];
             $QTY = $data['QTY'];
-            $DISC = $data['DISC'];
+            $DISC_PDP = $data['DISC'];
             $kodetarif_fo2 = $data['kodetarif_fo2'];
             $NoTRSBill1 = $data['NoTRSBill1'];
             $noreg = $data['Noreg'];
             $id_fo1 = $data['id_fo1'];
-
-
-            $subtotal = $QTY * $nilaitariffo2;
-            $subtotal2 = $QTY * $nilaitariffo2 * (1 - $DISC);
-            $discRP = $subtotal - $subtotal2;
-
-            // var_dump($subtotal2);
-            // var_dump($discRP);
-            // exit;
-
-            if ($data['TypePatientID'] == "1") {
-                $kekurangan = $subtotal2;
-                $klaim = "0";
-                $bayar = "0";
-            } else {
-                $kekurangan = "0";
-                $klaim = $subtotal2;
-                $bayar = "0";
-            }
-
-            // var_dump($klaim);
-            // var_dump($kekurangan);
-            // var_dump($data['TypePatientID']);
-            // exit;
+            $NILAI_PDP = $data['NILAI_PDP'];
+            $TypePatientID = $data['TypePatientID'];
+            $nilaiProsen = $data['NILAIPROSEN'];
+            // $NILAI_PDP = 0.1;
 
             $this->db->query("SELECT [Status ID] AS statuspasien FROM PerawatanSQL.dbo.visit WHERE NoRegistrasi = :norega1 UNION ALL SELECT StatusID AS statuspasien FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :norega2");
             $this->db->bind('norega1', $data['Noreg']);
@@ -9390,7 +11338,6 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $datastrspaymentcek =  $this->db->single();
             $ID_TRS_Payment = $datastrspaymentcek['ID_TRS_Payment'];
 
-
             if ($ID_TRS_Payment != NULL) {
                 $callback = array(
                     'status' => 'error',
@@ -9399,32 +11346,102 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                 return $callback;
                 exit;
             }
-            // var_dump($data);
+
+            $subtotal2a = $nilaitariffo2 * $nilaiProsen;
+            $subtotal2b = $subtotal2a - ($subtotal2a * $DISC_PDP);
+
+
+
+            // $subtotal2c = 0;
+            // if ($DISC_PDP <> '0') {
+            $subtotaldiscrp = $subtotal2a * $DISC_PDP;
+            $subtotaldisc = $subtotaldiscrp / $nilaitariffo2;
+
+            // }
+            // $subtotaldiskon = $subtotal2b / $nilaitariffo2;
+            // $subtotaldiskonrp = $nilaitariffo2 * $subtotaldiskon;
+
+
+            // var_dump('Nilai PDP AWAL : ', $subtotal2a);
+            // var_dump('NILAI PDP SESUDAH DI DISKON :', $subtotal2b);
+            // var_dump('DISKON TOTAL :', $subtotaldiskon);
+            // var_dump('DISKON RP TOTAL :', $subtotaldiskonrp);
             // exit;
 
-            //  insert ke tabel FO_T_Billing
-            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET QTY = :QTY1 , SUB_TOTAL = :subtotal, DISC = :DISC1, SUB_TOTAL_2 = :subtotal2, DISC_RP = :discRP1  WHERE ID = :id_fo2");
+            //  insert ke tabel FO_T_Billing2a
+            // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET QTY = :QTY1 , SUB_TOTAL = :subtotal, DISC = :DISC1, SUB_TOTAL_2 = :subtotal2, DISC_RP = :discRP1  WHERE ID = :id_fo2");
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET NILAI_DISKON_PDP = :DISC_PDPa, SUB_TOTAL_2 = :subtotal2a, 
+            NILAI_PDP = :subtotal2b, 
+            DISC = :subtotaldisc, DISC_RP = :subtotaldiscrp WHERE ID = :id_fo2");
             $this->db->bind('id_fo2', $id_fo2);
-            $this->db->bind('QTY1', $QTY);
-            $this->db->bind('subtotal2', $subtotal2);
-            $this->db->bind('subtotal', $subtotal);
-            $this->db->bind('DISC1', $DISC);
-            $this->db->bind('discRP1', $discRP);
+            // $this->db->bind('QTY1', $QTY);
+            $this->db->bind('subtotal2a', $subtotal2b);
+            $this->db->bind('subtotal2b', $subtotal2b);
+            $this->db->bind('subtotaldiscrp', $subtotaldiscrp);
+            // $this->db->bind('subtotal', $subtotal);
+            // $this->db->bind('DISC1', $DISC);
+            $this->db->bind('DISC_PDPa', $DISC_PDP);
+            $this->db->bind('subtotaldisc', $subtotaldisc);
+            // $this->db->bind('subtotaldiskon', $subtotaldiskon);
+            // $this->db->bind('subtotaldiskonrp', $subtotaldiskonrp);
+            // $this->db->bind('discRP1', $discRP);
             $this->db->execute();
 
-            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET GRANDTOTAL = :subtotal2b2, QTY = :QTY1b , SUB_TOTAL = :subtotalb, DISC = :DISC1b, SUB_TOTAL_2 = :subtotal2b, DISC_RP = :discRP1b, BAYAR= :bayarb, KLAIM= :klaimb, KEKURANGAN= :kekuranganb WHERE NO_TRS_BILLING = :NoTRSBill1b AND KODE_TARIF = :kodetarif_fo2b");
-            $this->db->bind('QTY1b', $QTY);
-            $this->db->bind('subtotal2b', $subtotal2);
-            $this->db->bind('subtotal2b2', $subtotal2);
-            $this->db->bind('subtotalb', $subtotal);
-            $this->db->bind('DISC1b', $DISC);
-            $this->db->bind('discRP1b', $discRP);
+
+            // var_dump('ok');
+            // exit;
+
+            // //  insert ke tabel FO_T_Billing2b
+            // // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET QTY = :QTY1 , SUB_TOTAL = :subtotal, DISC = :DISC1, SUB_TOTAL_2 = :subtotal2, DISC_RP = :discRP1  WHERE ID = :id_fo2");
+            // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_2 SET NILAI_DISKON_PDP = :DISC_PDP, SUB_TOTAL_2 = :subtotal2a, NILAI_PDP = :subtotal2b  WHERE NO_TRS_BILLING = :NoTRSBill1");
+            // $this->db->bind('NoTRSBill1', $NoTRSBill1);
+            // // $this->db->bind('QTY1', $QTY);
+            // $this->db->bind('subtotal2a', $subtotal2b);
+            // $this->db->bind('subtotal2b', $subtotal2b);
+            // // $this->db->bind('subtotal', $subtotal);
+            // // $this->db->bind('DISC1', $DISC);
+            // $this->db->bind('DISC_PDP', $DISC_PDP);
+            // // $this->db->bind('discRP1', $discRP);
+            // $this->db->execute();
+
+            // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET GRANDTOTAL = :subtotal2b2, QTY = :QTY1b , SUB_TOTAL = :subtotalb, DISC = :DISC1b, SUB_TOTAL_2 = :subtotal2b, DISC_RP = :discRP1b, BAYAR= :bayarb, KLAIM= :klaimb, KEKURANGAN= :kekuranganb WHERE NO_TRS_BILLING = :NoTRSBill1b AND KODE_TARIF = :kodetarif_fo2b");
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET 
+                            GRANDTOTAL = B.SUM_SUB_TOTAL_2, SUB_TOTAL_2 = B.SUM_SUB_TOTAL_2, BAYAR = '0', klaim = B.SUM_SUB_TOTAL_KLAIM, KEKURANGAN = B.SUM_SUB_TOTAL_KEKURANGAN,
+                            DISC = B.SUM_DISC_2, DISC_RP = B.SUM_DISC_RP2
+                            FROM Billing_Pasien.dbo.FO_T_BILLING_1 A 
+                            INNER JOIN 
+                            (
+                            	SELECT NO_TRS_BILLING,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                            	CASE 
+                            	WHEN $TypePatientID = '1' THEN SUM(SUB_TOTAL_2)
+                            	ELSE 0 END AS SUM_SUB_TOTAL_KEKURANGAN,
+                            	CASE
+                            	WHEN $TypePatientID != '1' THEN SUM(SUB_TOTAL_2)
+                            	ELSE 0 END AS SUM_SUB_TOTAL_KLAIM, SUM(DISC) AS SUM_DISC_2, SUM(DISC_RP) AS SUM_DISC_RP2
+                                FROM Billing_Pasien.dbo.FO_T_BILLING_2
+                                WHERE NO_TRS_BILLING = :NoTRSBill2b and Batal='0' AND KODE_TARIF = :kodetarif_fo2b
+                                GROUP BY NO_TRS_BILLING
+                            ) B
+                            ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                            WHERE A.NO_TRS_BILLING = :NoTRSBill1b AND KODE_TARIF = :kodetarif_fo1b AND Batal='0'");
+            // $this->db->bind('QTY1b', $QTY);
+            // $this->db->bind('subtotal2b', $subtotal2);
+            // $this->db->bind('subtotal2b2', $subtotal2);
+            // $this->db->bind('subtotalb', $subtotal);
+            // $this->db->bind('DISC1b', $DISC);
+            // $this->db->bind('discRP1b', $discRP);
             $this->db->bind('NoTRSBill1b', $NoTRSBill1);
+            $this->db->bind('NoTRSBill2b', $NoTRSBill1);
+            $this->db->bind('kodetarif_fo1b', $kodetarif_fo2);
             $this->db->bind('kodetarif_fo2b', $kodetarif_fo2);
-            $this->db->bind('kekuranganb', $kekurangan);
-            $this->db->bind('klaimb', $klaim);
-            $this->db->bind('bayarb', $bayar);
+            // $this->db->bind('kekuranganb', $kekurangan);
+            // $this->db->bind('klaimb', $klaim);
+            // $this->db->bind('bayarb', $bayar);
             $this->db->execute();
+
+
+            // var_dump('ok');
+            // exit;
 
             $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
                     SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
@@ -9438,8 +11455,7 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                         GROUP BY NO_TRS_BILLING
                     ) B
                     ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
-                    WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill
-                    ");
+                    WHERE A.NO_REGISTRASI=:noreg2 AND A.NO_TRS_BILLING=:notrsbill");
             $this->db->bind('noreg', $noreg);
             $this->db->bind('noreg2', $noreg);
             $this->db->bind('notrsbill', $NoTRSBill1);
@@ -9793,22 +11809,28 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $noreg = $data['noreg'];
             $nomr = $data['nomr'];
 
+            // $this->db->query("SELECT COUNT(*) AS CEK FROM Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_REFF = :noregistrasi");
+            // $this->db->bind('noregistrasi', $noreg);
+            // $statuscek =  $this->db->single();
+            // $statushutang = $statuscek['CEK'];
+
+            // if ($statushutang <> '0') {
             $this->db->query("SELECT a.*,b.NamaKelas,
-                        replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
-                        FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
-                        left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
-                        inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.id = a.UNIT
-                        inner join Billing_Pasien.dbo.CLOSING_BILL d ON d.NOREG_FIRST = a.NO_REGISTRASI
-                        WHERE a.NO_MR = :nomr1 AND d.NOREG_REFF = :noreg1 AND a.BATAL = '0' AND a.ID_TRS_Payment IS NULL
-            UNION ALL
-            SELECT a.*,b.NamaKelas,
-                        replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
-                        FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
-                        left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
-                        inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.id = a.UNIT
-                        inner join Billing_Pasien.dbo.CLOSING_BILL d ON d.NOREG_FIRST = a.NO_REGISTRASI
-                        inner join Billing_Pasien.dbo.FO_T_KASIR e ON e.NO_TRS = a.ID_TRS_Payment
-                        WHERE a.NO_MR = :nomr2 AND d.NOREG_REFF = :noreg2 AND a.BATAL = '0' AND e.NO_REGISTRASI = :noreg3");
+                replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
+                inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.id = a.UNIT
+                inner join Billing_Pasien.dbo.CLOSING_BILL d ON d.NOREG_FIRST = a.NO_REGISTRASI
+                WHERE a.NO_MR = :nomr1 AND d.NOREG_REFF = :noreg1 AND a.BATAL = '0' AND a.ID_TRS_Payment IS NULL
+    UNION ALL
+    SELECT a.*,b.NamaKelas,
+                replace(CONVERT(VARCHAR(11), TGL_BILLING, 111), '/','-') as TglBilling,c.NamaUnit
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                left join RawatInapSQL.dbo.TblKelas b on a.KD_KELAS=b.IDkelas
+                inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.id = a.UNIT
+                inner join Billing_Pasien.dbo.CLOSING_BILL d ON d.NOREG_FIRST = a.NO_REGISTRASI
+                inner join Billing_Pasien.dbo.FO_T_KASIR e ON e.NO_TRS = a.ID_TRS_Payment
+                WHERE a.NO_MR = :nomr2 AND d.NOREG_REFF = :noreg2 AND a.BATAL = '0' AND e.NO_REGISTRASI = :noreg3");
             $this->db->bind('noreg1', $noreg);
             $this->db->bind('noreg2', $noreg);
             $this->db->bind('noreg3', $noreg);
@@ -9840,6 +11862,7 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
                 $rows[] = $pasing;
             }
             return $rows;
+            // }
         } catch (PDOException $e) {
             die($e->getMessage());
         }
@@ -12375,11 +14398,8 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
     {
         try {
             $this->db->transaksi();
-
-            // var_dump($data);
-            // exit;
-
             // DATA USER INPUT
+
             $session = SessionManager::getCurrentSession();
             $datenowx = Utils::datenowcreateNotFull();
             $datenowcreate = Utils::seCurrentDateTime();
@@ -12391,21 +14411,236 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             // DATA PASING
             $NoRegistrasi = $data['NoRegistrasi'];
             $Ket_btn_closeoropenbill = $data['Ket_btn_closeoropenbill'];
-
+            $NoMR = $data['NoMR'];
+            $AlasanOpen = $data['AlasanOpen'];
 
             if ($Ket_btn_closeoropenbill == 'Close') {
-                $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET [Status ID] = 3 WHERE NoRegistrasi = :NoRegistrasi ");
+
+                $this->db->query("SELECT NOREG_REFF FROM Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_FIRST = :noreg1 AND NOREG_REFF <> ''");
+                $this->db->bind('noreg1', $NoRegistrasi);
+                $dataStatusId =  $this->db->single();
+                $cekDataHutang = $dataStatusId['NOREG_REFF'];
+
+                if ($cekDataHutang <> '') {
+                    $callback = array(
+                        'status' => "warning",
+                        'errorname' => "Billing sudah di pindah status pada No. Registrasi " . $cekDataHutang, // Set array nama 
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                $this->db->query("DELETE Billing_Pasien.dbo.CLOSING_BILL WHERE NOREG_FIRST = :NoRegistrasi1");
+                $this->db->bind('NoRegistrasi1', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("DELETE Billing_Pasien.dbo.CLOSE_RO WHERE NOREG = :NoRegistrasi2");
+                $this->db->bind('NoRegistrasi2', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("DELETE Billing_Pasien.dbo.TEMP_INA_CBG WHERE NO_REGISTRASI = :NoRegistrasi3");
+                $this->db->bind('NoRegistrasi3', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET [Status ID] = 3 WHERE NoRegistrasi = :NoRegistrasi4");
+                $this->db->bind('NoRegistrasi4', $NoRegistrasi);
+                $this->db->execute();
+                $this->db->query("UPDATE Billing_Pasien.dbo.CLOSING_BILL SET NOREG_REFF = '' WHERE NOREG_REFF = :NoRegistrasi5");
+                $this->db->bind('NoRegistrasi5', $NoRegistrasi);
+                $this->db->execute();
                 $respons_ket = 'Open Bill';
             } else {
+
+                $this->db->query("SELECT COUNT(ID) AS cekDataBill1 from Billing_Pasien.dbo.FO_T_BILLING_1 where BATAL='0' and NO_REGISTRASI=:noreg1 and ID_TRS_Payment is null");
+                $this->db->bind('noreg1', $NoRegistrasi);
+                $dataStatusBill1 =  $this->db->single();
+                $cekDataBill1 = $dataStatusBill1['cekDataBill1'];
+
+                if ($cekDataBill1 <> 0) {
+                    $callback = array(
+                        'status' => "warning",
+                        'errorname' => "Gagal Closing Bill, Ada Bilingan Yang Belum Dibayar", // Set array nama 
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                $this->db->query("SELECT COUNT(a.ID) AS cekDataBill2 FROM Billing_Pasien.dbo.FO_T_BILLING_1 a inner join Billing_Pasien.dbo.CLOSING_BILL b on a.NO_REGISTRASI=b.NOREG_FIRST where BATAL='0' and NOREG_REFF=:noreg2 and ID_TRS_Payment is null");
+                $this->db->bind('noreg2', $NoRegistrasi);
+                $dataStatusBill2 =  $this->db->single();
+                $cekDataBill2 = $dataStatusBill2['cekDataBill2'];
+
+                if ($cekDataBill2 <> 0) {
+                    $callback = array(
+                        'status' => "warning",
+                        'errorname' => "Gagal Closing Bill, Ada Bilingan Hutang Yang Belum Dibayar", // Set array nama 
+                    );
+                    return $callback;
+                    exit;
+                }
+
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan FROM Billing_Pasien.dbo.FO_T_BILLING_1 WHERE NO_REGISTRASI = :NoReg3 AND BATAL = '0' AND ID_TRS_Payment IS NOT NULL");
+                $this->db->bind('NoReg3', $NoRegistrasi);
+                $datasd =  $this->db->single();
+                $TotalBayar = $datasd['TotalBayar'];
+                $TotalKlaim = $datasd['TotalKlaim'];
+                $TotalKekurangan = $datasd['TotalKekurangan'];
+
+                //total hutang
+                $this->db->query("SELECT SUM(BAYAR) AS TotalBayar, SUM(KLAIM) AS TotalKlaim, SUM(KEKURANGAN) AS TotalKekurangan 
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 a
+                INNER JOIN Billing_Pasien.dbo.CLOSING_BILL b on a.NO_REGISTRASI=b.NOREG_FIRST
+                WHERE BATAL='0' and NOREG_REFF=:NoRegxd
+                and ID_TRS_Payment is null ");
+                $this->db->bind('NoRegxd', $NoRegistrasi);
+                $dataxd =  $this->db->single();
+                $TotalBayarxd = $dataxd['TotalBayar'];
+                $TotalKlaimxd = $dataxd['TotalKlaim'];
+                $TotalKekuranganxd = $dataxd['TotalKekurangan'];
+                // total hutang
+
+                $TotalBayarall = $TotalBayar + $TotalBayarxd;
+                $TotalKlaimall = $TotalKlaim + $TotalKlaimxd;
+                $TotalKekuranganall = $TotalKekurangan + $TotalKekuranganxd;
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSING_BILL
+                ([NOREG_FIRST], [JENIS_CLOSING], [TOTAL], [NOREG_REFF], [NO_MR])
+                VALUES ( 
+                :NoRegxd1a, 'CLOSEBILL', :TotalBayar1a, '', :NoMR1a)");
+                $this->db->bind('NoRegxd1a', $NoRegistrasi);
+                $this->db->bind('TotalBayar1a', $TotalBayarall);
+                $this->db->bind('NoMR1a', $NoMR);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.CLOSE_RO
+                ([NOREG], [TOTAL_BILL], [KLAIM], [KEKURANGAN])
+                VALUES ( 
+                :NoRegxd2a, :TotalBayar2a, :TotalKlaim2a, :TotalKekurangan2a)");
+                $this->db->bind('NoRegxd2a', $NoRegistrasi);
+                $this->db->bind('TotalBayar2a', $TotalBayarall);
+                $this->db->bind('TotalKlaim2a', $TotalKlaimall);
+                $this->db->bind('TotalKekurangan2a', $TotalKekuranganall);
+                $this->db->execute();
+
+                $this->db->query("INSERT INTO Billing_Pasien.dbo.TEMP_INA_CBG
+                SELECT 
+                NO_REGISTRASI
+                ,isnull(ProsedurNonBedah,0) as ProsedurNonBedah
+                ,isnull(ProsedurBedah,0) as ProsedurBedah
+                ,isnull(Konsultasi,0) as Konsultasi
+                ,0 as TenagaAhli
+                ,isnull(Keperawatan,0) as Keperawatan
+                ,0 as Penunjang
+                ,isnull(Laboratorium,0) as Laboratorium
+                ,isnull(Radiologi,0) as Radiologi
+                ,isnull(PelayananDarah,0) as PelayananDarah
+                ,isnull(Rehabilitasi,0) as Rehabilitasi
+                ,isnull(Kamar,0) as Kamar_Akomodasi
+                ,0 as RawatIntensif
+                ,isnull(Obat,0) as Obat
+                ,0 as ObatKronis
+                ,0 as ObatKemoterapi
+                ,0 as Alkes
+                ,0 as BMHP
+                ,0 as SewaAlat
+                ,isnull(ProsedurNonBedah,0)
+                +isnull(ProsedurBedah,0)
+                +isnull(Konsultasi,0)
+                +isnull(Laboratorium,0)
+                +isnull(Radiologi,0)
+                +isnull(PelayananDarah,0)
+                +isnull(Rehabilitasi,0)
+                +isnull(Kamar,0)
+                +isnull(Obat,0) as TOTAL
+                FROM (
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurNonBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3a and GROUP_TARIF ='Tindakan' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'ProsedurBedah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3b and GROUP_TARIF ='Operasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Konsultasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3c and GROUP_TARIF ='Konsultasi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Keperawatan' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3d and GROUP_TARIF ='Administrasi' 
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Laboratorium' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3e and GROUP_TARIF ='Laboratorium'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Radiologi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3f and GROUP_TARIF ='Radiologi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'PelayananDarah' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3g and GROUP_TARIF ='BankDarah'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Rehabilitasi' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3h and GROUP_TARIF ='Fisioterapi'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Kamar' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3i and GROUP_TARIF ='Kamar'
+                Group by NO_REGISTRASI
+                UNION ALL
+                SELECT NO_REGISTRASI,SUM(GRANDTOTAL) as TotalTarif,'Obat' as GROUP_TARIF FROM Billing_Pasien.dbo.FO_T_BILLING_1 
+                where BATAL='0' and ID_TRS_Payment is not null and NO_REGISTRASI=:NoReg3j and GROUP_TARIF ='Farmasi'
+                Group by NO_REGISTRASI
+                )AS QPivot
+                PIVOT( SUM(TotalTarif)   
+                FOR GROUP_TARIF IN ([ProsedurNonBedah],[ProsedurBedah],[Konsultasi],[Keperawatan],[Laboratorium],[Radiologi],[PelayananDarah],[Rehabilitasi],[Kamar],[Obat])) AS QPivot");
+                $this->db->bind('NoReg3a', $NoRegistrasi);
+                $this->db->bind('NoReg3b', $NoRegistrasi);
+                $this->db->bind('NoReg3c', $NoRegistrasi);
+                $this->db->bind('NoReg3d', $NoRegistrasi);
+                $this->db->bind('NoReg3e', $NoRegistrasi);
+                $this->db->bind('NoReg3f', $NoRegistrasi);
+                $this->db->bind('NoReg3g', $NoRegistrasi);
+                $this->db->bind('NoReg3h', $NoRegistrasi);
+                $this->db->bind('NoReg3i', $NoRegistrasi);
+                $this->db->bind('NoReg3j', $NoRegistrasi);
+                $this->db->execute();
+
                 $this->db->query("UPDATE PerawatanSQL.dbo.Visit SET [Status ID] = 4 WHERE NoRegistrasi = :NoRegistrasi ");
+                $this->db->bind('NoRegistrasi', $NoRegistrasi);
+                $this->db->execute();
+
                 $respons_ket = 'Close Bill';
             }
 
-            $this->db->bind('NoRegistrasi', $NoRegistrasi);
+            if ($respons_ket == 'Close Bill') {
+                $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                (noregistrasi, nama_biling, petugas_entry, tgl_entry)
+                VALUES ( 
+                :NoRegRecord, 'CLOSE BILL', :USER_KASIRRecord, :TGL_TRSRecord)");
+                $this->db->bind('NoRegRecord', $NoRegistrasi);
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->execute();
+            } else {
+                // $this->db->query("INSERT INTO SysLog.dbo.TZ_Log_Button
+                // (noregistrasi, nama_biling, petugas_entry, tgl_entry, alasan_batal)
+                // VALUES ( 
+                // :NoRegRecord, 'OPEN BILL', :USER_KASIRRecord, :TGL_TRSRecord, :AlasanOpenRecord)");
+                // $this->db->bind('NoRegRecord', $NoRegistrasi);
+                // $this->db->bind('USER_KASIRRecord', $namauserx);
+                // $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                // $this->db->bind('AlasanOpenRecord', $AlasanOpen);
+                // $this->db->execute();
 
-            $this->db->execute();
+                $this->db->query("UPDATE SysLog.dbo.TZ_Log_Button SET petugas_batal = :USER_KASIRRecord, alasan_batal = :AlasanOpenRecord, tgl_batal = :TGL_TRSRecord
+                WHERE NoRegistrasi = :NoRegRecord AND petugas_batal IS NULL");
+                $this->db->bind('USER_KASIRRecord', $namauserx);
+                $this->db->bind('AlasanOpenRecord', $AlasanOpen);
+                $this->db->bind('TGL_TRSRecord', $datenowcreate);
+                $this->db->bind('NoRegRecord', $NoRegistrasi);
+                $this->db->execute();
+            }
+
             $this->db->commit();
-
             $callback = array(
                 'status' => 'success',
                 'message' => 'Transaksi Berhasi',
@@ -12429,9 +14664,6 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
         try {
             $this->db->transaksi();
 
-            // var_dump($data);
-            // exit;
-
             // DATA USER INPUT
             $session = SessionManager::getCurrentSession();
             $datenowx = Utils::datenowcreateNotFull();
@@ -12444,10 +14676,40 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             // DATA PASING
             $noreg = $data['noreg'];
             $notrs = $data['notrs'];
+            $alasanBtlPayment = $data['alasanBtlPayment'];
+
+            $this->db->query("SELECT [Status ID] as StatusID FROM PerawatanSQL.dbo.Visit WHERE NoRegistrasi = :norega1
+            UNION ALL SELECT StatusID FROM RawatInapSQL.dbo.Inpatient WHERE NoRegRI = :norega2 ");
+            $this->db->bind('norega1', $noreg);
+            $this->db->bind('norega2', $noreg);
+            $dataStatusId =  $this->db->single();
+            $statusID = $dataStatusId['StatusID'];
+
+            if ($alasanBtlPayment == '') {
+                $callback = array(
+                    'status' => "warning",
+                    'errorname' => "Silahkan isi alasan terlebih dahulu", // Set array nama 
+
+                );
+                return $callback;
+                exit;
+            }
+
+            if ($statusID == '4') {
+                $callback = array(
+                    'status' => "warning",
+                    'errorname' => "Pasien sudah close, silahkan open bill untuk melakukan pembatalan pembayaran", // Set array nama 
+                );
+                return $callback;
+                exit;
+            }
 
             // BATAL KASIR
-            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET BATAL = '1' WHERE NO_TRS = :notrs1 AND NO_REGISTRASI = :noreg1");
-            $this->db->bind('noreg1', $noreg);
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR SET BATAL = '1', TGL_BATAL = :datenowx1, USER_BATAL= :namauserx1, ALASAN_BATAL = :alasanBtlPayment1 WHERE NO_TRS = :notrs1");
+            // $this->db->bind('noreg1', $noreg);
+            $this->db->bind('datenowx1', $datenowx);
+            $this->db->bind('namauserx1', $namauserx);
+            $this->db->bind('alasanBtlPayment1', $alasanBtlPayment);
             $this->db->bind('notrs1', $notrs);
             $this->db->execute();
             $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_KASIR_2 SET BATAL = '1' WHERE NO_TRS_REFF = :notrs2");
@@ -12455,9 +14717,9 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
             $this->db->execute();
 
             // BATAL FOT_BILL
-            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET ID_TRS_Payment = NULL, BAYAR = 0 WHERE NO_REGISTRASI = :noreg3 AND ID_TRS_Payment = :notrs3");
+            $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1 SET ID_TRS_Payment = NULL, BAYAR = 0 WHERE ID_TRS_Payment = :notrs3");
             $this->db->bind('notrs3', $notrs);
-            $this->db->bind('noreg3', $noreg);
+            // $this->db->bind('noreg3', $noreg);
             $this->db->execute();
 
             $this->db->commit();
@@ -12477,4 +14739,732 @@ and replace(CONVERT(VARCHAR(11), DateOrder, 111), '/','-') Between :periode_awal
         }
     }
     // 22/08/2024
+
+
+
+
+    public function getDataDocumentPDF($data)
+    {
+        try {
+            $this->db->transaksi();
+
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // DATA PASING
+            $NoMR = $data['nomr'];
+            // $notrs = $data['notrs'];
+            // $alasanBtlPayment = $data['alasanBtlPayment'];
+
+            $this->db->query("SELECT EmateraiDocument FROM Billing_Pasien.dbo.TDocumentPaymentDelays WHERE NoMR = :NoMR and ActiveDocument='1'");
+
+            $this->db->bind('NoMR', $NoMR);
+            $dataLinkTemp =  $this->db->single();
+            $dataLink = $dataLinkTemp['EmateraiDocument'];
+
+            // var_dump($dataLink);
+            // exit;
+
+            // $this->db->execute();
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                'link_response' => $dataLink,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+    //bridging materai
+    public function uploadAWS($data)
+    {
+        $notrs = $data['notrs'];
+
+        $bytes = random_bytes(20);
+        $nama_file_baru  =     $notrs . bin2hex($bytes) . "-" . date("YmdHis");
+        $nama_file = $data['GrupTransaksi'] . '-' . $notrs . '.pdf';
+        /// AWS
+        // Create an S3Client
+        $s3Client = new S3Client([
+            'version' => 'latest',
+            'region'  => 'ap-southeast-1',
+            'http'    => ['verify' => false],
+            'credentials' => [
+                'key'    => 'AKIAYV2M6ERJGUKK4QWQ',
+                'secret' => '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'
+            ]
+        ]);
+        //$file_name = __DIR__ . '/../../public' . '/tmp/' . $nama_file;
+        $file_name = $_SERVER['DOCUMENT_ROOT'] . 'ESIRYARSI/public/tmp/' . $nama_file;
+        $source =   $file_name;
+        $awsImages = '';
+        $handle = fopen($source, 'r');
+        try {
+            $bucket = 'rsuyarsibucket';
+            $key = basename($nama_file_baru);
+            $result = $s3Client->putObject([
+                'Bucket' => $bucket,
+                //'Key'    => 'digitalfiles/akadijaroh/' . $key,
+                'Key'    => 'digitalfiles/billing/' . $key,
+                'Body'   => $handle,
+                'ACL'    => 'public-read', // make file 'public', 
+            ]);
+            $awsImages = $result->get('ObjectURL');
+            $datenowcreate = Utils::datenowcreateNotFull();
+            // $datenowx = Utils::datenowcreateNotFull();
+
+            // $AwsUrlDocuments = $data['aws_url'];
+            $endpoint = 'singleStampMaterai';
+            $provider_code = '7146';
+            $app_id = 'api_aNky7D';
+            $project_id = 'e-materai_1t9v';
+            $document_name = $data['judul'];
+            $document_code = 'INV';
+            $visLLX = '320';
+            $visLLY = '44';
+            $visURX = '425';
+            $visURY = '150';
+            $visSignaturePage = '1';
+            $nodoc = '20';
+            $IdNumber = '1234123412341236';
+            $reason = 'alesan';
+
+            $nilai_document = '10000';
+            // $nama_file = 'KUITANSI-.pdf';
+
+            // $file_name = 'tmp/' . $nama_file;
+            // $source = curl_file_create($file_name);
+
+            // $file_name = $_SERVER['DOCUMENT_ROOT'] . 'ESIRYARSI/public/tmp/' . $nama_file;
+            $source = curl_file_create($file_name);
+            // $awsImages = '';
+            // $handle = fopen($source, 'r');
+            // 1. Gen Token
+            $method = "POST";
+
+            $postSatuanData = array(
+                'endpoint' => $endpoint,
+                'file' =>  $source,
+                'document_name' => $document_name,
+                'document_code' => $document_code,
+                'provider_code' => $provider_code,
+                'app_id' => $app_id,
+                'project_id' => $project_id,
+                'visLLX' => $visLLX,
+                'visLLY' => $visLLY,
+                'visURX' => $visURX,
+                'visURY' => $visURY,
+                'visSignaturePage' => $visSignaturePage,
+                'reason' => $reason,
+                'nodoc' => $nodoc,
+                'IdNumber' => $IdNumber,
+                'nilai_document' => $nilai_document,
+                'document_date' => $datenowcreate
+            );
+            $urlCreateEmaterai = "v2/coremdika";
+            $addematerai = $this->curl_request_ematerai(GenerateEmaterai::headers_api(), $method, $postSatuanData, $urlCreateEmaterai);
+            // return $addematerai;
+            if ($addematerai['status'] == true) {
+                $callback = array(
+                    'status' => 'success',
+                    'urlmaterai' => $addematerai['data'],
+                    'message' => $addematerai['message'],
+                );
+            } else {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => $addematerai['message'],
+                );
+            }
+            //             var_dump($addematerai['data']['url_file']);exit;
+            //             $array = array($addematerai['data']);
+            // $string = implode($array); 
+            $UrlEmaterai = $addematerai['data']['url_file'];
+
+            //close filenya
+            fclose($handle);
+            //hapus filenya 
+            // unlink($_SERVER["DOCUMENT_ROOT"] . 'ESIRYARSI/public/tmp/' . $nama_file);
+
+            return $this->SaveFileDocument($data, $awsImages, $UrlEmaterai);
+        } catch (MultipartUploadException $e) {
+
+            return $e->getMessage();
+        }
+    }
+
+    public function SaveFileDocument($data, $awsImages, $UrlEmaterai)
+    {
+        try {
+            $this->db->transaksi();
+            $session = SessionManager::getCurrentSession();
+            $userlogin = $session->IDEmployee;
+            $usernamelogin = $session->name;
+
+            $datenowcreate = Utils::seCurrentDateTime();
+            $uuid = $data['uuid4'];
+            $NoRegistrasi = $data['NoRegistrasi'];
+            // var_dump($data,$awsImages);exit;
+
+            if (substr($data['GrupTransaksi'], 0, 8) == 'KUITANSI') {
+                $DocumentType = 'KUITANSI_BILLING';
+            } else {
+                $DocumentType = 'RINCIAN_BILLING';
+            }
+
+            $query = "UPDATE a
+              SET Active='0' 
+              FROM Billing_Pasien.dbo.TDocumentMasters a
+              inner join Billing_Pasien.dbo.TDocumentBillingPatients b on a.Uuid=b.DocTransactionID
+              WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi
+              ";
+            $this->db->query($query);
+            $this->db->bind('id', $data['notrs']);
+            $this->db->bind('NoRegistrasi', $data['NoRegistrasi']);
+            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+            $this->db->execute();
+
+            $query = "INSERT INTO Billing_Pasien.dbo.TDocumentMasters (Uuid,DateCreate,UserCreate,DocumentType,AwsUrlDocuments,NamaTTD1)
+                Values
+            (:uuid,:datenowcreate,:userlogin,:DocumentType,:AWS_URL,:usernamelogin)";
+            $this->db->query($query);
+            $this->db->bind('uuid', $uuid);
+            $this->db->bind('datenowcreate', $datenowcreate);
+            $this->db->bind('userlogin', $userlogin);
+            $this->db->bind('DocumentType', $DocumentType);
+            $this->db->bind('AWS_URL', $awsImages);
+            $this->db->bind('usernamelogin', $usernamelogin);
+            // $this->db->bind('NoRegistrasi', $NoRegistrasi);
+
+            $this->db->execute();
+
+            $query = "UPDATE Billing_Pasien.dbo.TDocumentBillingPatients SET ActiveDocument='0' WHERE GrupTransaksi=:GrupTransaksi and NoTrs_Reff=:id and NoRegistrasi=:NoRegistrasi";
+            $this->db->query($query);
+            $this->db->bind('id', $data['notrs']);
+            $this->db->bind('NoRegistrasi', $data['NoRegistrasi']);
+            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+            $this->db->execute();
+
+            $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentBillingPatients (DocTransactionID,NoTrs_Reff,NoRegistrasi,GrupTransaksi,AwsUrlDocuments,TglCreate,UserCreate,EmateraiDocuments)
+                Values
+            (:uuid,:id,:NoRegistrasi,:GrupTransaksi,:AWS_URL,:datenowcreate,:userlogin,:EmateraiDocuments)";
+            $this->db->query($query);
+            $this->db->bind('uuid', $uuid);
+            $this->db->bind('id', $data['notrs']);
+            $this->db->bind('NoRegistrasi', $data['NoRegistrasi']);
+            $this->db->bind('GrupTransaksi', $data['GrupTransaksi']);
+            $this->db->bind('AWS_URL', $awsImages);
+            $this->db->bind('datenowcreate', $datenowcreate);
+            $this->db->bind('userlogin', $userlogin);
+            $this->db->bind('EmateraiDocuments', $UrlEmaterai);
+
+            $this->db->execute();
+
+
+            $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentHistoryBillingPatients (DocTransactionID,CetakanKe,Alasan_Cetak,UserCreate,DateCreate)
+                Values
+            (:uuid,:CetakanKe,:Alasan_Cetak,:userlogin,:datenowcreate)";
+            $this->db->query($query);
+            $this->db->bind('uuid', $uuid);
+            $this->db->bind('CetakanKe', $data['cetakanke']['CetakanKe']);
+            $this->db->bind('Alasan_Cetak', '');
+            $this->db->bind('userlogin', $userlogin);
+            $this->db->bind('datenowcreate', $datenowcreate);
+            $this->db->execute();
+
+
+            $this->db->Commit();
+            $callback = array(
+                'status' => 200,
+                'message' => 'Generate Upload Data Succesfully.',
+                'aws_url' =>  $awsImages,
+            );
+            // return $this->goEmateraiAPI($data, $awsImages);
+
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => 'warning',
+                'message' => $e,
+            );
+            return $callback;
+        }
+    }
+    public function goEmateraiAPI($data)
+    {
+        try {
+            // $datenowcreate = '2024-10-08';
+            $datenowcreate = Utils::datenowcreateNotFull();
+            // $datenowx = Utils::datenowcreateNotFull();
+
+            // $AwsUrlDocuments = $data['aws_url'];
+            $endpoint = 'singleStampMaterai';
+            $provider_code = '7146';
+            $app_id = 'api_aNky7D';
+            $project_id = 'e-materai_1t9v';
+            $document_name = $data['judul'];
+            $document_code = 'INV';
+            $visLLX = '320';
+            $visLLY = '44';
+            $visURX = '425';
+            $visURY = '150';
+            $visSignaturePage = '1';
+            $nodoc = '20';
+            $IdNumber = '1234123412341236';
+            $reason = 'alesan';
+
+            $nilai_document = '10000';
+            $nama_file = 'KUITANSI-.pdf';
+
+            // $file_name = 'tmp/' . $nama_file;
+            // $source = curl_file_create($file_name);
+
+            $file_name = $_SERVER['DOCUMENT_ROOT'] . 'ESIRYARSI/public/tmp/' . $nama_file;
+            $source = curl_file_create($file_name);
+            // $awsImages = '';
+            // $handle = fopen($source, 'r');
+            // 1. Gen Token
+            $method = "POST";
+
+            $postSatuanData = array(
+                'endpoint' => $endpoint,
+                'file' =>  $source,
+                'document_name' => $document_name,
+                'document_code' => $document_code,
+                'provider_code' => $provider_code,
+                'app_id' => $app_id,
+                'project_id' => $project_id,
+                'visLLX' => $visLLX,
+                'visLLY' => $visLLY,
+                'visURX' => $visURX,
+                'visURY' => $visURY,
+                'visSignaturePage' => $visSignaturePage,
+                'reason' => $reason,
+                'nodoc' => $nodoc,
+                'IdNumber' => $IdNumber,
+                'nilai_document' => $nilai_document,
+                'document_date' => $datenowcreate
+            );
+            $urlCreateEmaterai = "v2/coremdika";
+            $addematerai = $this->curl_request_ematerai(GenerateEmaterai::headers_api(), $method, $postSatuanData, $urlCreateEmaterai);
+            // return $addematerai;
+            if ($addematerai['status'] == true) {
+                $callback = array(
+                    'status' => 'success',
+                    'urlmaterai' => $addematerai['data'],
+                    'message' => $addematerai['message'],
+                );
+            } else {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => $addematerai['message'],
+                );
+            }
+            //             var_dump($addematerai['data']['url_file']);exit;
+            //             $array = array($addematerai['data']);
+            // $string = implode($array); 
+            $UrlEmaterai = $addematerai['data']['url_file'];
+            // var_dump($UrlEmaterai);exit;
+            $uuid = $data['uuid4'];
+
+            $query = "UPDATE Billing_Pasien.dbo.TDocumentBillingPatients SET EmateraiDocuments=:UrlEmaterai WHERE DocTransactionID=:uuid and NoRegistrasi=:NoRegistrasi";
+            $this->db->query($query);
+            $this->db->bind('UrlEmaterai', $UrlEmaterai);
+            $this->db->bind('NoRegistrasi', $data['noregistrasi']);
+            $this->db->bind('uuid', $uuid);
+            $this->db->execute();
+
+            //     $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentBillingPatients (EmateraiDocuments)
+            //       Values
+            //   (:EmateraiDocuments)";
+            //     $this->db->query($query);
+
+            //     $this->db->bind('EmateraiDocuments', $UrlEmaterai);
+
+            //     $this->db->execute();
+
+            return $callback;
+            // return $this->SaveFile($data, $UrlEmaterai);
+
+        } catch (MultipartUploadException $e) {
+
+            return $e->getMessage();
+        }
+    }
+    public function GenerateEmateraiHeaderbyIDX($data)
+    {
+        try {
+            // var_dump($data['notrs'], $data['NoRegistrasi']);
+            // exit;
+            if ($data['kodereg'] == 'RJ') {
+                $query = "SELECT f.PatientName, a.BILLTO, a.NO_MR, a.NO_REGISTRASI, a.NO_EPISODE, a.NO_KWITANSI, a.USER_KASIR, a.NOMINAL_BAYAR, SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) 
+                NamaTest, y.nominal_bayar_tunai, z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan, f3.NamaUnit, f4.NamaPerusahaan AS NamaJaminan, a.KODE_KASIR AS Id_Kasir
+                FROM Billing_Pasien.dbo.FO_T_KASIR a
+                INNER JOIN MasterdataSQL.dbo.Admision f ON f.NoMR = a.NO_MR COLLATE  SQL_Latin1_General_CP1_CI_AS
+                inner join PerawatanSQL.dbo.Visit f2 on a.NO_REGISTRASI collate Latin1_General_CI_AS = f2.NoRegistrasi
+                inner join MasterdataSQL.dbo.MstrUnitPerwatan f3 on f2.Unit= f3.ID
+                inner join MasterdataSQL.dbo.MstrPerusahaanJPK f4 on f2.Perusahaan = f4.ID
+                OUTER APPLY (
+                SELECT NAMA_TARIF + ', '
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 c
+                WHERE c.ID_TRS_Payment = a.NO_TRS AND c.BATAL = '0'
+                FOR XML PATH('')
+                ) x (nama_test)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 b
+                WHERE b.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai'
+                ) y (nominal_bayar_tunai)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 d
+                WHERE d.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit'
+                ) z (nominal_bayar_Debit)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 e
+                WHERE e.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan'
+                ) w (nominal_bayar_PiuangPerushaan)
+                WHERE a.NO_REGISTRASI = :noreg1 AND  a.NO_TRS = :notrskasir1
+                UNION ALL 
+                SELECT f.PatientName, a.BILLTO, a.NO_MR, a.NO_REGISTRASI, a.NO_EPISODE, a.NO_KWITANSI, a.USER_KASIR, a.NOMINAL_BAYAR, SUBSTRING(x.nama_test,1, LEN(x.nama_test) - 1) 
+                NamaTest, y.nominal_bayar_tunai, z.nominal_bayar_Debit, w.nominal_bayar_PiuangPerushaan, f3.NamaUnit, f4.NamaPerusahaan AS NamaJaminan, a.KODE_KASIR AS Id_Kasir
+                FROM Billing_Pasien.dbo.FO_T_KASIR a
+                INNER JOIN MasterdataSQL.dbo.Admision f ON f.NoMR = a.NO_MR COLLATE  SQL_Latin1_General_CP1_CI_AS
+                inner join PerawatanSQL.dbo.Visit f2 on a.NO_REGISTRASI collate Latin1_General_CI_AS = f2.NoRegistrasi
+                inner join MasterdataSQL.dbo.MstrUnitPerwatan f3 on f2.Unit= f3.ID
+                inner join MasterdataSQL.dbo.MstrPerusahaanAsuransi f4 on f2.Asuransi = f4.ID
+                OUTER APPLY (
+                SELECT NAMA_TARIF + ', '
+                FROM Billing_Pasien.dbo.FO_T_BILLING_1 c
+                WHERE c.ID_TRS_Payment = a.NO_TRS AND c.BATAL = '0'
+                FOR XML PATH('')
+                ) x (nama_test)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 b
+                WHERE b.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Tunai'
+                ) y (nominal_bayar_tunai)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 d
+                WHERE d.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Kartu Debit'
+                ) z (nominal_bayar_Debit)
+                OUTER APPLY (
+                SELECT SUM(NOMINAL_BAYAR) as bayartunai
+                FROM Billing_Pasien.dbo.FO_T_KASIR_2 e
+                WHERE e.NO_TRS_REFF = a.NO_TRS AND TIPE_PEMBAYARAN = 'Piutang Perusahaan'
+                ) w (nominal_bayar_PiuangPerushaan)
+                WHERE a.NO_REGISTRASI = :noreg2 AND  a.NO_TRS = :notrskasir2";
+            } elseif ($data['kodereg'] == 'RI') {
+                $query = "  SELECT a.ID,NoKwitansi,a.NoRegistrasi,b.NoMR,
+                case when billto is null then b.PatientName collate Latin1_General_CI_AS else billto end as billto,PatientName,NamaJaminan,a.Keterangan as NamaUnit,Ammount as TotalPaid,Kasir,Id_Kasir,isnull(Cetakan_Ke,0) as Cetakan_Ke
+                FROM RawatInapSQL.dbo.Deposit a
+                left join DashboardData.dbo.dataRWI b on a.NoRegistrasi=b.NoRegistrasi 
+                where a.ID=:id";
+            } elseif ($data['kodereg'] == 'PB') {
+                $query = "SELECT a.ID,NoKwitansi,a.NoRegistrasi,'-' NoMR,case when billto is null then b.[Ship Name] collate Latin1_General_CI_AS else billto end as billto,[Ship Name] as PatientName,'-' NamaJaminan,'PEMBELIAN OBAT BEBAS' as NamaUnit,TotalPaid,Kasir,Id_Kasir,isnull(Cetakan_Ke,0) as Cetakan_Ke
+                FROM PerawatanSQL.dbo.payments a
+                left join [Apotik_V1.1SQL].dbo.Orders b on a.NoRegistrasi=b.NoRegistrasi
+                where a.ID=:id";
+            } else {
+                $pasing['NoKwitansi'] = '';
+                $pasing['NoRegistrasi'] = '';
+                $pasing['NoMR'] = '';
+                $pasing['billto'] = '';
+                $pasing['PatientName'] = '';
+                $pasing['NamaJaminan'] = '';
+                $pasing['NamaUnit'] = '';
+                $pasing['Kasir'] = '';
+                $pasing['Terbilang'] = '';
+                $pasing['TotalPaid'] = '';
+                $pasing['Id_Kasir'] = '';
+                $pasing['Cetakan_Ke'] = '';
+                $pasing['ID'] = '';
+                return $pasing;
+            }
+            $this->db->query($query);
+            // $this->db->bind('id', $data['notrs']);
+            $this->db->bind('noreg1', $data['NoRegistrasi']);
+            $this->db->bind('notrskasir1', $data['notrs']);
+            $this->db->bind('noreg2', $data['NoRegistrasi']);
+            $this->db->bind('notrskasir2', $data['notrs']);
+            $datas =  $this->db->single();
+
+            if ($data['lang'] == 'EN') {
+                $terbilang = $this->terbilang_eng($datas['NOMINAL_BAYAR']);
+            } else {
+                $terbilang = $this->terbilang($datas['NOMINAL_BAYAR']);
+            }
+
+            // $pasing['TglCreate_sign'] = date('d/m/Y', strtotime($datas['TglCreate']));
+            $pasing['billto'] = $datas['BILLTO'];
+            $pasing['NoMR'] = $datas['NO_MR'];
+            $pasing['NoRegistrasi'] = $datas['NO_REGISTRASI'];
+            $pasing['NO_EPISODE'] = $datas['NO_EPISODE'];
+            $pasing['NoKwitansi'] = $datas['NO_KWITANSI'];
+            // $pasing['Id_Kasir'] = $datas['USER_KASIR'];
+
+            $pasing['PatientName'] = $datas['PatientName'];
+            $pasing['NamaJaminan'] = $datas['NamaJaminan'];
+            $pasing['NamaUnit'] = $datas['NamaUnit'];
+            $pasing['Kasir'] = $datas['USER_KASIR'];
+            $pasing['Id_Kasir'] = $datas['Id_Kasir'];
+            // $pasing['Cetakan_Ke'] = $datas['Cetakan_Ke'];
+            // $pasing['ID'] = $datas['ID'];
+            $pasing['Terbilang'] = $terbilang;
+            $pasing['TotalPaid'] = number_format($datas['NOMINAL_BAYAR'], 0, ',', '.');
+
+            // var_dump($pasing['TotalPaid']);
+            // exit;
+
+            return $pasing;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+    public function GenerateEmateraiDetailbyIDX($data)
+    {
+        try {
+
+            if ($data['kodereg'] == 'RJ' || $data['kodereg'] == 'PB') {
+                $query = "SELECT b.TIPE_PEMBAYARAN, b.NOMINAL_BAYAR FROM Billing_Pasien.dbo.FO_T_KASIR a
+                INNER JOIN Billing_Pasien.dbo.FO_T_KASIR_2 b ON b.NO_TRS_REFF = a.NO_TRS
+                WHERE a.NO_REGISTRASI = :noreg AND  a.NO_TRS = :notrskasir";
+            } elseif ($data['kodereg'] == 'RI') {
+                $query = "SELECT TipePembayaran,TotalBayar as TotalPaid FROM RawatInapSQL.dbo.DepositDetails Where IDDeposit=:id";
+            } else {
+                $pasing['No'] = '';
+                $pasing['TipePembayaran'] = '';
+                $pasing['TotalPaid'] = '';
+                $rows[] = $pasing;
+                return $rows;
+            }
+
+            $this->db->query($query);
+            $this->db->bind('noreg', $data['NoRegistrasi']);
+            $this->db->bind('notrskasir', $data['notrs']);
+            $data =  $this->db->resultSet();
+
+            $rows = array();
+            $no = 1;
+            foreach ($data as $key) {
+                $pasing['No'] = $no++;
+                $pasing['TipePembayaran'] = $key['TIPE_PEMBAYARAN'];
+                $pasing['TotalPaid'] = number_format($key['NOMINAL_BAYAR'], 0, ',', '.');
+                $rows[] = $pasing;
+            }
+            return $rows;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+
+    public function cekEmateraibyNoTRS($data)
+    {
+        try {
+            $this->db->transaksi();
+
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // DATA PASING
+            $notrs = $data['notrs'];
+
+            // var_dump($notrs);
+            // exit;
+
+            $this->db->query("SELECT COUNT(id) AS totalcek FROM Billing_Pasien.dbo.TDocumentBillingPatients WHERE NoTrs_Reff = :notrs AND EmateraiDocuments IS NOT NULL AND ActiveDocument = '1'");
+
+            $this->db->bind('notrs', $notrs);
+            $dataLinkTemp =  $this->db->single();
+            $dataLink = $dataLinkTemp['totalcek'];
+
+            // var_dump($dataLink);
+            // exit;
+
+            // $this->db->execute();
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                'link_response' => $dataLink,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+
+    public function UpdateAlasanSendEmail($data)
+    {
+        try {
+            $this->db->transaksi();
+
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // DATA PASING
+            $notrs = $data['notrs'];
+            $email = $data['email'];
+            $Alasan_Cetak = $data['Alasan_Cetak'];
+            $NoRegistrasi = $data['NoRegistrasi'];
+            $jeniscetakan = $data['jeniscetakan'];
+            // $uuid4 = $data['uuid4'];
+
+            // var_dump($data);
+            // exit;
+
+            $query = "SELECT Count(a.ID) as CetakanKe
+            FROM Billing_Pasien.dbo.TDocumentBillingPatients a
+			inner join Billing_Pasien.dbo.TDocumentHistoryBillingPatients b on a.DocTransactionID=b.DocTransactionID
+            where NoTrs_Reff=:notrs AND GrupTransaksi=:jeniscetakan AND NoRegistrasi=:noregistrasi";
+            $this->db->query($query);
+            $this->db->bind('notrs', $notrs);
+            $this->db->bind('jeniscetakan', $jeniscetakan);
+            $this->db->bind('noregistrasi', $NoRegistrasi);
+            $datas =  $this->db->single();
+
+            $CetakanKe = $datas['CetakanKe'] + 1;
+
+            $this->db->query("SELECT DocTransactionID,EmateraiDocuments FROM Billing_Pasien.dbo.TDocumentBillingPatients WHERE NoTrs_Reff = :notrs AND EmateraiDocuments IS NOT NULL AND ActiveDocument = '1'");
+
+            $this->db->bind('notrs', $notrs);
+            $dataLinkTemp =  $this->db->single();
+            $dataLink = $dataLinkTemp['DocTransactionID'];
+            $dataEmaterai = $dataLinkTemp['EmateraiDocuments'];
+
+            // var_dump($dataLink);
+            // exit;
+
+            $query = "INSERT INTO  Billing_Pasien.dbo.TDocumentHistoryBillingPatients (DocTransactionID,CetakanKe,Alasan_Cetak,UserCreate,DateCreate,SendEmailTo)
+                Values
+            (:uuid,:CetakanKe,:Alasan_Cetak,:userlogin,:datenowcreate,:email)";
+            $this->db->query($query);
+            $this->db->bind('uuid', $dataLink);
+            $this->db->bind('CetakanKe', $CetakanKe);
+            $this->db->bind('Alasan_Cetak', $Alasan_Cetak);
+            $this->db->bind('userlogin', $userid);
+            $this->db->bind('datenowcreate', $datenowcreate);
+            $this->db->bind('email', $email);
+
+            $this->db->execute();
+            // $this->db->execute();
+            // var_dump($dataEmaterai);
+            // exit;
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                'link_response' => $dataLink,
+                'link_response' => $dataEmaterai,
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+    public function getDataCetakDocumentPDF($data)
+    {
+        try {
+            $this->db->transaksi();
+
+            // DATA USER INPUT
+            $session = SessionManager::getCurrentSession();
+            $datenowx = Utils::datenowcreateNotFull();
+            $datenowcreate = Utils::seCurrentDateTime();
+            $userid = $session->username;
+            $token = $session->token;
+            $namauserx = $session->name;
+            $useridx = $session->IDEmployee;
+
+            // DATA PASING
+            $NoMR = $data['nomr'];
+            $noreg = $data['noreg'];
+            $pkuitansi_notrs = $data['pkuitansi_notrs'];
+
+            // var_dump($pkuitansi_notrs);exit;
+            // $notrs = $data['notrs'];
+            // $alasanBtlPayment = $data['alasanBtlPayment'];
+
+            $this->db->query("SELECT count (EmateraiDocuments) as jumlah FROM Billing_Pasien.dbo.TDocumentBillingPatients WHERE NoRegistrasi = :noreg and NoTrs_Reff=:pkuitansi_notrs and ActiveDocument='1'");
+
+            $this->db->bind('noreg', $noreg);
+            $this->db->bind('pkuitansi_notrs', $pkuitansi_notrs);
+
+            $dataLinkTemp =  $this->db->single();
+            // $dataLink = $dataLinkTemp['EmateraiDocuments'];
+            $datajumlah = $dataLinkTemp['jumlah'];
+
+            $this->db->query("SELECT EmateraiDocuments FROM Billing_Pasien.dbo.TDocumentBillingPatients WHERE NoRegistrasi = :noreg and NoTrs_Reff=:pkuitansi_notrs and ActiveDocument='1'");
+
+            $this->db->bind('noreg', $noreg);
+            $this->db->bind('pkuitansi_notrs', $pkuitansi_notrs);
+
+            $dataLinkTemp =  $this->db->single();
+            $dataLink = $dataLinkTemp['EmateraiDocuments'];
+            // $datajumlah = $dataLinkTemp['jumlah'];
+            // var_dump($dataLink);
+            // exit;
+
+            // $this->db->execute();
+
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success',
+                'message' => 'Transaksi Berhasi',
+                'link_response' => $dataLink,
+                'link_jumlah' => $datajumlah,
+
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
+    //bridging materai
 }

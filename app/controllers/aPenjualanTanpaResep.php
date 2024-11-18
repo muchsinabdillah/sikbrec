@@ -59,5 +59,9 @@ class aPenjualanTanpaResep extends Controller
     {
         echo json_encode($this->model('B_Farmasi')->getUnitbyIP($_POST));
     }
+    public function getSalesbyPeriodeTanpaResep()
+    {
+        echo json_encode($this->model('B_Farmasi')->getSalesbyPeriodeTanpaResep($_POST));
+    }
 
 }

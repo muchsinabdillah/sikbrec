@@ -1,4 +1,4 @@
- <div class="main-page">
+<div class="main-page">
      <div class="container-fluid">
          <div class="row page-title-div">
              <div class="col-md-6">
@@ -99,8 +99,10 @@
                                              </th>
                                              <th align='center'>Kuota Non BPJS
                                              </th>
-                                             <!-- <th align='center'>Send HFIS
-                                             </th> -->
+                                             <th align='center'>Close Schedule
+                                             </th>
+                                             <th align='center'>Open Jadwal Assesment
+                                             </th>
                                          </tr>
                                          <tr>
                                              <th align='center'>Senin
@@ -129,6 +131,20 @@
                                              </th>
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsSenin" name="KuotaNonBpjsSenin">
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Senin" name="Close_Schedule_Senin">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Senin" name="Open_Jadwal_Senin">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
                                              </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Senin')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
@@ -162,6 +178,20 @@
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsSelasa" name="KuotaNonBpjsSelasa">
                                              </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Selasa" name="Close_Schedule_Selasa">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Selasa" name="Open_Jadwal_Selasa">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
+                                             </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Selasa')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
                                              </th> -->
@@ -193,6 +223,20 @@
                                              </th>
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsRabu" name="KuotaNonBpjsRabu">
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Rabu" name="Close_Schedule_Rabu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Rabu" name="Open_Jadwal_Rabu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
                                              </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Rabu')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
@@ -226,6 +270,20 @@
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsKamis" name="KuotaNonBpjsKamis">
                                              </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Kamis" name="Close_Schedule_Kamis">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Kamis" name="Open_Jadwal_Kamis">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
+                                             </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Kamis')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
                                              </th> -->
@@ -257,6 +315,20 @@
                                              </th>
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsJumat" name="KuotaNonBpjsJumat">
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Jumat" name="Close_Schedule_Jumat">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Jumat" name="Open_Jadwal_Jumat">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
                                              </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Jumat')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
@@ -290,6 +362,20 @@
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsSabtu" name="KuotaNonBpjsSabtu">
                                              </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Sabtu" name="Close_Schedule_Sabtu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Sabtu" name="Open_Jadwal_Sabtu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
+                                             </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Sabtu')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>
                                              </th> -->
@@ -321,6 +407,20 @@
                                              </th>
                                              <th>
                                                  <input type="text" class="form-control" id="KuotaNonBpjsMinggu" name="KuotaNonBpjsMinggu">
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Close_Schedule_Minggu" name="Close_Schedule_Minggu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Open</option>
+                                                     <option value="1">Closed</option>
+                                                 </select>
+                                             </th>
+                                             <th align='center'>
+                                                 <select class="form-control js-example-basic-single" id="Open_Jadwal_Minggu" name="Open_Jadwal_Minggu">
+                                                     <option value="">-- PILIH STATUS --</option>
+                                                     <option value="0">Close</option>
+                                                     <option value="1">Open</option>
+                                                 </select>
                                              </th>
                                              <!-- <th>
                                                  <button type="button" class="btn btn-default border-danger btn-animated btn-xs" onclick="sendHFIS('Minggu')"><span class="visible-content">Send HFIS</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>

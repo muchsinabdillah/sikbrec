@@ -16,7 +16,7 @@ function showdatatabel() {
            "ordering": true, // Set true agar bisa di sorting
            "order": [[ 0, 'desc' ]],
         "ajax": {
-            "url": base_url + "/ESIRYARSI/public/Hutang/getListPelunasanHutang",
+            "url": base_url + "/SIKBREC/public/Hutang/getListPelunasanHutang",
             "dataSrc": "",
             "deferRender": true,
         },
@@ -78,10 +78,10 @@ function showdatatabel() {
 function showOrderMutasiBarang(str) {
     const base_url = window.location.origin;
     var str = btoa(str);
-    window.location = base_url + '/ESIRYARSI/public/Hutang/PelunasanHutang/' + str;
+    window.location = base_url + '/SIKBREC/public/Hutang/PelunasanHutang/' + str;
 }
 
 function goGroupShiftPages() {
     const base_url = window.location.origin;
-    window.location = base_url + "/ESIRYARSI/public/Hutang/PelunasanHutang";
+    window.location = base_url + "/SIKBREC/public/Hutang/PelunasanHutang";
 }

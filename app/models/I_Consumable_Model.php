@@ -344,7 +344,9 @@ class I_Consumable_Model
             $hpp_barang = $data['hpp_barang'];
             $persediaan = $data['persediaan'];
             $totalpakai = $data['totalpakai'];
-            $Konversi_QtyTotal = $qtypakai*$nilaikonversisatuan;
+            //$Konversi_QtyTotal = $qtypakai*$nilaikonversisatuan;
+            $Konversi_QtyTotal = $qtypakai;
+            $TransactionDate = $data['TransasctionDate'];
             $datenowcreate = Utils::seCurrentDateTime();
             $session = SessionManager::getCurrentSession();
             $UserCreate = $session->username;
@@ -372,7 +374,8 @@ class I_Consumable_Model
                 "Persediaan" : "'.$persediaan.'", 
                 "UnitTujuan" : "'.$UnitTujuan.'",  
                 "UserCreate" : "'.$UserCreate.'",
-                "Total" : "'.$totalpakai.'" 
+                "Total" : "'.$totalpakai.'" ,
+                "TransactionDate" : "'.$TransactionDate.'"
             }
             ';
                 $urlAddKelompok = "transaction/consumable/addConsumableDetailv2/";

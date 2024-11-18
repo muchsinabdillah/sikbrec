@@ -297,8 +297,8 @@ class I_DeliveryOrder_Model
                     $pasing['TotalDeliveryOrder'] =    $hidden_grandtotal_[$x];
                     $pasing['ExpiredDate'] =    $hidden_ed_[$x];
                     $pasing['NoBatch'] =    $hidden_nobatch_[$x];
-                    $pasing['Hpp'] =    ($hidden_harga_barang_[$x]/$KonversiSatuan[$x])-$hidden_discrp_barang_[$x];//(price/koversiqty)-diskonn
-                    $pasing['HppTax'] =    ($hidden_harga_barang_[$x]/$konversiqty_total)-$hidden_discrp_barang_[$x]+$hidden_taxrp2_[$x];//(price/koversiqty)+tax
+                    $pasing['Hpp'] =    ($hidden_harga_barang_[$x]-$hidden_discrp_barang_[$x])/$KonversiSatuan[$x];//(price/koversiqty)-diskonn
+                    $pasing['HppTax'] =    ($hidden_harga_barang_[$x]/$KonversiSatuan[$x]) + ($hidden_taxrp2_[$x]/$KonversiSatuan[$x]);//(price/koversiqty)+tax
                     $pasing['KonversiQty'] =    $KonversiSatuan[$x];
                     $pasing['Konversi_QtyTotal'] =    $KonversiSatuan[$x]*$hidden_qty_barang_[$x];//( KonversiQty * QtyPurchase )
                     $pasing['Satuan_Konversi'] =    $unitsatuan[$x];

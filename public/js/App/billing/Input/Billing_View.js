@@ -281,12 +281,12 @@ $("#btn_Voucher").click(function () {
 
         const base_url = window.location.origin;
         var str = btoa(str);
-        window.location = base_url + '/ESIRYARSI/public/aBillingPasien/billingpayment/' + str;
+        window.location = base_url + '/SIKBREC/public/aBillingPasien/billingpayment/' + str;
         // const base_url = window.location.origin;
         // var str = btoa(str);
         // var judul = 'Billing Rawat Jalan';
-        // //window.location = base_url + '/ESIRYARSI/public/aBillingPasien/' + str;
-        // window.open(base_url + '/ESIRYARSI/public/aBillingPasien/billingpayment/' + str , "_blank");
+        // //window.location = base_url + '/SIKBREC/public/aBillingPasien/' + str;
+        // window.open(base_url + '/SIKBREC/public/aBillingPasien/billingpayment/' + str , "_blank");
     }
     
 
@@ -296,12 +296,12 @@ $("#btn_Voucher").click(function () {
 
         const base_url = window.location.origin;
         var str = btoa(str);
-        window.location = base_url + '/ESIRYARSI/public/aBillingPasien/billingclose/' + str;
+        window.location = base_url + '/SIKBREC/public/aBillingPasien/billingclose/' + str;
         // const base_url = window.location.origin;
         // var str = btoa(str);
         // var judul = 'Billing Rawat Jalan';
-        // //window.location = base_url + '/ESIRYARSI/public/aBillingPasien/' + str;
-        // window.open(base_url + '/ESIRYARSI/public/aBillingPasien/billingpayment/' + str , "_blank");
+        // //window.location = base_url + '/SIKBREC/public/aBillingPasien/' + str;
+        // window.open(base_url + '/SIKBREC/public/aBillingPasien/billingpayment/' + str , "_blank");
     }
 
     function showIDbyNoRegx2(str) {
@@ -310,12 +310,12 @@ $("#btn_Voucher").click(function () {
 
         const base_url = window.location.origin;
         var str = btoa(str);
-        window.location = base_url + '/ESIRYARSI/public/aBillingPasien/billingdeposit/' + str;
+        window.location = base_url + '/SIKBREC/public/aBillingPasien/billingdeposit/' + str;
         // const base_url = window.location.origin;
         // var str = btoa(str);
         // var judul = 'Billing Rawat Jalan';
-        // //window.location = base_url + '/ESIRYARSI/public/aBillingPasien/' + str;
-        // window.open(base_url + '/ESIRYARSI/public/aBillingPasien/billingpayment/' + str , "_blank");
+        // //window.location = base_url + '/SIKBREC/public/aBillingPasien/' + str;
+        // window.open(base_url + '/SIKBREC/public/aBillingPasien/billingpayment/' + str , "_blank");
     }
     function showIDbyNoRegVoucher(str) {
         // console.log(str);
@@ -323,12 +323,12 @@ $("#btn_Voucher").click(function () {
 
         const base_url = window.location.origin;
         var str = btoa(str);
-        window.location = base_url + '/ESIRYARSI/public/aBillingPasien/BillingVoucher/' + str;
+        window.location = base_url + '/SIKBREC/public/aBillingPasien/BillingVoucher/' + str;
         // const base_url = window.location.origin;
         // var str = btoa(str);
         // var judul = 'Billing Rawat Jalan';
-        // //window.location = base_url + '/ESIRYARSI/public/aBillingPasien/' + str;
-        // window.open(base_url + '/ESIRYARSI/public/aBillingPasien/billingpayment/' + str , "_blank");
+        // //window.location = base_url + '/SIKBREC/public/aBillingPasien/' + str;
+        // window.open(base_url + '/SIKBREC/public/aBillingPasien/billingpayment/' + str , "_blank");
     }
 
     $("#add_row").click(function () { 
@@ -709,7 +709,7 @@ $("#btn_Voucher").click(function () {
         var idunit = $("#IDUnit").val();
         var tglawal = $("#tglawal").val();
         var tglakhir = $("#tglakhir").val();
-        window.open(base_url + "/ESIRYARSI/public/aBillingPasien/PrintRincian"+kodereg+"/"+lang +"/"+notrs+"/"+tglawal+"/"+tglakhir, "_blank",
+        window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincian"+kodereg+"/"+lang +"/"+notrs+"/"+tglawal+"/"+tglakhir, "_blank",
             "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
     });
     $('#btn_rekap_kuintansi').click(function () {
@@ -768,7 +768,7 @@ $("#btn_Voucher").click(function () {
     });
 
     
-    $('#btnSendEmail').click(function () {
+    $('#btnSendEmailx').click(function () {
         swal({
             title: "Kirim E-mail",
             text: "Apakah Anda ingin Kirim E-mail ?",
@@ -818,7 +818,7 @@ async function gouploadtoAws(notrs,kodereg,lang,jeniscetakan,url,email) {
 
 async function uploadtoAws_filepdfx(notrs,kodereg,lang,jeniscetakan,urlx){
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/'+urlx;
+    let url = base_url + '/SIKBREC/public/aBillingPasien/'+urlx;
     return fetch(url, {
     method: 'POST',
     headers: {
@@ -1055,7 +1055,7 @@ async function updateUIdatagetDatabyID(datagetDatabyID) {
 
 function getDatabyID() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getDataPasien';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataPasien';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1095,7 +1095,7 @@ async function getClassID(classid) {
 
 function getClass() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataBed/getClass';
+    let url = base_url + '/SIKBREC/public/MasterDataBed/getClass';
     return fetch(url, {
         method: 'GET',
         headers: {
@@ -1172,7 +1172,7 @@ function getTindakanRajal() {
     var base_url = window.location.origin;
     var xdi = $('#IDUnit').val();
     var groupjaminan = $('#GroupJaminan').val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTindakanRajal';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTindakanRajal';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1205,7 +1205,7 @@ function getTindakanRanap() {
     var base_url = window.location.origin;
     var groupjaminan = $('#GroupJaminan').val();
     var IDKelas = $('#IDKelas').val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTindakanRanap';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTindakanRanap';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1266,7 +1266,7 @@ function updateUIgetDataTarifTindakan(datagetTindakan) {
 function getTarifTindakanRajal(val) {
     var base_url = window.location.origin;
     var IDUnit = $('#IDUnit').val();;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTarifTindakanRajal';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTarifTindakanRajal';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1298,7 +1298,7 @@ function getTarifTindakanRajal(val) {
 function getTarifTindakanRanap(val) {
     var base_url = window.location.origin;
     var IDKelas = $('#IDKelas').val();;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTarifTindakanRanap';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTarifTindakanRanap';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1363,7 +1363,7 @@ function getDataDokterByJadwal() {
     var tglnow = $('#TglMasuk').val();
     const days = getWeekdays(tglnow);
     var xdi = $('#IDUnit').val();
-    let url = base_url + '/ESIRYARSI/public/JadwalAbsensi/getHariJadwalDokterCurrent';
+    let url = base_url + '/SIKBREC/public/JadwalAbsensi/getHariJadwalDokterCurrent';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1409,7 +1409,7 @@ function getWeekdays(params){
 
 function getDokterAllAktif() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/bInformationRekamMedik/getIDDokter';
+    let url = base_url + '/SIKBREC/public/bInformationRekamMedik/getIDDokter';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1449,7 +1449,7 @@ function getDokterAllAktif() {
     
     function getDataDetailBillbyID(id) {
         var base_url = window.location.origin;
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/getDataDetailBillbyID';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/getDataDetailBillbyID';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -1514,7 +1514,7 @@ function getDokterAllAktif() {
     
     // function getDataDetailBillbyIDfo2(id) {
     //     var base_url = window.location.origin;
-    //     let url = base_url + '/ESIRYARSI/public/aBillingPasien/getDataDetailBillbyID';
+    //     let url = base_url + '/SIKBREC/public/aBillingPasien/getDataDetailBillbyID';
     //     return fetch(url, {
     //         method: 'POST',
     //         headers: {
@@ -1570,7 +1570,7 @@ function getDataDetailBilling() {
            "order": [[ 2, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataDetailBilling", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataDetailBilling", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -1874,7 +1874,7 @@ function showTindakanbyFO1(ID) {
     var base_url = window.location.origin;
     // console.log(IDFO1);
     // return false;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ShowTindakanbyFO1';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ShowTindakanbyFO1';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1978,7 +1978,7 @@ async function goBatalDetailBill(ID,value) {
 
 function getgoBatalDetailBillbyID(ID,value) {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/goBatalDetailBillbyID';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/goBatalDetailBillbyID';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -2028,7 +2028,7 @@ function getDataRekapBiaya() {
            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataRekapBiaya", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataRekapBiaya", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -2086,7 +2086,7 @@ function getDataRiwayatPayment(){
            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataRiwayatPayment", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataRiwayatPayment", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -2166,7 +2166,7 @@ function goCetakKuitansiBynoKuitansi(NO_KWITANSI,TIPE_PEMBAYARAN,NOMINAL_BAYAR,U
     // return false;
     var base_url = window.location.origin;
     var jeniscetak = 'PrintKuitansi2';
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/"+jeniscetak+"/" + NO_KWITANSI +"/"+TIPE_PEMBAYARAN+"/"+NOMINAL_BAYAR+"/"+USER_KASIR+"/"+BILLTO+"/"+NO_TRS+"/"+NamaTest,"_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + NO_KWITANSI +"/"+TIPE_PEMBAYARAN+"/"+NOMINAL_BAYAR+"/"+USER_KASIR+"/"+BILLTO+"/"+NO_TRS+"/"+NamaTest,"_blank",
         "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
     //MyBack();
     // $("#notif_ShowTTD_Digital").modal('hide');
@@ -2203,7 +2203,7 @@ function updateUIdatagoCetakKuitansi(params) {
 function goCetakKuitansi(NO_KWITANSI,TIPE_PEMBAYARAN,NOMINAL_BAYAR,USER_KASIR,BILLTO,NO_TRS,NamaTest) {
 
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/PrintKuitansi2';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/PrintKuitansi2';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -2253,7 +2253,7 @@ function getDataApproveBDRS() {
     $('#tbl_approveBDRS').DataTable({
         'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveBDRS", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveBDRS", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.noreg = noreg
@@ -2313,7 +2313,7 @@ function approvemodalBDRSdetail2(thisid){
        $('#tbl_approvebdrs_detail').DataTable({
          'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveBDRSdetail", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveBDRSdetail", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.id = id
@@ -2440,10 +2440,11 @@ function ApproveAllBDRS(data) {
     var nomr = $("#NoMR").val();
     var idX = $("#bdrsidxx").val();
     var getreg = $("#NoRegistrasi").val().substring(0, 2);
+    var IDUnit =  $('#IDUnit').val();
     // console.log(data,passingidbtn,noreg,idbtn);
     // return false;
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveAllBDRS';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveAllBDRS';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -2456,6 +2457,7 @@ function ApproveAllBDRS(data) {
         + '&nomr=' + nomr
         + '&idX=' + idX
         + '&getreg=' + getreg
+        + '&IDUnit=' + IDUnit
 
     })
         .then(response => {
@@ -2493,7 +2495,7 @@ function ApproveAllBDRS(data) {
 //        $('#tbl_approveBDRSdetail').DataTable({
 //          'ajax':
 //     {
-//         "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveBDRS", // URL file untuk proses select datanya
+//         "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveBDRS", // URL file untuk proses select datanya
 //         "type": "POST",
 //         data: function (d) {
 //          d.noreg = noreg
@@ -2564,7 +2566,7 @@ function getDataApproveRad() {
        $('#tbl_approveRadiology').DataTable({
          'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveRad", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveRad", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.noreg = noreg
@@ -2600,13 +2602,13 @@ function getDataApproveRad() {
                                      return html 
                               }
                           },
-                          { "render": function ( data, type, row ) { // Tampilkan kolom aksi
-                            var html = ""
+                    //       { "render": function ( data, type, row ) { // Tampilkan kolom aksi
+                    //         var html = ""
                              
-                              var html  = '<button type="button" title="Approve" class="btn btn-success btn-xs" id="btn_approveRad" onclick="ApproveSatuanRad(' + row.WOID + ',this)" ><span class="glyphicon glyphicon-check"></span></button>&nbsp<button type="button" title="Batal Approve" class="btn btn-danger btn-xs" id="btn_btlapproveRad"  onclick="ApproveSatuanRad(' + row.WOID + ',this)" ><i class="fa fa-ban"></i></button>'
-                                 return html 
-                          }
-                      },
+                    //           var html  = '<button type="button" title="Approve" class="btn btn-success btn-xs" id="btn_approveRad" onclick="ApproveSatuanRad(' + row.WOID + ',this)" ><span class="glyphicon glyphicon-check"></span></button>&nbsp<button type="button" title="Batal Approve" class="btn btn-danger btn-xs" id="btn_btlapproveRad"  onclick="ApproveSatuanRad(' + row.WOID + ',this)" ><i class="fa fa-ban"></i></button>'
+                    //              return html 
+                    //       }
+                    //   },
                            ],
         'columnDefs': [
            {
@@ -2724,11 +2726,12 @@ function ApproveRad(data,passingidbtn) {
     var getreg = $("#NoRegistrasi").val().substring(0, 2);
 
     var GROUP_JAMINAN =  $('#TypePatientID').val();
+    var IDUnit =  $('#IDUnit').val();
 
     // console.log(data,passingidbtn,noreg,idbtn);
     // return false;
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveRad';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveRad';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -2742,6 +2745,7 @@ function ApproveRad(data,passingidbtn) {
         + '&nomr=' + nomr
         + '&getreg=' + getreg
         + '&GROUP_JAMINAN=' + GROUP_JAMINAN
+        + '&IDUnit=' + IDUnit
         
     })
         .then(response => {
@@ -2773,8 +2777,10 @@ function ApproveAllRad(data) {
     var nomr = $("#NoMR").val();
     var getreg = $("#NoRegistrasi").val().substring(0, 2);
     var GROUP_JAMINAN =  $('#TypePatientID').val();
+    var IDUnit =  $('#IDUnit').val();
+
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveAllRad';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveAllRad';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -2787,6 +2793,7 @@ function ApproveAllRad(data) {
         + '&nomr=' + nomr
         + '&getreg=' + getreg
         + '&GROUP_JAMINAN=' + GROUP_JAMINAN
+        + '&IDUnit=' + IDUnit
     })
         .then(response => {
             if (!response.ok) {
@@ -2821,7 +2828,7 @@ function getDataApproveLabo() {
        $('#tbl_approveLaboratorium').DataTable({
          'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveLabo", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveLabo", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.noreg = noreg
@@ -2883,7 +2890,7 @@ function ApproveSatuanlabdetail2(thisid){
        $('#tbl_approveLaboratorium_detail').DataTable({
          'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveLabodetail", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveLabodetail", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.id = id
@@ -3003,11 +3010,12 @@ function ApproveAllLab(data) {
     var getreg = $("#NoRegistrasi").val().substring(0, 2);
 
     var GROUP_JAMINAN =  $('#TypePatientID').val();
+    var IDUnit =  $('#IDUnit').val();
     // console.log(getreg);
     // return false;
 
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveAllLab';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveAllLab';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3021,8 +3029,7 @@ function ApproveAllLab(data) {
         + '&labidx=' + labidx
         + '&getreg=' + getreg
         + '&GROUP_JAMINAN=' + GROUP_JAMINAN
-
-
+        + '&IDUnit=' + IDUnit
 
     })
         .then(response => {
@@ -3138,7 +3145,7 @@ function getTarifAllSum(data) {
     // return false;
 
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/sumAllTarif';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/sumAllTarif';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3187,7 +3194,7 @@ function getDataApproveFarmasi() {
        $('#tbl_approvefarmasi').DataTable({
          'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataApproveFarmasi", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApproveFarmasi", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.noreg = noreg
@@ -3204,29 +3211,44 @@ function getDataApproveFarmasi() {
                             { "data": "JenisResep" },
                             { "data": "NoResep" },
                             { "data": "Jumlah" },
-                            { "render": function ( data, type, row ) { // Tampilkan kolom aksi
-                                var html = ""
-                                  if(row.StatusID == "0"){ 
-                                      var badge  = 'success'
-                                  }else if(row.StatusID == "1"){ 
-                                      var badge  = 'warning'
-                                  }else if(row.StatusID == "2"){ 
-                                    var badge  = 'danger'
-                                  }else if(row.StatusID == "3"){ 
-                                    var badge  = 'info'
-                                  }else if(row.StatusID == "4"){ 
-                                    var badge  = 'secondary'
-                                  }else{
-                                    var badge  = ''
-                                  }
-                                  var html = '<span class="badge badge-'+badge+'">'+row.StatusName+'</span>'
-                                     return html 
+                        //     { "render": function ( data, type, row ) { // Tampilkan kolom aksi
+                        //         var html = ""
+                        //           if(row.StatusID == "0"){ 
+                        //               var badge  = 'success'
+                        //           }else if(row.StatusID == "1"){ 
+                        //               var badge  = 'warning'
+                        //           }else if(row.StatusID == "2"){ 
+                        //             var badge  = 'danger'
+                        //           }else if(row.StatusID == "3"){ 
+                        //             var badge  = 'info'
+                        //           }else if(row.StatusID == "4"){ 
+                        //             var badge  = 'secondary'
+                        //           }else{
+                        //             var badge  = ''
+                        //           }
+                        //           var html = '<span class="badge badge-'+badge+'">'+row.StatusName+'</span>'
+                        //              return html 
+                        //       }
+                        //   },
+
+                          { "render": function ( data, type, row ) { // Tampilkan kolom aksi
+                            var html = ""
+                              if(row.StatusResep == "Review"){ 
+                                  var badge  = 'warning'
+                              }else if(row.StatusResep == "Approve"){ 
+                                var badge  = 'danger'
+                              }else{
+                                var badge  = 'success'
                               }
-                          },
+                              var html = '<span class="badge badge-'+badge+'">'+row.StatusResep+'</span>'
+                                 return html 
+                          }
+                      },
                           { "render": function ( data, type, row ) { // Tampilkan kolom aksi
                             var html = ""
                              
-                              var html  = '<button type="button" title="Approve" class="btn btn-success btn-xs" id="btn_approve" onclick="ApproveSatuan(' + row.orderid + ',this)" ><span class="glyphicon glyphicon-check"></span></button>&nbsp<button type="button" title="Batal Approve" class="btn btn-danger btn-xs" id="btn_btlapprove"  onclick="ApproveSatuan(' + row.orderid + ',this)" ><i class="fa fa-ban"></i></button>'
+                            var html  = '<button type="button" title="Approve" class="btn btn-success btn-xs" id="btn_approve" onclick="ApproveSatuan(' + row.orderid + ',this)" ><span class="glyphicon glyphicon-check"></span></button>&nbsp<button type="button" title="Batal Approve" class="btn btn-danger btn-xs" id="btn_btlapprove"  onclick="ApproveSatuan(' + row.orderid + ',this)" ><i class="fa fa-ban"></i></button>'
+                            //   var html  = '<button type="button" title="Approve" class="btn btn-success btn-xs" id="btn_approve" onclick="ApproveSatuan(' + row.orderid + ',this)" ><span class="glyphicon glyphicon-check"></span></button>'
                                  return html 
                           }
                       },
@@ -3328,8 +3350,9 @@ function Approve(data,passingidbtn) {
     var nomr = $("#NoMR").val();
     var getreg = $("#NoRegistrasi").val().substring(0, 2);
     var GROUP_JAMINAN =  $('#TypePatientID').val();
+    var IDUnit =  $('#IDUnit').val();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/Approve';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/Approve';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3343,6 +3366,7 @@ function Approve(data,passingidbtn) {
         + '&nomr=' + nomr
         + '&getreg=' + getreg
         + '&GROUP_JAMINAN=' + GROUP_JAMINAN
+        + '&IDUnit=' + IDUnit
 
     })
         .then(response => {
@@ -3370,7 +3394,7 @@ function ApproveAll(data) {
     var form = $("#form_approve").serialize();
     
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveAll';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveAll';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3420,7 +3444,7 @@ function getDataDetailBilling_Payment(attr) {
            "order": [[ 2, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataDetailBillingx", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataDetailBillingx", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -3503,86 +3527,86 @@ async function ApproveCheckboxAmount(data) {
     console.log(data);
     exit;
 
-    try {
-        const dataApproveAllBDRS = await ApproveAllBDRS(data);
-        updateUIdataApproveAllBDRS(dataApproveAllBDRS);
-    } catch (err) {
-        toast(err.message, "error")
-    }
+    // try {
+    //     const dataApproveAllBDRS = await ApproveAllBDRS(data);
+    //     updateUIdataApproveAllBDRS(dataApproveAllBDRS);
+    // } catch (err) {
+    //     toast(err.message, "error")
+    // }
 }
 
-function updateUIdataApproveAllBDRS(params) {
-    let response = params;
-    if (response.status == "success") {
-        swal({
-            title: "Simpan Berhasil!",
-            text: response.message,
-            icon: "success",
-        })
-        getDataApproveBDRS();
-         var ID = $("#bdrsidxx").val();
-        approvemodalBDRSdetail(ID);
-    }else{
-        toast(response.message, "error")
-    }
-}
+// function updateUIdataApproveAllBDRS(params) {
+//     let response = params;
+//     if (response.status == "success") {
+//         swal({
+//             title: "Simpan Berhasil!",
+//             text: response.message,
+//             icon: "success",
+//         })
+//         getDataApproveBDRS();
+//          var ID = $("#bdrsidxx").val();
+//         approvemodalBDRSdetail(ID);
+//     }else{
+//         toast(response.message, "error")
+//     }
+// }
 
-function ApproveAllBDRS(data) {
-    var form = $("#form_approvebdrs_detail").serialize();
-    // var idbtn = $(passingidbtn).attr("id");
-    // var noreg = $("#NoRegistrasi").val();
-    // var datebill = $("#tglawal").val();
-    // var noeps = $("#NoEpisode").val();
-    // var nomr = $("#NoMR").val();
+// function ApproveAllBDRS(data) {
+//     var form = $("#form_approvebdrs_detail").serialize();
+//     // var idbtn = $(passingidbtn).attr("id");
+//     // var noreg = $("#NoRegistrasi").val();
+//     // var datebill = $("#tglawal").val();
+//     // var noeps = $("#NoEpisode").val();
+//     // var nomr = $("#NoMR").val();
 
-    var noreg = $("#NoRegistrasi").val();
-    var datebill = $("#tglawal").val();
-    var noeps = $("#NoEpisode").val();
-    var nomr = $("#NoMR").val();
-    var idX = $("#bdrsidxx").val();
-    var getreg = $("#NoRegistrasi").val().substring(0, 2);
+//     var noreg = $("#NoRegistrasi").val();
+//     var datebill = $("#tglawal").val();
+//     var noeps = $("#NoEpisode").val();
+//     var nomr = $("#NoMR").val();
+//     var idX = $("#bdrsidxx").val();
+//     var getreg = $("#NoRegistrasi").val().substring(0, 2);
 
-    // var GROUP_JAMINAN =  $('#TypePatientID').val();
-    // console.log(data,passingidbtn,noreg,idbtn);
-    // return false;
-    var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/ApproveAllBDRS';
-    return fetch(url, {
-        method: 'POST',
-        headers: {
-            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
-        },
-        body: form + '&idbtn=' + data 
-        + '&noreg=' + noreg
-        + '&datebill=' + datebill
-        + '&noeps=' + noeps
-        + '&nomr=' + nomr
-        + '&idX=' + idX
-        + '&getreg=' + getreg
-        // + '&GROUP_JAMINAN=' + GROUP_JAMINAN
+//     // var GROUP_JAMINAN =  $('#TypePatientID').val();
+//     // console.log(data,passingidbtn,noreg,idbtn);
+//     // return false;
+//     var base_url = window.location.origin;
+//     let url = base_url + '/SIKBREC/public/aBillingPasien/ApproveAllBDRS';
+//     return fetch(url, {
+//         method: 'POST',
+//         headers: {
+//             "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+//         },
+//         body: form + '&idbtn=' + data 
+//         + '&noreg=' + noreg
+//         + '&datebill=' + datebill
+//         + '&noeps=' + noeps
+//         + '&nomr=' + nomr
+//         + '&idX=' + idX
+//         + '&getreg=' + getreg
+//         // + '&GROUP_JAMINAN=' + GROUP_JAMINAN
 
 
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(response.statusText)
-            }
-            return response.json();
-        })
-        .then(response => {
-            if (response.status === "error") {
-                throw new Error(response.message.errorInfo[2]);
-                // console.log("ok " + response.message.errorInfo[2])
-            } else if (response.status === "warning") {
-                throw new Error(response.message);
-                // console.log("ok " + response.message.errorInfo[2])
-            }
-            return response
-        })
-        .finally(() => {
-            $(".preloader").fadeOut();
-        })
-}
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error(response.statusText)
+//             }
+//             return response.json();
+//         })
+//         .then(response => {
+//             if (response.status === "error") {
+//                 throw new Error(response.message.errorInfo[2]);
+//                 // console.log("ok " + response.message.errorInfo[2])
+//             } else if (response.status === "warning") {
+//                 throw new Error(response.message);
+//                 // console.log("ok " + response.message.errorInfo[2])
+//             }
+//             return response
+//         })
+//         .finally(() => {
+//             $(".preloader").fadeOut();
+//         })
+// }
 
 function BtnSubmitBayar(){
     var table = $('#tbl_rincianbiaya_payment').DataTable();
@@ -3673,7 +3697,7 @@ function UpdateKlaimBayar() {
     // var tglpayment = $("#tglpayment").val();
     var tipepembayaran = $("#tipepembayaran").val();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/UpdateKlaimBayar';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/UpdateKlaimBayar';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3730,7 +3754,7 @@ function updateUIdataOpenBill(params) {
 function OpenBill() {
     var base_url = window.location.origin;
     var groupjaminan = $('#GroupJaminan').val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/OpenBilling';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/OpenBilling';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3830,7 +3854,7 @@ function SaveTrsPayment() {
     // console.log(bilito);
     // return false;
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/SaveTrsPayment';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/SaveTrsPayment';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3878,7 +3902,7 @@ function updateUIgetPaymentType(datagetPaymentType) {
 }
 function getPaymentType() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getPaymentType';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getPaymentType';
     return fetch(url, {
         method: 'GET',
         headers: {
@@ -3937,7 +3961,7 @@ function updateUIgetEDC(datagetEDC) {
 }
 function getPaymentEDC(param) {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getPaymentEDC';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getPaymentEDC';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -3992,7 +4016,7 @@ function getKodeRekening(param) {
     var jenispasien = 'RAJAL';
     var namabank = $("#namabank").val();
     var idjaminan = $("#penjamin_kode").val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getKodeRekening';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getKodeRekening';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4050,7 +4074,7 @@ function updateUIdatagetAllDataPerusahaan(param) {
 }
 function getAllDataPerusahaan() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataPerusahaan/getAllDataPerusahaan';
+    let url = base_url + '/SIKBREC/public/MasterDataPerusahaan/getAllDataPerusahaan';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4109,7 +4133,7 @@ function updateUIdatagetAllDataAsuransi(param) {
 }
 function getAllDataAsuransi() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataAsuransi/getAllDataAsuransi';
+    let url = base_url + '/SIKBREC/public/MasterDataAsuransi/getAllDataAsuransi';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4287,7 +4311,7 @@ async function goDataBillClosingan() {
 function getDataBillClosingan() {
     var base_url = window.location.origin;
     var NoRegistrasi = $("#NoRegistrasi").val()
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getDataBillClosingan';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataBillClosingan';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4363,7 +4387,7 @@ function SaveTrsPayment_closing() {
     var tglpayment = $("#tglpayment_closing").val();
     var TypePatientID = $("#TypePatientID").val();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/SaveTrsPayment_closing';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/SaveTrsPayment_closing';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4396,14 +4420,15 @@ function SaveTrsPayment_closing() {
 
 //#END BILL CLOSING
 
-async function printkuitansidetail(no_trs) {
+
+async function printkuitansidetailshow(no_trs) {
     var base_url = window.location.origin;
     // var base_urlx = window.location.origin;
     var jeniscetak = 'PrintKuitansiDetail';
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
     var lang = no_trs;
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs, "_blank",
             "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
     // printrincian(base_urlx);
 }
@@ -4413,7 +4438,7 @@ async function printrinciandetail(no_trs) {
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0,2);
     var lang = no_trs;
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs, "_blank",
     "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
 }
 
@@ -4425,6 +4450,14 @@ async function printrinciandetail(no_trs) {
 //     console.log(notrs);
 // }
 async function btnbatalriwayatpembayaran(no_trs){
+    $("#mAlasanBtlPayment").modal('show');
+    $('#tNoTrs').val(no_trs);
+}
+async function btnbatalriwayatpembayaranbymodal(){
+    var tNoTrs = $("#tNoTrs").val();
+    btnbatalriwayatpembayaranbymodalnotrs(tNoTrs);
+}
+async function btnbatalriwayatpembayaranbymodalnotrs(no_trs){
     try{
         const dataSetBatalRiwayatPembayaran = await SetBatalRiwayatPembayaran(no_trs);
         updateUIdataSetBatalRiwayatPembayaran(dataSetBatalRiwayatPembayaran);
@@ -4435,17 +4468,18 @@ async function btnbatalriwayatpembayaran(no_trs){
 function SetBatalRiwayatPembayaran(no_trs) {
     var base_url = window.location.origin;
     var noreg = $("#NoRegistrasi").val();
+    var alasanBtlPayment = $("#alasanBtlPayment").val();
     var notrs = no_trs;
 
-
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/SetSaveBatalRiwayatPembayaran';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/SetSaveBatalRiwayatPembayaran';
     return fetch(url, {
         method: 'POST',
         headers: {
             "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
         },
         body:   'noreg=' +  noreg +
-                '&notrs=' + notrs 
+                '&notrs=' + notrs +
+                '&alasanBtlPayment=' + alasanBtlPayment 
 
             })
             .then(response => {
@@ -4474,9 +4508,7 @@ function updateUIdataSetBatalRiwayatPembayaran(dataSetBatalRiwayatPembayaran) {
     if (dataSaveTampung.status == "success") {
         swal("DATA RIWAYAT PEMBAYARAN",  "BERHASIL DI BATALKAN", "success");
         asyncShowMain();
-        // asyncShowListBalanceCairan();
-        // asyncShowWakilPasien();
-        // asyncShowNurseAssOp();
+        $("#mAlasanBtlPayment").modal('hide');
     }else{
         toast(response.message, "error")
     }
@@ -4490,7 +4522,7 @@ async function printkuitansiAll() {
     var jeniscetak = 'PrintKuitansiAll';
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs, "_blank",
             "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
     // printrincian(base_urlx);
 }
@@ -4499,7 +4531,7 @@ async function printrincianAll() {
     var base_url = window.location.origin;
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0,2);
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
     "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
 }
 
@@ -4530,7 +4562,7 @@ function updateUiSukseshistory(params, notrs,lang,kodereg,jeniscetakan) {
             var jeniscetak = 'PrintKuitansi';
         }
 
-        window.open(base_url + "/ESIRYARSI/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs, "_blank",
+        window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs, "_blank",
             "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
         //MyBack();
         $("#notif_ShowTTD_Digital").modal('hide');
@@ -4540,7 +4572,7 @@ function updateUiSukseshistory(params, notrs,lang,kodereg,jeniscetakan) {
 
 function CountCetak(notrs, signAlasanCetak, jeniscetakan,kodereg) {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/CountCetak';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/CountCetak';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4589,7 +4621,7 @@ function uploadtoAws(notrs,kodereg,lang,jeniscetakan,url){
     }
     var base_url = window.location.origin;
     $.ajax({
-        url: base_url + '/ESIRYARSI/public/aBillingPasien/'+url,
+        url: base_url + '/SIKBREC/public/aBillingPasien/'+url,
         data: FormData,
         type: 'post',
         dataType: 'json',
@@ -4664,7 +4696,7 @@ async function SendEmail(judul,email,awsurl) {
         aws_url:aws_url,
     }
     var base_url = window.location.origin;
-    const url = base_url + "/ESIRYARSI/public/aBillingPasien/SendMail/";
+    const url = base_url + "/SIKBREC/public/aBillingPasien/SendMail/";
     $.ajax({
         url: url,
         type: "POST",
@@ -4756,7 +4788,7 @@ function CekPernahGenerate() {
     var noregistrasi = $("#NoRegistrasi").val()
     var jeniscetakan = $("#pkuitansi_jeniscetakan").val() 
     var notrs = $("#pkuitansi_notrs").val()
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/CekPernahGenerate';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/CekPernahGenerate';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4848,7 +4880,7 @@ function getTarifChanger(){
            "order": [[ 0, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataTarifNext", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataTarifNext", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -4942,7 +4974,7 @@ function getTindakanRJ() {
     var xdi = $('#IDUnit').val();
     var groupjaminan = $('#GroupJaminan').val();
     var jenispasien = 'RJ';
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/gettarifnew';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/gettarifnew';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -4973,15 +5005,27 @@ function getTindakanRJ() {
 
 function getTindakanRI() {
     var base_url = window.location.origin;
-    var groupjaminan = $('#GroupJaminan').val();
+    // var groupjaminan = $('#GroupJaminan').val();
     var IDKelas = $('#IDKelas').val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTindakanRanap';
+
+    var tglbill = $('#dateabilling').val();
+    var xdi = $('#IDUnit').val();
+    var groupjaminan = $('#GroupJaminan').val();
+    var noreg = $('#NoRegistrasi').val();
+    var jenispasien = 'RI';
+    // let url = base_url + '/SIKBREC/public/aBillingPasien/getTindakanRanap';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/gettarifnew';
     return fetch(url, {
         method: 'POST',
         headers: {
             "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
         },
-        body: 'groupjaminan=' + groupjaminan + '&IDKelas=' + IDKelas
+        body: 'groupjaminan=' + groupjaminan 
+        + '&IDKelas=' + IDKelas
+        + '&tglbill=' + tglbill
+        + '&xdi=' + xdi
+        + '&jenispasien=' + jenispasien
+        + '&noreg=' + noreg
     })
         .then(response => {
             if (!response.ok) {
@@ -5039,7 +5083,7 @@ function getDataDokterRJ() {
     var tglnow = $('#TglMasuk').val();
     const days = getWeekdays(tglnow);
     var xdi = $('#IDUnit').val();
-    let url = base_url + '/ESIRYARSI/public/JadwalAbsensi/getHariJadwalDokterCurrent';
+    let url = base_url + '/SIKBREC/public/JadwalAbsensi/getHariJadwalDokterCurrent';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -5084,7 +5128,7 @@ function getWeekdays(params){
 
 function getDataDokterRI() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/bInformationRekamMedik/getIDDokter';
+    let url = base_url + '/SIKBREC/public/bInformationRekamMedik/getIDDokter';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -5137,6 +5181,7 @@ function getDataDokterRI() {
             $("#hargatarifnew").val(convertEntities(responseApi.data.GetTarif));
             $("#tindakannew").val(convertEntities(responseApi.data.ProductName));
             $("#kategorinewproduct").val(convertEntities(responseApi.data.CategoryProduct));
+            $("#idtrstariftdk").val(convertEntities(responseApi.data.ID_TR_TARIF));
             
             $("#qty_addvisitnew").val('1');
             
@@ -5151,7 +5196,7 @@ function getDataDokterRI() {
         var xdi = $('#IDUnit').val();
         var groupjaminan = $('#GroupJaminan').val();
         var jenispasien = 'RJ';
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/gettarifdetailnew';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/gettarifdetailnew';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5187,7 +5232,7 @@ function getDataDokterRI() {
     function getTarifTindakanRI(val) {
         var base_url = window.location.origin;
         var IDKelas = $('#IDKelas').val();
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTarifTindakanRanap';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/getTarifTindakanRanap';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5228,7 +5273,7 @@ function getDataDokterRI() {
     function getDokterbyid(val) {
         var base_url = window.location.origin;
         var iddokter = val;
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/getdokterdetailnew';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/getdokterdetailnew';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5310,7 +5355,7 @@ function getDataDokterRI() {
         var IDUnit = $('#IDUnit').val();
         var kodereg = $("#NoRegistrasi").val().slice(0, 2);
 
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/newInsertFO';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/newInsertFO';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5394,7 +5439,7 @@ function getDataDokterRI() {
         var IDUnit = $('#IDUnit').val();
         var kodereg = $("#NoRegistrasi").val().slice(0, 2);
         
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/newInsertFO';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/newInsertFO';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5439,8 +5484,9 @@ function getDataDokterRI() {
             var NO_TRS_BILLING = $('#Idbilling').val();
             var KODE_TARIF = document.getElementById("namatindakannew").value;
             var KD_DR = document.getElementById("dokterpemeriksanew").value;
+            var idtrstariftdk = document.getElementById("idtrstariftdk").value;
             var QTY = $('#qty_addvisitnew').val();
-            if (NO_TRS_BILLING == '' || KODE_TARIF =='' || KD_DR == '' || QTY =='') {
+            if (NO_TRS_BILLING == '' || KODE_TARIF =='' || KD_DR == '' || QTY ==''|| idtrstariftdk =='') {
                 toast("Warning! Periksa kembali pastikan data sudah terisi", 'warning');
                 return false;
             }
@@ -5488,7 +5534,11 @@ function getDataDokterRI() {
         var KD_DR = document.getElementById("dokterpemeriksanew").value;
         var NM_DR = $('#dokternew').val();
 
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/newInsertBill';
+        var KDREG = $("#NoRegistrasi").val().slice(0,2);
+
+        var idtrstariftdk = document.getElementById("idtrstariftdk").value;
+
+        let url = base_url + '/SIKBREC/public/aBillingPasien/newInsertBill';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5514,6 +5564,8 @@ function getDataDokterRI() {
             + '&KD_DR=' + KD_DR 
             + '&NM_DR=' + NM_DR 
             + '&GROUP_ENTRI=' + GROUP_ENTRI  
+            + '&KDREG=' + KDREG  
+            + '&idtrstariftdk=' + idtrstariftdk
             
         })
             .then(response => {
@@ -5543,7 +5595,7 @@ function getDataDokterRI() {
         dataHandler.html("");
         var NoTRS = $("#Idbilling").val();
         var base_url = window.location.origin;
-        var url2 = "/ESIRYARSI/public/aBillingPasien/showDatafoBill";
+        var url2 = "/SIKBREC/public/aBillingPasien/showDatafoBill";
 
         $.ajax({
             type: "POST",
@@ -5613,16 +5665,14 @@ function getDataDokterRI() {
     }
     function changetarifbill(){
         var data = $("#detail_fo_bill, #form_tindakan_new").serialize();
-     
         var groupjaminan = $('#xgrupjaminan').val();
-
         var GROUP_JAMINANNO =  $('#TypePatientID').val();
-
         var penjamin_kodex =  $('#penjamin_kode').val();
+        var ID_UNIT = $('#IDUnit').val();
         // console.log(penjamin_kodex);
         // return false;
     
-        var url2 = "/ESIRYARSI/public/aBillingPasien/changeBillingJaminan";
+        var url2 = "/SIKBREC/public/aBillingPasien/changeBillingJaminan";
         var base_url = window.location.origin;
         let url = base_url + url2;
         return fetch(url, {
@@ -5634,6 +5684,7 @@ function getDataDokterRI() {
             +"&groupjaminan="+groupjaminan
             +"&GROUP_JAMINANNO="+GROUP_JAMINANNO
             +"&penjamin_kodex="+penjamin_kodex
+            +"&ID_UNIT="+ID_UNIT
         })
             .then(response => {
                 if (!response.ok) {
@@ -5684,7 +5735,7 @@ function getDataDokterRI() {
         var Notrs = $('#Idbilling').val();
         var Noreg = $('#NoRegistrasi').val();
 
-       let url = base_url + '/ESIRYARSI/public/aBillingPasien/UpdateKlaimbyFO1';
+       let url = base_url + '/SIKBREC/public/aBillingPasien/UpdateKlaimbyFO1';
        return fetch(url, {
            method: 'POST',
            headers: {
@@ -5739,7 +5790,7 @@ function getunklaim(id, klaim) {
    var Notrs = $('#Idbilling').val();
    var Noreg = $('#NoRegistrasi').val();
 
-   let url = base_url + '/ESIRYARSI/public/aBillingPasien/UpdateUnklaimbyFO1';
+   let url = base_url + '/SIKBREC/public/aBillingPasien/UpdateUnklaimbyFO1';
    return fetch(url, {
        method: 'POST',
        headers: {   
@@ -5792,7 +5843,7 @@ function getunklaim(id, klaim) {
         var Notrs = $('#Idbilling').val();
         var Noreg = $('#NoRegistrasi').val();
 
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/updateBatalBill';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/updateBatalBill';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5852,7 +5903,7 @@ function getunklaim(id, klaim) {
         var base_url = window.location.origin;
         var Noreg = $('#NoRegistrasi').val();
 
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/saveDataBill';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/saveDataBill';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5896,6 +5947,9 @@ function getunklaim(id, klaim) {
             $("#Idbillingfo1").val(convertEntities(responseApi.data.ID));
             $("#NoTRSBill1").val(convertEntities(responseApi.data.NO_TRS_BILLING));
             $("#tgltransaksi").val(convertEntities(responseApi.data.TGL_BILLING));
+            $("#KodeTarifBill").val(convertEntities(responseApi.data.KODE_TARIF));
+            $("#NamaTarifBill").val(convertEntities(responseApi.data.NAMA_TARIF));
+            $("#TotalTarifBill").val(convertEntities(responseApi.data.GRANDTOTAL));
 
             showDataGroupShiftFO2(KODE_TARIF);
             $("#modaltindakanbyorderOperasi").modal('hide');
@@ -5906,7 +5960,7 @@ function getunklaim(id, klaim) {
         var base_url = window.location.origin;
         var idfo1 = params;
 
-        let url = base_url + '/ESIRYARSI/public/aBillingPasien/showUpdateBillByFO1';
+        let url = base_url + '/SIKBREC/public/aBillingPasien/showUpdateBillByFO1';
         return fetch(url, {
             method: 'POST',
             headers: {
@@ -5951,7 +6005,7 @@ function getunklaim(id, klaim) {
         $('#tbl_fo_bill_2').DataTable({
             "ordering": true,
             "ajax": {
-                "url": base_url + "/ESIRYARSI/public/aBillingPasien/showDataBillFO2",
+                "url": base_url + "/SIKBREC/public/aBillingPasien/showDataBillFO2",
                 "dataSrc": "",
                 "deferRender": true,
                 "type": "POST",
@@ -5972,49 +6026,51 @@ function getunklaim(id, klaim) {
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.KODE_TARIF + ' </font>  ';
+                        var html = '<font size="1"> ' + row.KODE_KOMPONEN_TARIF + '<br>' + '(' + row.JasaBill + ')' +'</font>  ';
                         return html
                     }
                 },
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.NAMA_TARIF + ' </font>  ';
+                        var html = '<font size="1"> ' + parseFloat(row.QTY) + ' </font>  ';
                         return html
                     }
                 },
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.QTY + ' </font>  ';
+                        var html = '<font size="1"> ' + parseFloat(row.SUB_TOTAL) + ' </font>  ';
                         return html
                     }
                 },
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.NILAI_TARIF + ' </font>  ';
+                        var html = '<font size="1"> ' + parseFloat(row.NILAI_PROSEN) + ' </font>  ';
+                        return html
+                    }
+                },
+
+                // { "data": "Grandtotal" ,  render: $.fn.dataTable.render.number( ',', '.', 2,'Rp ' )},
+                {
+                    "render": function (data, type, row) { // Tampilkan kolom aksi
+                        var html = ""
+                        var html = '<font size="1"> ' + parseFloat(row.NILAI_PDP) + ' </font>  ';
                         return html
                     }
                 },
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.SUB_TOTAL + ' </font>  ';
+                        var html = '<font size="1"> ' + parseFloat(row.NILAI_DISKON_PDP) + ' </font>  ';
                         return html
                     }
                 },
                 {
                     "render": function (data, type, row) { // Tampilkan kolom aksi
                         var html = ""
-                        var html = '<font size="1"> ' + row.DISC + ' </font>  ';
-                        return html
-                    }
-                },
-                {
-                    "render": function (data, type, row) { // Tampilkan kolom aksi
-                        var html = ""
-                        var html = '<font size="1"> ' + row.SUB_TOTAL_2 + ' </font>  ';
+                        var html = '<font size="1"> ' + parseFloat(row.SUB_TOTAL_2) + ' </font>  ';
                         return html
                     }
                 },
@@ -6022,7 +6078,7 @@ function getunklaim(id, klaim) {
                     "render": function (data, type, row) {
                         var html = ""
                         // var html = '<button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="deleteDataGroupShiftbyfo2(' + row.ID + ')" ><span class="visible-content" >Hapus</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button> &nbsp <button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="editDataGroupShiftfo2(' + row.ID + ')" ><span class="visible-content" >Edit</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>'
-                        var html = `<button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="deleteDataGroupShiftbyfo2('${row.ID }')" ><span class="visible-content" >Hapus</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button> &nbsp <button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="editDataGroupShiftbyfo2('${row.ID }','${row.KODE_TARIF }','${row.NAMA_TARIF }','${row.NILAI_TARIF }','${row.QTY }','${row.DISC }','${row.NILAI_PDP }')" ><span class="visible-content" >Edit</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>`
+                        var html = `<button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="deleteDataGroupShiftbyfo2('${row.ID }')" ><span class="visible-content" >Hapus</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button> &nbsp <button type="button" class="btn btn-default border-danger btn-animated btn-xs"  onclick="editDataGroupShiftbyfo2('${row.ID }','${row.KODE_TARIF }','${row.NAMA_TARIF }','${row.NILAI_TARIF }','${row.QTY }','${row.NILAI_DISKON_PDP }','${row.NILAI_PDP }','${row.KODE_KOMPONEN_TARIF}','${row.NILAI_PROSEN}')" ><span class="visible-content" >Edit</span><span class="hidden-content"><i class="fa fa-hand-pointer-o"></i></span></button>`
                         return html
                     },
                 },
@@ -6050,7 +6106,7 @@ function getunklaim(id, klaim) {
        var Idfo2 = params;
        // var Noreg = $('#NoRegistrasi').val();
 
-       let url = base_url + '/ESIRYARSI/public/aBillingPasien/updateBatalBillfo2';
+       let url = base_url + '/SIKBREC/public/aBillingPasien/updateBatalBillfo2';
        return fetch(url, {
            method: 'POST',
            headers: {
@@ -6102,7 +6158,7 @@ function getupdatebillfo2(params) {
    var Idfo1 = $('#Idbillingfo1').val();
    var Noreg = $('#NoRegistrasi').val();
 
-   let url = base_url + '/ESIRYARSI/public/aBillingPasien/updateBatalBillfo2';
+   let url = base_url + '/SIKBREC/public/aBillingPasien/updateBatalBillfo2';
    return fetch(url, {
        method: 'POST',
        headers: {
@@ -6135,28 +6191,33 @@ function getupdatebillfo2(params) {
        })
 }
 
-async function editDataGroupShiftbyfo2(id,kode,namatarif_fo2,NILAI_TARIF,QTY, DISC){
+async function editDataGroupShiftbyfo2(id,kode,namatarif_fo2,NILAI_TARIF,QTY, NILAI_DISKON_PDP, NILAI_PDP, KODE_KOMPONEN_TARIF, NILAI_PROSEN){
     $("#qty_fo2").attr('disabled', false);
     $("#diskon_fo2").attr('disabled', false);
     $("#btnupfo2update").attr('disabled', false);
 
     $("#id_fo2").val(convertEntities(id));
+    $("#komponenName").val(convertEntities(KODE_KOMPONEN_TARIF));
     $("#kodetarif_fo2").val(kode);
     $("#namatarif_fo2").val(namatarif_fo2);
-    $("#nilai_fo2").val(NILAI_TARIF);
+    // $("#nilai_fo2").val(NILAI_TARIF);
     $("#qty_fo2").val(number_to_price(QTY));
-    $("#diskon_fo2").val(number_to_price(DISC));
+    $("#diskon_fo2").val(parseFloat(NILAI_DISKON_PDP) * 100);
+    $("#nilai_fo2").val(number_to_price(NILAI_TARIF));
     $("#nilaipdp_fo2").val(number_to_price(NILAI_PDP));
+    $("#nilaiprosen_fo2").val(parseFloat(NILAI_PROSEN));
 }
 
 async function BtnCLoseClear(){
     $("#id_fo2").val('');
+    $("#komponenName").val('');
     $("#kodetarif_fo2").val('');
     $("#namatarif_fo2").val('');
     $("#qty_fo2").val('');
     $("#diskon_fo2").val('');
     $("#nilai_fo2").val('');
     $("#nilaipdp_fo2").val('');
+    $("#nilaiprosen_fo2").val('');
 }
 
 
@@ -6195,12 +6256,14 @@ function updateUIgetsavebillfo2(datagetsavebillfo2) {
                     var KODE_TARIF = $('#kodetarif_fo2').val();
                     showDataGroupShiftFO2(KODE_TARIF);
                     $("#id_fo2").val('');
+                    $("#komponenName").val('');
                     $("#kodetarif_fo2").val('');
                     $("#namatarif_fo2").val('');
                     $("#qty_fo2").val('');
                     $("#diskon_fo2").val('');
                     $("#nilai_fo2").val('');
                     $("#nilaipdp_fo2").val('');
+                    $("#nilaiprosen_fo2").val('');
                     // $("#modaltindakanbyorderOperasi").modal('hide');
                 } else {
                     // not clicked
@@ -6213,18 +6276,27 @@ function getsavebillfo2() {
     var id_fo1 = $('#Idbillingfo1').val();
     var id_fo2 = $('#id_fo2').val();
     var kodetarif_fo2 = $('#kodetarif_fo2').val();
-    var NILAI_TARIF = $('#nilai_fo2').val();
+    var NILAI_TARIFx = $('#nilai_fo2').val();
     var QTY = $('#qty_fo2').val();
-    var DISCx = $('#diskon_fo2').val();
-    var NILAI_PDP = $('#nilaipdp_fo2').val(); 
+    var DISC = $('#diskon_fo2').val() / 100;
+    var NILAI_PDPx = $('#nilaipdp_fo2').val();
     var NoTRSBill1 = $('#NoTRSBill1').val();
     var Noreg = $('#NoRegistrasi').val();
     var TypePatientID = $('#TypePatientID').val();
+    var NILAIPROSEN = $('#nilaiprosen_fo2').val();
     
+    // DISCx = DISCx / 100;
+    // console.log(DISCx);
+    // exit;
+    // var DISC = DISCx.replace(",", "");
+    // var NILAIPROSEN = NILAIPROSENx.replace(/,/g, '.');
+    var NILAI_PDP = NILAI_PDPx.replace(".", "");
+    var NILAI_TARIF = NILAI_TARIFx.replace(".", "");
+    // console.log(NILAI_PDPx);
+    // console.log(NILAIPROSEN);
+    // return false;
 
-    var DISC = DISCx.replace(/,/g, '.');
-
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getsavebillfo2';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getsavebillfo2';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -6241,6 +6313,7 @@ function getsavebillfo2() {
         +'&Noreg=' + Noreg
         +'&TypePatientID=' + TypePatientID
         +'&id_fo1=' + id_fo1
+        +'&NILAIPROSEN=' + NILAIPROSEN
 
     })
         .then(response => {
@@ -6279,7 +6352,7 @@ function getDataHutangKabur() {
     $('#tbl_PasienKabur').DataTable({
         'ajax':
     {
-        "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataHutangKabur", // URL file untuk proses select datanya
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataHutangKabur", // URL file untuk proses select datanya
         "type": "POST",
         data: function (d) {
          d.noreg = noreg
@@ -6329,7 +6402,7 @@ function setTransferBill() {
     var base_url = window.location.origin;
     var noreg = $("#NoRegistrasi").val();
     var nomr = $("#NoMR").val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/transferBillPasienHutang';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/transferBillPasienHutang';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -6371,7 +6444,7 @@ function getDataDetailRincianHutang() {
            "order": [[ 2, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataDetailRincianHutang", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataDetailRincianHutang", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -6539,7 +6612,7 @@ function getCekHutangx() {
     var noreg = $("#NoRegistrasi").val();
     var nomr = $("#NoMR").val();
     // console.log(noreg);
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getCekHutangPasien';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getCekHutangPasien';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -6733,7 +6806,7 @@ function getTotalPembayaranxx() {
     var nomr = $("#NoMR").val();
     // console.log(noreg);
     
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTotalPembayaran';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTotalPembayaran';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -6765,28 +6838,46 @@ function getTotalPembayaranxx() {
 }
 
 // 20/08/2024
+
+// mAlasanOpenBill
+
 async function btnCloseOrOpenBill(){
+    var Ket_btn_closeoropenbill = $("#Ket_btn_closeoropenbill").val();
+    if (Ket_btn_closeoropenbill == 'Close') {
+        $("#mAlasanOpenBill").modal('show');
+        $("#AlasanOpen").val('');
+    }else{
+        btnCloseOrOpenBillNext();
+    }
+}
+
+async function btnCloseOrOpenBillNext(){
     try{
         const dataSaveCloseOrOpenBill = await SaveCloseOrOpenBill();
         updateUIdataSaveCloseOrOpenBill(dataSaveCloseOrOpenBill);
+        $("#mAlasanOpenBill").modal('hide');
     }catch (err) {
-        toast(err.message, "error")
+        toast(err.message, "error");
     }
 }
 function SaveCloseOrOpenBill() {
     var base_url = window.location.origin;
 
     var NoRegistrasi = $("#NoRegistrasi").val();
+    var NoMR = $("#NoMR").val();
     var Ket_btn_closeoropenbill = $("#Ket_btn_closeoropenbill").val();
+    var AlasanOpen = $("#AlasanOpen").val();
 
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/setSaveCloseOrOpenBill';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/setSaveCloseOrOpenBill';
     return fetch(url, {
         method: 'POST',
         headers: {
             "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
         },
         body:   'NoRegistrasi=' +  NoRegistrasi +
-                '&Ket_btn_closeoropenbill=' + Ket_btn_closeoropenbill
+                '&Ket_btn_closeoropenbill=' + Ket_btn_closeoropenbill + 
+                '&AlasanOpen=' + AlasanOpen + 
+                '&NoMR=' + NoMR
 
             })
             .then(response => {
@@ -6848,7 +6939,6 @@ function toast(data, status) {
         "hideMethod": "fadeOut"
     }
     toastr[status](data);
-   
 }
 
 function number_to_price(v) {
@@ -6873,3 +6963,695 @@ function Showmodalcetak (No){
 
     $("#notif_ShowTTD_Digital").modal('show');
 }
+
+
+
+
+async function viewsPDF(){
+    try{
+        var datagetviewsPDF =  await getviewsPDF();
+        updateUIdatagetviewsPDF(datagetviewsPDF);
+    } catch (err) {
+        toast(err, "error")
+    }
+}
+
+function getviewsPDF() {
+    var base_url = window.location.origin;
+    var noreg = $("#NoRegistrasi").val();
+    var nomr = $("#NoMR").val();
+    // console.log(noreg);
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataDocumentPDF';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body:
+        'nomr=' + nomr 
+        +'&noreg=' + noreg
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            // $("#namatindakan").select2();
+        })
+}
+
+function updateUIdatagetviewsPDF(datagetviewsPDF) {
+    let responseLink = datagetviewsPDF;
+    window.open(responseLink.link_response);
+}
+//bridging materai
+async function printkuitansidetail(no_trs) {
+    var base_url = window.location.origin;
+    // var base_urlx = window.location.origin;
+    // var jeniscetak = 'PrintKuitansiDetail';
+    // var notrs = $("#NoRegistrasi").val();
+    // var kodereg = $("#NoRegistrasi").val().slice(0, 2);
+    // var lang = no_trs;
+    $("#notif_ShowTTD_Digital").modal('show');
+    $("#pkuitansi_notrs").val(convertEntities(no_trs));
+    cekEmateraiByNotrs(no_trs);
+    
+    // printrincian(base_urlx);
+}
+
+$('#bubuhimaterai').click(function () {
+    $("#notif_ShowTTD_Digital").modal('show');
+    $("#pkuitansi_notrs").val(convertEntities(''));
+
+});
+$('#btnSaveSendX').click(function () {
+    swal({
+        title: "Kirim E-mail",
+        text: "Apakah Anda yakin ingin Bubuhi E-Materai & kirim ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+        .then((willDelete) => {
+            if (willDelete) {
+                
+                var email = $("#pemail_pasien").val();
+                if (!validateEmail(email)) {
+                    swal({
+                        title: "Email Tidak Sesuai Format",
+                        text: "Maaf, Format Email Tidak Sesuai! Mohon Diperiksa Kembali!",
+                        icon: "warning",
+                    })
+                    $("#pemail_pasien").focus();
+                    $(".preloader").fadeOut();
+                    return false;
+                   }
+
+                        var notrs = $("#pkuitansi_notrs").val();
+                        var kodereg = $("#NoRegistrasi").val().slice(0,2);
+                        var NoRegistrasi = $("#NoRegistrasi").val();
+
+                        // if (kodereg != 'RJ' || kodereg != 'RI'){
+                        //     kodereg = 'PB';
+                        // }
+                        var lang = $("#pkuitansi_lang").val();
+                        // var jeniscetakan = $("#pkuitansi_jeniscetakan").val();
+                        jeniscetakan = 'KUITANSI';
+                        var uploadurl='SaveKuitansi';
+                        // if (jeniscetakan == 'KUITANSIREKAP'){
+                        //     var url = 'SaveKuitansiRekap';
+                        // }else if(jeniscetakan == 'KUITANSI'){
+                        //     var url = 'SaveKuitansi';
+                        // }else if(jeniscetakan == 'RINCIANBIAYA_PB'){
+                        //     var url = 'SaveRincianPB';
+                        // }else if(jeniscetakan == 'RINCIANBIAYA_RJ'){
+                        //     var url = 'SaveRincianRJ';
+                        // }else if(jeniscetakan == 'RINCIANBIAYA_RI'){
+                        //     var url = 'SaveRincianRI';
+                        // }
+                        gouploadtoAws(notrs,kodereg,lang,jeniscetakan,uploadurl,email,NoRegistrasi);
+                        // console.log(notrs,kodereg,lang,jeniscetakan,url,email);return false;
+            } 
+        });
+    });
+
+        $('#btnGenerateEmaterai').click(function () {
+            swal({
+                title: "Generate E-materi",
+                text: "Apakah Anda yakin ingin Bubuhi E-Materai ?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
+            })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        
+                        var email = $("#pemail_pasien").val();
+                        // if (!validateEmail(email)) {
+                        //     swal({
+                        //         title: "Email Tidak Sesuai Format",
+                        //         text: "Maaf, Format Email Tidak Sesuai! Mohon Diperiksa Kembali!",
+                        //         icon: "warning",
+                        //     })
+                        //     $("#pemail_pasien").focus();
+                        //     $(".preloader").fadeOut();
+                        //     return false;
+                        //    }
+        
+                                var notrs = $("#pkuitansi_notrs").val();
+                                var kodereg = $("#NoRegistrasi").val().slice(0,2);
+                                var NoRegistrasi = $("#NoRegistrasi").val();
+                                var Alasan_Cetak = $("#Alasan_Cetak").val();
+                                // if (kodereg != 'RJ' || kodereg != 'RI'){
+                                //     kodereg = 'PB';
+                                // }
+                                var lang = $("#pkuitansi_lang").val();
+                                // var jeniscetakan = $("#pkuitansi_jeniscetakan").val();
+                                jeniscetakan = 'KUITANSI';
+                                var uploadurl='SaveKuitansi';
+                                // if (jeniscetakan == 'KUITANSIREKAP'){
+                                //     var url = 'SaveKuitansiRekap';
+                                // }else if(jeniscetakan == 'KUITANSI'){
+                                //     var url = 'SaveKuitansi';
+                                // }else if(jeniscetakan == 'RINCIANBIAYA_PB'){
+                                //     var url = 'SaveRincianPB';
+                                // }else if(jeniscetakan == 'RINCIANBIAYA_RJ'){
+                                //     var url = 'SaveRincianRJ';
+                                // }else if(jeniscetakan == 'RINCIANBIAYA_RI'){
+                                //     var url = 'SaveRincianRI';
+                                // }
+                                gouploadtoAwsEmaterai(notrs,kodereg,lang,jeniscetakan,uploadurl,email,NoRegistrasi,Alasan_Cetak);
+                                // cekEmateraiByNotrs(notrs);
+                                // console.log(notrs,kodereg,lang,jeniscetakan,url,email);return false;
+                    } 
+                });
+});
+
+
+async function gouploadtoAwsEmaterai(notrs,kodereg,lang,jeniscetakan,uploadurl,email,NoRegistrasi,Alasan_Cetak) {
+    try {
+        $(".preloader").fadeIn();
+
+        const awsurl = await uploadtoAws_filepdfEmaterai(notrs,kodereg,lang,jeniscetakan,uploadurl,NoRegistrasi,Alasan_Cetak);
+        // if ($("#pkuitansi_jeniscetakan").val() == 'KUITANSIREKAP'){
+        //     var uploadurl = 'SendMailKuitansiRekap';
+        //     var judul = 'Kuitansi Rekap';
+        // }else if($("#pkuitansi_jeniscetakan").val() == 'KUITANSI'){
+             var uploadurl = 'SendMailKuitansi';
+             var judul = 'Kuitansi';
+        // }else{
+        //     var uploadurl = 'SendMailRincian';
+        //     var judul = 'Rincian Biaya';
+        // }
+        updateUIdataGenerateEmaterai(awsurl);
+
+        // await SendEmailEmaterai(judul,email,awsurl);
+        // await CreateEmaterai(judul,email,awsurl);
+
+    } catch (err) {
+        //console.log(err);
+        toast(err, "error")
+    }
+}
+async function uploadtoAws_filepdfEmaterai(notrs,kodereg,lang,jeniscetakan,uploadurl,NoRegistrasi,Alasan_Cetak){
+var base_url = window.location.origin;
+let url = base_url + '/SIKBREC/public/aBillingPasien/'+uploadurl;
+return fetch(url, {
+method: 'POST',
+headers: {
+    "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+},
+body:   'notrs='+notrs+
+        '&jeniscetakan='+jeniscetakan+
+        '&kodereg='+kodereg+
+        '&lang='+lang+
+        '&periode_awal='+$("#tglawal").val()+
+        '&periode_akhir='+$("#tglakhir").val()+
+        '&NoRegistrasi='+NoRegistrasi+
+        '&Alasan_Cetak='+Alasan_Cetak
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error(response.statusText)
+    }
+    return response.json();
+})
+.then(response => {
+    if (response.status === "error") {
+        throw new Error(response.message.errorInfo[2]);
+        // console.log("ok " + response.message.errorInfo[2])
+    } else if (response.status === "warning") {
+        throw new Error(response.errorname);
+        // console.log("ok " + response.message.errorInfo[2])
+    }
+    return response
+})
+.finally(() => {
+    //$("#NamaPenjamin").select2();
+})
+}
+function updateUIdataGenerateEmaterai(awsurl) {
+    let dataGenerateEmaterai = awsurl;
+    if (dataGenerateEmaterai.status == "success") {
+        $(".preloader").fadeIn();
+        swal(dataGenerateEmaterai.message,  "BERHASIL", "success");
+        asyncShowMain();
+        $(".preloader").fadeOut();
+
+    }else{
+        toast(response.message, "error")
+    }
+}
+async function SendEmailEmaterai(judul,email,awsurl) {
+    $(".preloader").fadeIn();
+
+    // console.log(judul);
+    // console.log(email);
+    // console.log(awsurl);
+    // return false;
+
+    var pkuitansi_notrs = $("#pkuitansi_notrs").val();
+    var jeniscetakan = $("#pkuitansi_jeniscetakan").val();
+    var noregistrasi = $("#NoRegistrasi").val();
+    var aws_url = awsurl['UrlEmaterai'];
+    var email = $("#pemail_pasien").val();
+
+    var materai_url = awsurl;
+
+// console.log(pkuitansi_notrs,
+//     jeniscetakan,
+//     noregistrasi,
+//     aws_url,
+//     email,
+//     materai_url); return false;
+    // var email = $("#pemail_pasien").val();
+    // if (!validateEmail(email)) {
+    //     swal({
+    //         title: "Email Tidak Sesuai Format",
+    //         text: "Maaf, Format Email Tidak Sesuai! Mohon Diperiksa Kembali!",
+    //         icon: "warning",
+    //     })
+    //     $("#pemail_pasien").focus();
+    //     $(".preloader").fadeOut();
+    //     return false;
+    //    }
+
+
+    var FormData = {
+        notrs:pkuitansi_notrs,
+        jeniscetakan:jeniscetakan,
+        noregistrasi:noregistrasi,
+        judul:judul,
+        email:email,
+        email_send:email,
+
+        aws_url:aws_url,
+        materai_url:materai_url,
+
+    }
+    var base_url = window.location.origin;
+    const url = base_url + "/SIKBREC/public/aBillingPasien/SendEmailEmaterai/";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: FormData,
+        dataType: "JSON",
+        success: function (data) {
+          $(".preloader").fadeOut();
+            if (data.status=='success'){
+              var title = 'Kirim Email Berhasil!';
+              var statuskirim = 'TERKIRIM';
+            }else{
+              var title = 'Kirim Email Gagal!';
+              var statuskirim = 'GAGAL';
+            }
+            
+            $("#notif_ShowTTD_Digital").modal('hide');
+            swal({
+              title: title,
+              text: data.message,
+              icon: data.status,
+          }).then(function() {
+
+          });
+          //INSERT TZ LOG EMAIL
+          //goInsertLog(nolab,statuskirim,email);
+
+        },
+        error: function (xhr, status) {
+          $(".preloader").fadeOut();
+          toast(xhr, status);
+            // handle errors
+            console.log(xhr,status);
+        }
+    });
+}
+async function CreateEmaterai(judul,email,awsurl) {
+    $(".preloader").fadeIn();
+    var pkuitansi_notrs = $("#pkuitansi_notrs").val();
+    var jeniscetakan = $("#pkuitansi_jeniscetakan").val();
+    var noregistrasi = $("#NoRegistrasi").val();
+    var aws_url = awsurl['aws_url'];
+    // var email = $("#pemail_pasien").val();
+    // if (!validateEmail(email)) {
+    //     swal({
+    //         title: "Email Tidak Sesuai Format",
+    //         text: "Maaf, Format Email Tidak Sesuai! Mohon Diperiksa Kembali!",
+    //         icon: "warning",
+    //     })
+    //     $("#pemail_pasien").focus();
+    //     $(".preloader").fadeOut();
+    //     return false;
+    //    }
+    var FormData = {
+        notrs:pkuitansi_notrs,
+        jeniscetakan:jeniscetakan,
+        noregistrasi:noregistrasi,
+        judul:judul,
+        email:email,
+        aws_url:aws_url,
+    }
+    var base_url = window.location.origin;
+    const url = base_url + "/SIKBREC/public/aBillingPasien/CreateEmaterai/";
+    $.ajax({
+        url: url,
+        type: "POST",
+        data: FormData,
+        dataType: "JSON",
+        success: function (response) {
+          $(".preloader").fadeOut();
+            if (response.status=='success'){
+              var title = 'Berhasil Bubuhi E-Materai!';
+              var statuskirim = 'TERKIRIM';
+            }else{
+              var title = 'Gagal Bubuhi E-Materai!';
+              var statuskirim = 'GAGAL';
+            }
+            
+            $("#notif_ShowTTD_Digital").modal('hide');
+            swal({
+              title: title,
+              text: response.message,
+              icon: response.status,
+          }).then(function() {
+
+          });
+          //INSERT TZ LOG EMAIL
+          //goInsertLog(nolab,statuskirim,email);
+
+        },
+        error: function (xhr, status) {
+          $(".preloader").fadeOut();
+          toast(xhr, status);
+            // handle errors
+            console.log(xhr,status);
+        }
+    });
+}
+
+async function cekEmateraiByNotrs(notrs) {
+    try {
+        const datacekEmateraiByNotrsGet = await cekEmateraiByNotrsGet(notrs);
+        updateUIdatacekEmateraiByNotrsGet(datacekEmateraiByNotrsGet);
+    } catch (err) {
+        toast(err.message, "error")
+    }
+}
+
+//payment Save
+function cekEmateraiByNotrsGet(notrs) {
+    var notrs = notrs;
+
+    // return false;
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/aBillingPasien/cekEmateraibyNoTRS';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: "notrs=" + notrs
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+
+function updateUIdatacekEmateraiByNotrsGet(params) {
+    let response = params;
+    console.log(response.link_response);
+    if(response.link_response == '1'){
+        var datacek = 'SUDAH ADA E-MATERAI';
+    }else{
+        var datacek = 'BELUM ADA E-MATERAI';
+    }
+    $("#pstatsu_Ematerai").val(convertEntities(datacek));
+}
+
+$('#btnSendEmail').click(function () {
+    swal({
+        title: "Kirim E-mail",
+        text: "Apakah Anda ingin Kirim E-mail ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+        .then((willDelete) => {
+            if (willDelete) {
+                var email = $("#pemail_pasien").val();
+                if (!validateEmail(email)) {
+                    swal({
+                        title: "Email Tidak Sesuai Format",
+                        text: "Maaf, Format Email Tidak Sesuai! Mohon Diperiksa Kembali!",
+                        icon: "warning",
+                    })
+                    $("#pemail_pasien").focus();
+                    $(".preloader").fadeOut();
+                    return false;
+                   }
+                   var Alasan_Cetak = $("#Alasan_Cetak").val();
+                   if ($("#Alasan_Cetak").val() == '') {
+                    swal({
+                        title: "WARNING !!!",
+                        text: "Harap Sertai Alasan !",
+                        icon: "warning",
+                    })
+                    $("#Alasan_Cetak").focus();
+                    $(".preloader").fadeOut();
+                    return false;
+                   }
+                   var notrs = $("#pkuitansi_notrs").val();
+                   var NoRegistrasi = $("#NoRegistrasi").val();
+                   var kodereg = $("#NoRegistrasi").val().slice(0,2);
+                   var lang = $("#pkuitansi_lang").val();
+
+
+                   jeniscetakan = 'KUITANSI';
+
+                goSendEmailmaterai(notrs,email,Alasan_Cetak,jeniscetakan,NoRegistrasi,kodereg,lang);
+            } 
+        });
+});
+
+async function goSendEmailmaterai(notrs,email,Alasan_Cetak,jeniscetakan,NoRegistrasi,kodereg) {
+    try {
+        const dataSendEmailmaterai = await SendEmailmaterai(notrs,email,Alasan_Cetak,jeniscetakan,NoRegistrasi,kodereg);
+        updateUIdataSendEmailmaterai(dataSendEmailmaterai);
+    } catch (err) {
+        toast(err.message, "error")
+    }
+}
+
+// async function SendEmailmaterai(notrs,email,Alasan_Cetak) {
+//     $(".preloader").fadeIn();
+//     var notrs = $("#pkuitansi_notrs").val();
+//     var email = $("#pemail_pasien").val();
+//     var Alasan_Cetak = $("#Alasan_Cetak").val();
+
+//     var FormData = {
+//         notrs:notrs,
+//         email:email,
+//         Alasan_Cetak:Alasan_Cetak,
+       
+//     }
+//     var base_url = window.location.origin;
+//     const url = base_url + "/SIKBREC/public/aBillingPasien/UpdateAlasanSendEmail/";
+//     $.ajax({
+//         url: url,
+//         type: "POST",
+//         data: FormData,
+//         dataType: "JSON",
+//         success: function (data) {
+//           $(".preloader").fadeOut();
+//             if (data.status=='success'){
+//               var title = 'Kirim Email Berhasil!';
+//               var statuskirim = 'TERKIRIM';
+//             }else{
+//               var title = 'Kirim Email Gagal!';
+//               var statuskirim = 'GAGAL';
+//             }
+            
+//             $("#notif_ShowTTD_Digital").modal('hide');
+//             swal({
+//               title: title,
+//               text: data.message,
+//               icon: data.status,
+//           }).then(function() {
+
+//           });
+//           //INSERT TZ LOG EMAIL
+//           //goInsertLog(nolab,statuskirim,email);
+
+//         },
+//         error: function (xhr, status) {
+//           $(".preloader").fadeOut();
+//           toast(xhr, status);
+//             // handle errors
+//             console.log(xhr,status);
+//         }
+//     });
+// }
+async function SendEmailmaterai(notrs,email,Alasan_Cetak,jeniscetakan,NoRegistrasi,kodereg) {
+    var base_url = window.location.origin;
+
+    var notrs = $("#pkuitansi_notrs").val();
+    var email = $("#pemail_pasien").val();
+    var Alasan_Cetak = $("#Alasan_Cetak").val();
+    var jeniscetakan = 'KUITANSI';
+    var NoRegistrasi = $("#NoRegistrasi").val();
+
+    let url = base_url + '/SIKBREC/public/aBillingPasien/UpdateAlasanSendEmail';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body:   'notrs=' +  notrs +
+                '&email=' + email + 
+                '&Alasan_Cetak=' + Alasan_Cetak + 
+                '&jeniscetakan=' + jeniscetakan + 
+                '&NoRegistrasi=' + NoRegistrasi+ 
+                '&kodereg=' + kodereg
+
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText)
+                }
+                return response.json();
+            })
+            .then(response => {
+                if (response.status === "error") {
+                    throw new Error(response.message.errorInfo[2]);
+                    // console.log("ok " + response.message.errorInfo[2])
+                } else if (response.status === "warning") {
+                    throw new Error(response.errorname);
+                    // console.log("ok " + response.message.errorInfo[2])
+                }
+                return response
+            })
+            .finally(() => {
+                
+            })
+}
+async function updateUIdataSendEmailmaterai(params) {
+    let response = params;
+    var jeniscetakan = $("#pkuitansi_jeniscetakan").val();
+    var noregistrasi = $("#NoRegistrasi").val();
+    if(response.link_response == '1'){
+        var datacek = 'SUDAH ADA E-MATERAI';
+    }else{
+        var datacek = 'BELUM ADA E-MATERAI';
+        await SendEmailEmaterai(noregistrasi,jeniscetakan,response.link_response);
+    }
+    $("#pstatsu_Ematerai").val(convertEntities(datacek));
+}
+async function CetakPDF(){
+    try{
+        var datagetCetakPDF =  await getCetakPDF();
+        updateUIdatagetCetakPDF(datagetCetakPDF);
+    } catch (err) {
+        toast(err, "error")
+    }
+}
+
+function getCetakPDF() {
+    var base_url = window.location.origin;
+    var noreg = $("#NoRegistrasi").val();
+    var nomr = $("#NoMR").val();
+    var pkuitansi_notrs = $("#pkuitansi_notrs").val();
+
+    // console.log(noreg);
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataCetakDocumentPDF';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body:
+        'nomr=' + nomr 
+        +'&noreg=' + noreg
+        +'&pkuitansi_notrs=' + pkuitansi_notrs
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            // $("#namatindakan").select2();
+        })
+}
+
+function updateUIdatagetCetakPDF(datagetCetakPDF) {
+    let responseLink = datagetCetakPDF;
+    // console.log(responseLink.link_jumlah);return false;
+    if(responseLink.link_jumlah == '0'){
+        // console.log('sasdgd');return false;
+var base_url = window.location.origin;
+
+var jeniscetak = 'PrintKuitansiDetail';
+var notrs = $("#NoRegistrasi").val();
+var no_trs = $("#pkuitansi_notrs").val();
+
+var kodereg = $("#NoRegistrasi").val().slice(0, 2);
+var lang = no_trs;
+// console.log(jeniscetak,notrs,kodereg,lang);return false;
+window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintKuitansiDetail/" + lang +"/"+kodereg+"/"+notrs, "_blank",
+        "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    }else if(responseLink.link_jumlah == '1'){
+    window.open(responseLink.link_response);
+    }else{
+        var base_url = window.location.origin;
+
+        var jeniscetak = 'PrintKuitansiDetail';
+        var notrs = $("#NoRegistrasi").val();
+        var no_trs = $("#pkuitansi_notrs").val();
+        
+        var kodereg = $("#NoRegistrasi").val().slice(0, 2);
+        var lang = no_trs;
+        // console.log(jeniscetak,notrs,kodereg,lang);return false;
+        window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintKuitansiDetail/" + lang +"/"+kodereg+"/"+notrs, "_blank",
+                "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    }
+}
+//bridging materai

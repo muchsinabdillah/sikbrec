@@ -23,12 +23,12 @@
                                     <th align="center">Accession Number</th>
                                     <th align="center">Total</th>
                                     <th align="center">Status</th>
-                                    <th align="center">Action</th>
+                                    <!-- <th align="center">Action</th> -->
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th colspan="8"></th>
+                                    <th colspan="7"></th>
                                     <th align="center"><button type="button" title="Approve Yang Dipilih"
                                             class="btn btn-success btn-xs" id="cb_approveRadiologyall"
                                             name="cb_approveRadiologyall" onclick="BtnApproveRad(this)"><span

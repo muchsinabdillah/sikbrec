@@ -86,6 +86,10 @@ class ReturJual extends Controller
         echo json_encode($this->model('I_ReturJual_Model')->addReturJualFinishbyReg($_POST));
     }
 
+    public function voidReturJualPerRegister(){
+        echo json_encode($this->model('I_ReturJual_Model')->voidReturJualPerRegister($_POST));
+    }
+
     
     
 }

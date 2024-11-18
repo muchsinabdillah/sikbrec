@@ -141,5 +141,9 @@ class PencairanKasbon extends Controller
     {
         echo json_encode($this->model('A_PencairanKasbon_Model')->batalPenyelesaianPencairanKasbon($_POST));
     }
+    public function showDataRealisasiPencairanbyUser()
+    {
+        echo json_encode($this->model('A_PencairanKasbon_Model')->showDataRealisasiPencairanbyUser($_POST));
+    }
     
 }

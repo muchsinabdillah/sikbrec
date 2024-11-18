@@ -428,6 +428,12 @@ async function asyncShowMain() {
             updateUIdatagetMutasibyIDD(datagetMutasibyIDD);
             enableAll();
         }
+        
+        $("#TglTransaksi").attr('readonly',true);
+        $('#LokasiAwalOrderx option:not(:selected)').prop('disabled', true);
+        $('#LokasiTujuanStokx option:not(:selected)').prop('disabled', true);
+        $('#JenisStok').prop('readonly', true);
+        $('#jenistransaksi').prop('readonly', true);
        
     } catch (err) {
         toast(err, "error")

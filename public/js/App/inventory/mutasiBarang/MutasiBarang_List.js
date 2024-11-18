@@ -13,6 +13,7 @@ function showdatatabel() {
     }).fnDestroy();
     $('#example').DataTable({
         "ordering": true,
+        "order":['1','desc'],
         "ajax": {
             "url": base_url + "/SIKBREC/public/OrderMutasiBarang/getMutasibyDateUser",
             "dataSrc": "",

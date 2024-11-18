@@ -130,9 +130,10 @@ $(document).ready(function () {
               $("#QtyStok").val(ui.item.qty);
               $("#Satuan").val(ui.item.Satuan_Beli);
               //$("#hpp_add").val(ui.item.NilaiHpp);
-              $("#HargaProduct").val(ui.item.NilaiHpp);
+              //$("#HargaProduct").val(ui.item.NilaiHpp);
               $("#Satuan_Konversi").val(ui.item.Satuan);
-              $("#Konversi_satuan").val(ui.item.konversisatuan); 
+              $("#Konversi_satuan").val(ui.item.konversisatuan);
+              getHargaJualFix(ui.item.id); 
               return false; 
           }
   })
@@ -153,10 +154,13 @@ $(document).ready(function () {
 
           if($('#totalrow').val()==0){
             var count =0;
+            var countid =0;
           }else{
             var count = parseFloat($('#totalrow').val());
+            var countid = parseFloat($('#datatable_prdetail >tbody >tr:last').attr('id'));
           }
           count = count + 1;
+          countid = countid + 1;
           total_items = count;
           //document.getElementById('grantotalOrder').innerHTML = count;
           $('#totalrow').val(count);
@@ -172,13 +176,13 @@ $(document).ready(function () {
           hidden_hpp_barang_ = 5;
           hidden_total_barang_ = 5;
           hidden_signa_terjemahan = $('#SignaTerjemahan').val();
-          harga = $('#HargaProduct').val();
+          harga = number_to_price($('#HargaProduct').val());
           UangR = 0;
           Embalase = 0;
 
           var totalitem = $("#totalrow").val();
             for (i = 1; i <= totalitem; i++) { 
-                if (hidden_kode_barang == $("#hidden_kode_barang"+i).val() ){
+                if (hidden_kode_barang == $("#hidden_kode_barang"+$('#datatable_prdetail tr').eq(i).attr('id')).val() ){
                     swal({
                         title: "Warning",
                         text: hidden_nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
@@ -207,24 +211,40 @@ $(document).ready(function () {
             UangR:UangR,
             Embalase:Embalase,
             }
-            console.log(number_to_price((val.QryOrder)),'dd');
-          var newRow = $("<tr id='row_'" + total_items + "'>");
-            /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
-            /*2*/ "'<td><font size='2'>" + isracik +"<input type='hidden'  name='hidden_racik_[]' id='hidden_racik_'" + total_items + "' value='" + val.Racik +"' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_'" + total_items + "' value='" + val.Header +"' ><input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ></font></td>'"+
-            /*3*/"'<td><font size='1'>" + val.Satuan_Konversi + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Konversi +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font></td>'"+
-            /*2*/ "'<td>" + val.KodeBarang +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' value='" + val.KodeBarang +"' ></td> '"+
-            /*3*/"'<td><font size='2'>" + val.NamaBarang +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.NamaBarang +"' ></font></td>'"+
-            /*3*/"'<td><font size='2'>" + val.Signa +"<input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'" + total_items + "' value='" + val.Signa +"' ></font></td>'"+
-            /*3*/"'<td><font size='2'><input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value='" + val.SignaTerjemahan +"'></font></td>'"+
-            /*4*/"' <td>" + val.QryOrder + "<input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + val.QryOrder +"' ></td> '"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + val.QryOrder +"' ></td> '"+
-            /*5*/"' <td>" + number_to_price(val.Harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(val.Harga) + "' ></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+val.UangR+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+val.Embalase+"'></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
-            // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
-                "  </tr>")
-                ;
+        //   var newRow = $("<tr id='row_'" + total_items + "'>");
+        //     /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
+        //     /*2*/ "'<td><font size='2'>" + isracik +"<input type='hidden'  name='hidden_racik_[]' id='hidden_racik_'" + total_items + "' value='" + val.Racik +"' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_'" + total_items + "' value='" + val.Header +"' ><input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ></font></td>'"+
+        //     /*3*/"'<td><font size='1'>" + val.Satuan_Konversi + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Konversi +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font></td>'"+
+        //     /*2*/ "'<td>" + val.KodeBarang +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' value='" + val.KodeBarang +"' ></td> '"+
+        //     /*3*/"'<td><font size='2'>" + val.NamaBarang +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.NamaBarang +"' ></font></td>'"+
+        //     /*3*/"'<td><font size='2'>" + val.Signa +"<input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'" + total_items + "' value='" + val.Signa +"' ></font></td>'"+
+        //     /*3*/"'<td><font size='2'><input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value='" + val.SignaTerjemahan +"'></font></td>'"+
+        //     /*4*/"' <td>" + val.QryOrder + "<input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + val.QryOrder +"' ></td> '"+
+        //     /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + val.QryOrder +"' ></td> '"+
+        //     /*5*/"' <td>" + number_to_price(val.Harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(val.Harga) + "' ></td> '"+
+        //     /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
+        //     /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+val.UangR+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+val.Embalase+"'></td> '"+
+        //     /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+        //     // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
+        //         "  </tr>")
+        //         ;
+
+            var newRow = `
+                    <tr id='${countid}'>
+                    <td><font size='2'>${isracik}<input type='hidden'  name='hidden_racik_[]' id='hidden_racik_${countid}' value='${val.Racik}' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_${countid}' value='${val.Header}' ><input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'${countid}' value='${val.ID}' ></font></td>
+                    <td><font size='1'>${val.Satuan_Konversi}<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_${countid}' value='${val.Satuan}' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_${countid}' value='${val.Satuan_Konversi}' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'${countid}' value='${val.Konversi_satuan}' ></font></td>
+                    <td>${val.KodeBarang}<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang${countid}' value='${val.KodeBarang}' ></td>
+                    <td><font size='2'>${val.NamaBarang}<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_${countid}' value='${val.NamaBarang}' ></font></td>
+                    <td><font size='2'>${val.Signa}<input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'${countid}' value='${val.Signa}' ></font></td>
+                    <td><font size='2'><input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan${countid}' value='${val.SignaTerjemahan}'></font></td>
+                    <td>${val.QryOrder}<input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_${countid}' value='${val.QryOrder}' ></td>
+                    <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_${countid}' value='${val.QryOrder}' ></td>
+                    <td>${number_to_price(val.Harga)}<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_${countid}' value='${parseFloat(val.Harga)}' ></td>
+                    <td><font size='1'><input type='text' style="width: 75px;" name='hidden_subtotal_[]' id='hidden_subtotal_${countid}' readonly></font></td>
+                    <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_${countid}' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_${countid}' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_${countid}' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_${countid}' ><input  size='2'  type='hidden'  name='uangr[]' id='uangr${countid}' value='${val.UangR}'><input  size='2'  type='hidden'  name='embalase[]' id='embalase${countid}' value='${val.Embalase}'></td>
+                    <td><font size='1'><input type='text' style="width: 75px;" name='hidden_grandtotal_[]' id='hidden_grandtotal_${countid}' readonly></font></td>
+                    <td><button type='button' name='cetak_label' class='btn btn-info btn-xs cetak_label btn-rounded'onclick='CetakLabelPdf("${countid}")'><i class="fa fa-print"></i> Label</button>&nbsp <button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${countid}' ><i class="fa fa-close"></i> Delete</Hapus></td>
+            `
 
             // output = '<tr id="row_closing_' + count + '">';
             // output += '<td>' + hidden_kode_barang+ ' <input type="hidden" name="hidden_kode_barang[]" id="first_name' + count +'" class="hidden_kode_barang" value="' + hidden_kode_barang+ '" /></td>';
@@ -251,6 +271,20 @@ $(document).ready(function () {
             $("#nama_Barang").focus();
             
     });
+
+    $("#btnCetakResep").click(function() {
+        var notrs = $("#No_Order").val(); 
+        var base_url = window.location.origin;
+        window.open(base_url + "/SIKBREC/public/aPenjualanDenganResep/CetakResepv2/" + notrs , "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    })
+
+    $("#btnCopyResep").click(function() {
+        var notrs = $("#No_Order").val(); 
+        var base_url = window.location.origin;
+        window.open(base_url + "/SIKBREC/public/aPenjualanDenganResep/CopyResepv2/" + notrs , "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    })
 
 });
 
@@ -341,10 +375,11 @@ function showdatatabel(TransactionCode) {
                 //         var signaterjemahanext = "<input type='hidden'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value=''>";
                 //     }
                 // }else{
-                      var isracik = '<span class="label label-warning">NON RACIK</span>';
+                      //var isracik = '<span class="label label-warning">NON RACIK</span>';
+                      var isracik = 'NON RACIK';
                       //var issignaracik = "<br>Signa Latin: "+val.Signa+"<br>Signa Terjemahan: "+val.SignaTerjemahan;
                       var NamaBarang = '<span class="label label-'+LabelClassNamaBarang+'" onclick=\'updateSignaTerjemahan("'+val.ID+'","'+val.Racik+'","'+val.Header+'","'+val.NamaBarang+'","'+val.Signa+'","'+val.SignaTerjemahan+'")\'> '+val.NamaBarang+ '</span>';
-                      var signaterjemahanext = "<input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan'" + total_items + "' value='" + val.AturanPakai +"'>";
+                      var signaterjemahanext = "<input type='text'  name='hidden_signa_terjemahan[]' id='hidden_signa_terjemahan" + total_items + "' value='" + val.AturanPakai +"'>";
                 //}
 
                 // document.getElementById('totalrow').innerHTML = total_items;
@@ -360,11 +395,14 @@ function showdatatabel(TransactionCode) {
                 converted_qtysalesremain = val.QtySalesRemain.replace(".", ",");
                 converted_subtotal = val.Subtotal.replace(".", ",");
                 converted_tax = val.Tax.replace(".", ",");
+                converted_uangr = val.UangR.replace(".", ",");
+                converted_embalase = val.Embalase.replace(".", ",");
 
-                var newRow = $("<tr id='row_'" + total_items + "'>");
-            /*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
+                var newRow = $("<tr id='" + total_items + "'>");
+            /*1*/  newRow.html(
+                //"<td><font size='1'>" + total_items + "</td>'"+
             /*2*/ "'<td><font size='2'>" + isracik +"<input type='hidden'  name='hidden_racik_[]' id='hidden_racik_'" + total_items + "' value='" + val.Racik +"' ><input type='hidden'  name='hidden_racik_header_[]' id='hidden_racik_header_'" + total_items + "' value='" + val.Header +"' ><input type='hidden'  name='hidden_ID_[]' id='hidden_ID_'" + total_items + "' value='" + val.ID +"' ></font></td>'"+
-            /*3*/"'<td><font size='1'>" + val.Satuan + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Beli +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font></td>'"+
+            /*3*/"'<td><font size='1'>" + val.Satuan + "<input type='hidden'  name='hidden_satuan_barang_[]' id='hidden_satuan_barang_'" + total_items + "' value='" + val.Satuan +"' ><input type='hidden'  name='hidden_satuan_konversi_[]' id='hidden_satuan_konversi_'" + total_items + "' value='" + val.Satuan_Beli +"' ><input type='hidden'  name='hidden_konversi_satuan_[]' id='hidden_konversi_satuan_'" + total_items + "' value='" + val.Konversi_satuan +"' ></font><input  size='2'  type='hidden'  name='uangr[]' id='uangr" + total_items + "' value='"+converted_uangr+"'><input  size='2'  type='hidden'  name='embalase[]' id='embalase" + total_items + "' value='"+converted_embalase+"'></td>'"+
             /*2*/ "'<td>" + val.ProductCode +"<input type='hidden' name='hidden_kode_barang[]' id='hidden_kode_barang" + total_items + "' value='" + val.ProductCode +"' ></font></td> '"+
             /*3*/"'<td><font size='2'>" + val.ProductName +"<input type='hidden'  name='hidden_nama_barang_[]' id='hidden_nama_barang_'" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
             /*3*/"'<td><font size='2'><input type='hidden'  name='hidden_signa_latin_[]' id='hidden_signa_latin_'" + total_items + "' value='' ></font></td>'"+
@@ -372,9 +410,10 @@ function showdatatabel(TransactionCode) {
             /*4*/"' <td>" + converted_qty + "<input type='hidden' name='hidden_qty_barang_[]' id='hidden_qty_barang_" + total_items +"' value='" + converted_qty +"' ></td> '"+
             /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_qtyreal_barang_[]' id='hidden_qtyreal_barang_" + total_items + "' value='" + converted_qtyresep +"' ></td> '"+
             /*5*/"' <td>" + number_to_price(converted_harga) + "<input type='hidden'  name='hidden_harga_barang_[]' id='hidden_harga_barang_" + total_items + "' value='" + parseFloat(converted_harga) + "' ></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
+            /*3*/"'<td><font size='1'><input type='text' style='width: 75px;' name='hidden_subtotal_[]' id='hidden_subtotal_" + total_items + "' readonly></font></td>'"+
             /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='hidden_discpros_barang_[]' id='hidden_discpros_barang_" + total_items + "' value='0'><input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_discrp_barang_[]' id='hidden_discrp_barang_" + total_items + "' value='0'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxprosen_[]' id='hidden_taxprosen_" + total_items + "' value='11'> <input  size='2'  type='hidden' onkeydown='FormatCell(this)'  name='hidden_taxrp_[]' id='hidden_taxrp_" + total_items + "' ></td> '"+
-            /*3*/"'<td><font size='1'><input type='text'  name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+            /*3*/"'<td><font size='1'><input type='text' style='width: 75px;' name='hidden_grandtotal_[]' id='hidden_grandtotal_" + total_items + "' readonly></font></td>'"+
+            `<td><button type='button' name='cetak_label' class='btn btn-info btn-xs cetak_label btn-rounded'onclick='CetakLabelPdf("${total_items}")'><i class="fa fa-print"></i> Label</button>&nbsp <button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${total_items}' ><i class="fa fa-close"></i> Delete</Hapus></td>`+
             // /*14*/"<td> <button type='button' onclick=goVoidDetails('" + val.ProductCode + "') name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='" + total_items + "' >Delete</Hapus></td> " +
                 "  </tr>")
                 ;
@@ -505,24 +544,24 @@ function calculateAllDetail(){
     var total_items = $('#totalrow').val();
     //console.log($("#hidden_qty_barang_2").val());return false; 
     for (i = 1; i <= total_items; i++) {
-       
+        var idx = $('#datatable_prdetail tr').eq(i).attr('id');
         //var qtyx = document.getElementById("hidden_qty_barang_" + i);
 
-        var qty = parseFloat(price_to_number($("#hidden_qtyreal_barang_" + i).val()));
-        var qtymr = parseFloat(price_to_number($("#hidden_qty_barang_" + i).val()));
-        var disconprosen = parseFloat(price_to_number($("#hidden_discpros_barang_" + i).val()));
+        var qty = parseFloat(price_to_number($("#hidden_qtyreal_barang_" + idx).val()));
+        var qtymr = parseFloat(price_to_number($("#hidden_qty_barang_" + idx).val()));
+        var disconprosen = parseFloat(price_to_number($("#hidden_discpros_barang_" + idx).val()));
         //var disconprosen = 0;
-        var harga = parseFloat(price_to_number($("#hidden_harga_barang_" + i).val()));
-        var taxprosen = parseFloat(price_to_number($("#hidden_taxprosen_" + i).val()));
+        var harga = parseFloat(price_to_number($("#hidden_harga_barang_" + idx).val()));
+        var taxprosen = parseFloat(price_to_number($("#hidden_taxprosen_" + idx).val()));
         //var taxprosen = 0;
 
 
         // if (typeof qtyx === 'undefined' || qtyx === null) {
-        //     alert("No such item - " + "hidden_qty_barang_" + i); 
+        //     alert("No such item - " + "hidden_qty_barang_" + idx); 
         // } else {
             if (qty > qtymr) {
                 toast('Qty Order Lebih Besar daripada Qty Real !', 'warning'); 
-                $("#hidden_qtyreal_barang_"+i).val(0);
+                $("#hidden_qtyreal_barang_"+idx).val(0);
                 return false;
             } else  { 
                 subtotal = parseFloat(harga) * qty;
@@ -549,14 +588,14 @@ function calculateAllDetail(){
                 subtotal_all = subtotal_all + subtotal;
                 
             }
-            $("#hidden_discrpttl_barang_" + i).val(number_to_price(totaldiskonrp));
-            $("#hidden_discrp_barang_" + i).val(number_to_price(hargamindiskon));
-            $("#hidden_subtotal_" + i).val(number_to_price(subtotal));
-            $("#grandtotalqty" + i).val(number_to_price(qtytotal));
-            $("#hidden_taxrp_" + i).val(number_to_price(taxrp));
-            $("#hidden_taxrp2_" + i).val(number_to_price(taxrp_stn));
-            $("#hidden_grandtotal_" + i).val(number_to_price(grandtotalPurchase));
-            $("#hidden_harga_barang_" + i).val(number_to_price(harga));
+            $("#hidden_discrpttl_barang_" + idx).val(number_to_price(totaldiskonrp));
+            $("#hidden_discrp_barang_" + idx).val(number_to_price(hargamindiskon));
+            $("#hidden_subtotal_" + idx).val(number_to_price(subtotal));
+            $("#grandtotalqty" + idx).val(number_to_price(qtytotal));
+            $("#hidden_taxrp_" + idx).val(number_to_price(taxrp));
+            $("#hidden_taxrp2_" + idx).val(number_to_price(taxrp_stn));
+            $("#hidden_grandtotal_" + idx).val(number_to_price(grandtotalPurchase));
+            $("#hidden_harga_barang_" + idx).val(number_to_price(harga));
  
 
         //}
@@ -1112,6 +1151,8 @@ function disableAll() {
 
 
     $("#btnNewTransaksi").attr('disabled', true);
+    $('#JenisPasien option:not(:selected)').prop('disabled', true);
+    $('#JenisKelamin option:not(:selected)').prop('disabled', true);
 
     showdatatabel(dataResponse.data[0].TransactionCode);
 }
@@ -1292,9 +1333,11 @@ function changeVal (e){
     $("#Unit").val(e.value)
 }
 
-function changeValJaminan (e){
-    $("#KodeJaminan").val(e.value)
-    $("#KodeJaminan_Nama").val($('#KodeJaminan_Select option:selected').text())
+async function changeValJaminan (e){
+    // $("#KodeJaminan").val(e.value)
+    // $("#KodeJaminan_Nama").val($('#KodeJaminan_Select option:selected').text())
+    const dataPenjamin = await getPenjeminbyID(e.value,$("#TipePasien").val());
+    updateUIgetPenjeminbyID(dataPenjamin);
 }
 
 function isKaryawan (param){
@@ -1497,4 +1540,157 @@ return fetch(url, {
     .finally(() => {
         $("#KodeJaminan_Select").select2();
     })
+}
+
+
+$(document).on('click', '.remove_details', function () {
+    var row_id = $(this).attr("id");
+    swal({
+        title: "Are you sure?",
+        text: "Apakah anda yakin Ingin hapus data ini ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
+            //$('#row_' + row_id + '').remove();
+            $(this).closest("tr").remove();
+            var count = $('#totalrow').val();
+            count = count - 1 ;
+            //document.getElementById('grantotalOrder').innerHTML = count;
+            $('#totalrow').val(count);
+            toast('Berhasil Hapus !', "success")
+            calculateAllDetail();
+        } else {
+          //swal("Your imaginary file is safe!");
+        }
+      });
+
+    });
+
+    function CetakLabelPdf(index){
+        const code = $("#hidden_kode_barang"+index).val()
+        const signa = $("#hidden_signa_terjemahan"+index).val()
+        const qty = $("#hidden_qtyreal_barang_"+index).val()
+        const NoMR = '-'
+        const PatientName = $("#Nama").val() 
+        const NoRegistrasi = $("#NoRegistrasi").val() 
+        const dob = $("#Tgl_Lahir").val() 
+        const TglResep = $("#Tgl_Penjualan").val() 
+        const notrs = '-'
+            const obj = JSON.parse(`
+                {
+                "productcode":"${code}", 
+                "signa":"${signa}", 
+                "qty":"${qty}",
+                "NoMR":"${NoMR}",
+                "PatientName":"${PatientName}",
+                "NoRegistrasi":"${NoRegistrasi}",
+                "dob":"${dob}",
+                "TglResep":"${TglResep}",
+                "notrs":"${notrs}"
+                }
+                `);
+            var mybj = JSON.stringify(obj);
+            var mybj = btoa(mybj);
+            var base_url = window.location.origin;
+            window.open(base_url + "/SIKBREC/public/aPenjualanDenganResep/CetakLabelPdf/" + mybj , "_blank",
+                "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    }
+
+    async function getHargaJualFix(idbarang){  
+        const data = await gogetHargaJualFix(idbarang);
+        updategogetHargaJualFix(data);
+    }
+    function updategogetHargaJualFix(params){
+    
+        if (params.status) {
+            $("#HargaProduct").val(params.data);
+        } else {
+            $("#HargaProduct").val('0');
+           toast(params.message, "error") 
+        } 
+    }
+    function gogetHargaJualFix(idbarang) {
+    
+        var kodebarang = idbarang; 
+        var NoRegistrasi = '-'; 
+        var KodeGroupJaminan = $("#GroupJaminan").val(); //xedit  
+        var Kelasid = '3';     
+        var tgl = document.getElementById("Tgl_Penjualan").value; 
+        var TransasctionDate = tgl.replace('Z', '').replace('T', ' ').replace('.000', '');
+        var base_url = window.location.origin;
+        let url = base_url + '/SIKBREC/public/InventoryCharged/gogetHargaJualFix/';
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+            body: 'kodebarang=' + kodebarang + '&NoRegistrasi=' + NoRegistrasi + '&GroupJaminan=' + KodeGroupJaminan + '&TransasctionDate=' + TransasctionDate 
+            + '&Kelasid=' + Kelasid 
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText)
+                }
+                return response.json();
+            })
+            .then(response => {
+                if (response.status === "error") {
+                    throw new Error(response.message.errorInfo[2]);
+                    // console.log("ok " + response.message.errorInfo[2])
+                } else if (response.status === "warning") {
+                    throw new Error(response.errorname);
+                    // console.log("ok " + response.message.errorInfo[2])
+                }
+                return response
+            })
+            .finally(() => {
+                $(".preloader").fadeOut();
+            })
+    }
+
+    
+function updateUIgetPenjeminbyID(dataGetDataJaminan) {
+    let dataResponse = dataGetDataJaminan;
+    $("#GroupJaminan").val(dataResponse.data.Group_Jaminan)
+    $("#KodeJaminan").val(dataResponse.data.ID)
+    $("#KodeJaminan_Nama").val(dataResponse.data.NamaPerusahaan)
+}
+
+async function getPenjeminbyID(id,tipepasien) {
+    var base_url = window.location.origin;
+    if (tipepasien == '2'){
+        var endpoint = '/SIKBREC/public/MasterDataAsuransi/getAsuransiId/';
+    }else{
+        var endpoint = '/SIKBREC/public/MasterDataPerusahaan/getPerusahaanId/';
+    }
+    let url = base_url + endpoint;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'id=' + id
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
 }

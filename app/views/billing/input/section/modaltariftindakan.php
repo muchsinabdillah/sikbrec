@@ -107,6 +107,7 @@
                                        <label for="inputEmail3" class="col-sm-2 control-label"> Tindakan </label>
                                        <div class="col-sm-10">
                                            <input type="text" class="form-control" id="tindakannew" name="tindakannew" readonly>
+                                           <input type="text" class="form-control" id="idtrstariftdk" name="idtrstariftdk" readonly>
                                        </div>
                                        <br>
                                        <label for="inputEmail3" class="col-sm-2 control-label"> Tarif </label>

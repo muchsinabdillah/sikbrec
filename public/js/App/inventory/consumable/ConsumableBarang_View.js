@@ -1,14 +1,36 @@
 $(document).ready(function () {
 
     $(document).on('click', '.remove_details', function () {
-        $('#row_closing_' + row_id + '').remove();
-        $('#row_closing_')
-        var count = $('#totalrow_closing').val();
-        //console.log(count);
-        count = count - 1 ;
-        document.getElementById('grantotalOrder_closing').innerHTML = count;
-        $('#totalrow_closing').val(count);
-        CalculateALL()
+        // $('#row_closing_' + row_id + '').remove();
+        // $('#row_closing_')
+        // var count = $('#totalrow_closing').val();
+        // //console.log(count);
+        // count = count - 1 ;
+        // document.getElementById('grantotalOrder_closing').innerHTML = count;
+        // $('#totalrow_closing').val(count);
+        // CalculateALL()
+
+        swal({
+            title: "Are you sure?",
+            text: "Apakah anda yakin Ingin hapus data ini ?",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+          })
+          .then((willDelete) => {
+            if (willDelete) {
+                //$('#row_' + row_id + '').remove();
+                $(this).closest("tr").remove();
+                var count = $('#totalrow_closing').val();
+                count = count - 1 ;
+                //document.getElementById('grantotalOrder').innerHTML = count;
+                $('#totalrow_closing').val(count);
+                toast('Berhasil Hapus !', "success")
+                CalculateALL();
+            } else {
+              //swal("Your imaginary file is safe!");
+            }
+          });
     });
     //$(".preloader").fadeOut();
     asyncShowMain();
@@ -47,7 +69,6 @@ $(document).ready(function () {
                 } else {
                 }
             });
-
     });
 
     $( "#nama_Barang" ).autocomplete({
@@ -84,6 +105,7 @@ $(document).ready(function () {
                 $("#Satuan_Konversi").val(ui.item.Satuan);
                 $("#Konversi_satuan").val(ui.item.konversisatuan); 
               //getBarangbyId(ui.item.id);
+              getHargaJualFix(ui.item.id);
               return false; 
           }
   })
@@ -175,12 +197,13 @@ $(document).ready(function () {
 
     //Btn add detail
     $("#btnAdd").click(function () { 
-        AddRow();
+        //AddRow();
+        AddRowTemp();
     });
 
     $("#QtyOrder").keyup(function (e) { 
         if (e.keyCode == 13) { 
-            AddRow();
+            AddRowTemp();
         }
     });
 
@@ -262,6 +285,10 @@ $(document).ready(function () {
                     }
                 });
         });
+
+        $('#CloseMex').click(function () {
+            $("#btnPaketDetail_modal").modal('hide')
+        });
     
 
 
@@ -287,6 +314,12 @@ function updateUIgoSave(params) {
         });
     }else{
         toast(params.message, "error")
+        swal({
+            title: 'Warning',
+            text: params.message,
+            icon: 'warning',
+        }).then(function() {
+        });
     }
 }
 function goSave2() {
@@ -510,7 +543,8 @@ function addDetailsConsumableperitem(){
         $("#xNamaBarang").focus();
         toast("Nama Barang Kosong !", 'warning');
         return false;
-    } kode_barang
+    } 
+    //kode_barang
 
     if($("#QtyOrder").val() == '' || $("#QtyOrder").val() == 0 ){
         $("#QtyOrder").focus();
@@ -518,6 +552,8 @@ function addDetailsConsumableperitem(){
         return false;
     }
 
+    var date = document.getElementById("TglTransaksi").value;
+    var TransasctionDate = date.replace('Z', '').replace('T', ' ').replace('.000', '');
     var No_Transaksi = $('#No_Transaksi').val();
     var kode_barang = $('#xIdBarang').val();  
     var nama_barang = $('#xNamaBarang').val();
@@ -543,6 +579,7 @@ function addDetailsConsumableperitem(){
                 + '&hpp_barang=' + hpp_barang + '&persediaan=' + persediaan + '&totalpakai=' + totalpakai 
                 + '&No_Transaksi=' + No_Transaksi    
                 + '&UnitTujuan=' + UnitTujuan   
+                + '&TransasctionDate=' + TransasctionDate   
     })
         .then(response => {
             if (!response.ok) {
@@ -570,7 +607,13 @@ function updateaddDetailsConsumableperitem(params){
         toast(params.message, "success")
         var idtrs = $('#No_Transaksi').val();
         showDataDetil_View(idtrs);
-         
+        $("#xIdBarang").val('');
+        $("#xNamaBarang").val('')
+        $("#Satuan_Konversi").val('');
+        $("#QtyStok").val('');
+        $("#QtyOrder").val('');
+        $("#nama_Barang").val('');
+        $("#nama_Barang").focus(); 
     }else{
         toast(params.message, "error")
     }
@@ -1130,17 +1173,18 @@ function showDataDetil_View(TransasctionCode) {
                 total_items = total_items + 1;
                 //$("#totalrow").val(total_items);
                 // document.getElementById('totalrow').innerHTML = total_items;
-                var newRow = $("<tr id='row_'" + total_items + "'>");
+                var newRow = $("<tr id='" + total_items + "'>");
             //*1*/  newRow.html("<td><font size='1'>" + total_items + "</td>'"+
             /*2*/ newRow.html("'<td>" + val.ProductCode +"<input type='hidden' name='kode_barang[]' id='kode_barang" + total_items + "' class='kode_barang'"+total_items + "' value='" + val.ProductCode +"' ></font></td> '"+
             /*3*/"'<td><font size='1'>" + val.ProductName + "<input type='hidden'  name='nama_barang_[]' id='nama_barang_" + total_items + "' value='" + val.ProductName +"' ></font></td>'"+
             /*4*/"' <input type='hidden' name='satuan_barang_[]' id='satuan_barang_" + total_items +"' value='" + val.Satuan +"'>"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='qty_barang_[]' id='qty_barang_" + total_items + "' value='" + val.Qty +"' ></td> '"+
+            /*6*/"' <td><input  size='2' autocomplete='off' type='text' onkeydown='FormatCell(this)'  name='qty_barang_[]' id='qty_barang_" + total_items + "' value='" + val.Qty +"' ></td> '"+
              /*7*/"' <td>"+val.Satuan_Konversi+"<input size='1'  value='" + val.Satuan_Konversi + "' type='hidden' name='satuan_konversi_[]'   id='satuan_konversi_" + total_items +"' ></td>'"+
              /*7*/"'<td>"+val.KonversiQty+"<input size='1'  value='" + val.KonversiQty + "' type='hidden' name='satuan_qty_[]'   id='satuan_qty_" + total_items +"' ></td>'"+
             /*8*/"' <td><input size='5' readonly  type='text' name='hpp_barang_[]' onkeydown='FormatCell(this)'  id='hpp_barang_" + total_items + "' class='harga'  value='" + val.Hpp + "' ></td> '"+
             /*9*/"' <td><input size='1' readonly value='" + val.Total + "' type='text' name='total_barang_[]'   id='total_barang_" + total_items +"' >"+
-            /*10*/"<td> <button type='button' onclick=\'deletedetilPerItem("+val.ProductCode+","+total_items+")\'  name='remove_details' class='btn btn-warning btn-xs remove_details' id='" + total_items + "' >Delete</Hapus> " +
+            // /*10*/"<td> <button type='button' onclick=\'deletedetilPerItem("+val.ProductCode+","+total_items+")\'  name='remove_details' class='btn btn-warning btn-xs remove_details' id='" + total_items + "' >Delete</Hapus> " +
+            `<td><button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${total_items}' ><i class="fa fa-close"></i> Delete</Hapus></td>`+
                 "</td>  </tr>")
                 ;
 
@@ -1164,14 +1208,16 @@ function CalculateALL() {
 
     for (i = 1; i <= totalitem; i++) {
 
-        itemID = document.getElementById("qty_barang_" + i);
-        var qty = $("#qty_barang_" + i).val();
+        var idx = $('#datadetail tr').eq(i).attr('id');
+        itemID = document.getElementById("qty_barang_" + idx);
+        //var qty = $("#qty_barang_" + idx).val();
+        var qty = parseFloat(price_to_number($("#qty_barang_" + idx).val()));
         //console.log(total_items);
-        var Hpp = $("#hpp_barang_" + i).val();
-        //var Subtotal = $("#hidden_total_barang_" + i).val();
+        var Hpp = $("#hpp_barang_" + idx).val();
+        //var Subtotal = $("#hidden_total_barang_" + idx).val();
 
             var subtotalx = parseFloat(qty) * parseFloat(Hpp);
-            var Subtotal = $("#total_barang_" + i).val(subtotalx);
+            var Subtotal = $("#total_barang_" + idx).val(subtotalx);
             
             //TOTAL  
             var totalqty = totalqty + parseFloat(qty);
@@ -1454,16 +1500,73 @@ function getDataListBillingRanap(tglawal,tglakhir) {
        });
 } 
 
-function showID(noreg){
-    $("#NoRegistrasi").val(noreg);
-    toast('Pasien berhasil dipilih !', "success");
+function getPasienByNoReg(noreg) {
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataPasien';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'NoRegistrasi=' + noreg
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+function updateUIdatagetPasienByNoReg(datagetPasienByNoReg) {
+    let datapasien = datagetPasienByNoReg;
+    if (datapasien.message == 'success'){
+        $("#NoRegistrasi").val(datapasien.data.NoRegistrasi)
+        $("#GroupJaminan").val(datapasien.data.GroupJaminan)
+        if (datapasien.data.IDKelas == '' || datapasien.data.IDKelas == null){
+            var kelasid = '3'
+        }else{
+            var kelasid = datapasien.data.IDKelas
+        }
+        $("#IDKelas").val(kelasid)
         swal({
-            title: 'Success',
-            text: 'Pasien berhasil dipilih !',
-            icon: 'success',
+        title: 'Success',
+        text: 'Pasien berhasil dipilih !',
+        icon: 'success',
         }).then(function() {
             $("#btnSearching_modal").modal('hide')
         });
+    }else{
+        toast(datapasien.message,warning)
+    }
+}
+
+
+async function showID(noreg){
+    $(".preloader").fadeIn();
+    // $("#NoRegistrasi").val(noreg);
+    // toast('Pasien berhasil dipilih !', "success");
+    //     swal({
+    //         title: 'Success',
+    //         text: 'Pasien berhasil dipilih !',
+    //         icon: 'success',
+    //     }).then(function() {
+    //         $("#btnSearching_modal").modal('hide')
+    //     });
+    const datagetPasienByNoReg = await getPasienByNoReg(noreg);
+    updateUIdatagetPasienByNoReg(datagetPasienByNoReg);
 }
 
 function showDataPaket() {
@@ -1575,6 +1678,7 @@ async function AddRowPaket(){
     try {
         $(".preloader").fadeIn();
         const dataGocreateDtlPaket = await GocreateDtlPaket();
+        console.log(dataGocreateDtlPaket,'fffff');
         updateUIdataGocreateDtlPaket(dataGocreateDtlPaket);
     } catch (err) {
         toast(err, "error")
@@ -1587,6 +1691,7 @@ function updateUIdataGocreateDtlPaket(dataResponse) {
     }else{
         // toast(dataResponse.message, "success")
          var arrayLength = dataResponse['data'].length;
+         var namabarang_array = []
         for (var i = 0; i < arrayLength; i++) {
     kode_barang = dataResponse.data[i].ProductCode;
     nama_barang_ = dataResponse.data[i].ProductName;
@@ -1601,42 +1706,48 @@ function updateUIdataGocreateDtlPaket(dataResponse) {
     var totalitem = $("#totalrow_closing").val();
     var istaken = '0';
     for (x = 1; x <= totalitem; x++) {
-        if (kode_barang == $("#kode_barang"+x).val() ){
+        //console.log(kode_barang,'--',$("#kode_barang"+$('#datadetail tr').eq(x).attr('id')).val());
+        if (kode_barang == $("#kode_barang"+$('#datadetail tr').eq(x).attr('id')).val() ){
+            namabarang_array.push(nama_barang_)
             swal({
                 title: "Warning",
-                text: nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
+                text: namabarang_array.toString()+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
                 icon: "warning",
             });
             toast(nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!','warning');
             var istaken = '1';
         }
         //console.log(kode_barang,$("#kode_barang"+i).val(),istaken);
-
     }
+    
     if (istaken == '1'){
         continue;
     }
 
       if($('#totalrow_closing').val()==0){
         var count =0;
+        var countid =0;
       }else{
         var count = parseFloat($('#totalrow_closing').val());
+        var  countid = parseFloat($('#datadetail >tbody >tr:last').attr('id'));
       }
       count = count + 1;
+      countid = countid + 1;
       document.getElementById('grantotalOrder_closing').innerHTML = count;
       $('#totalrow_closing').val(count);
 
-        var newRow = $("<tr id='row_'" + count + "'>");
-            //*1*/  newRow.html("<td><font size='1'>" + count + "</td>'"+
-            /*2*/ newRow.html("'<td>" + kode_barang +"<input type='hidden' name='kode_barang[]' id='kode_barang" + count + "' class='kode_barang'"+count + "' value='" + kode_barang +"' ></font></td> '"+
-            /*3*/"'<td><font size='1'>" + nama_barang_ + "<input type='hidden'  name='nama_barang_[]' id='nama_barang_" + count + "' value='" + nama_barang_ +"' ></font></td>'"+
-            /*4*/"" + satuan_barang_ + "<input type='hidden' name='satuan_barang_[]' id='satuan_barang_" + count +"' value='" + satuan_barang_ +"'>"+
-            /*6*/"' <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='qty_barang_[]' id='qty_barang_" + count + "' value='" + qty_barang_ +"' ></td> '"+
-             /*7*/"' <td>"+satuan_konversi_+"<input size='1'  value='" + satuan_konversi_ + "' type='hidden' name='satuan_konversi_[]'   id='satuan_konversi_" + count +"' ></td>'"+
-             /*7*/"'<td>"+satuan_qty_+"<input size='1'  value='" + satuan_qty_ + "' type='hidden' name='satuan_qty_[]'   id='satuan_qty_" + count +"' ></td>'"+
-            /*8*/"' <td><input size='5' readonly  type='text' name='hpp_barang_[]' onkeydown='FormatCell(this)'  id='hpp_barang_" + count + "' class='harga'  value='" + hpp_barang_ + "' ></td> '"+
-            /*9*/"' <td><input size='1' readonly value='" + total_barang_ + "' type='text' name='total_barang_[]'   id='total_barang_" + count +"' >"+
-            /*10*/"<td> <button type='button' onclick=\'deletedetilPerItemx("+kode_barang+","+count+")\'  name='remove_details' class='btn btn-warning btn-xs remove_details' id='" + count + "' >Delete</Hapus> " +
+        var newRow = $("<tr id='" + countid + "'>");
+            //*1*/  newRow.html("<td><font size='1'>" + countid + "</td>'"+
+            /*2*/ newRow.html("'<td>" + kode_barang +"<input type='hidden' name='kode_barang[]' id='kode_barang" + countid + "' class='kode_barang'"+countid + "' value='" + kode_barang +"' ></font></td> '"+
+            /*3*/"'<td><font size='1'>" + nama_barang_ + "<input type='hidden'  name='nama_barang_[]' id='nama_barang_" + countid + "' value='" + nama_barang_ +"' ></font></td>'"+
+            /*4*/"" + satuan_barang_ + "<input type='hidden' name='satuan_barang_[]' id='satuan_barang_" + countid +"' value='" + satuan_barang_ +"'>"+
+            /*6*/"' <td><input  size='2' autocomplete='off' type='text' onkeydown='FormatCell(this)'  name='qty_barang_[]' id='qty_barang_" + countid + "' value='" + qty_barang_ +"' ></td> '"+
+             /*7*/"' <td>"+satuan_konversi_+"<input size='1'  value='" + satuan_konversi_ + "' type='hidden' name='satuan_konversi_[]'   id='satuan_konversi_" + countid +"' ></td>'"+
+             /*7*/"'<td>"+satuan_qty_+"<input size='1'  value='" + satuan_qty_ + "' type='hidden' name='satuan_qty_[]'   id='satuan_qty_" + countid +"' ></td>'"+
+            /*8*/"' <td><input size='5' readonly  type='text' name='hpp_barang_[]' onkeydown='FormatCell(this)'  id='hpp_barang_" + countid + "' class='harga'  value='" + hpp_barang_ + "' ></td> '"+
+            /*9*/"' <td><input size='1' readonly value='" + total_barang_ + "' type='text' name='total_barang_[]'   id='total_barang_" + countid +"' >"+
+            // /*10*/"<td> <button type='button' onclick=\'deletedetilPerItemx("+kode_barang+","+countid+")\'  name='remove_details' class='btn btn-warning btn-xs remove_details' id='" + countid + "' >Delete</Hapus> " +
+            `<td><button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${countid}' ><i class="fa fa-close"></i> Delete</Hapus></td>`+
                 "</td>  </tr>")
                 ;
 
@@ -1651,6 +1762,14 @@ function updateUIdataGocreateDtlPaket(dataResponse) {
         // $("#nama_Barang").focus();
         // $("#nama_Barang").empty();
         // $("#nama_Barang").select2('open');
+        }
+        if (namabarang_array.length == 0){
+            swal({
+                title: "Success",
+                text: 'Data paket berhasil ditambahkan ! Silahkan dicek kembali !',
+                icon: "success",
+            });
+            toast('Data paket berhasil ditambahkan ! Silahkan dicek kembali !','success');
         }
         CalculateALL();
 
@@ -1676,6 +1795,141 @@ async function GocreateDtlPaket() {
             + '&UnitTujuan=' + UnitTujuan 
             + '&IdPaket=' + IdPaket 
             + '&NoRegistrasi=' + NoRegistrasi 
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+
+async function AddRowTemp(){
+    try {
+        
+        // if ($("#SignaTerjemahan").val() == ''){
+        //     toast('Silahkan masukkan Signa !','warning');
+        //     $("#SignaTerjemahan").focus();
+        //     return false;
+        // }
+
+        const kode_barang = $("#xIdBarang").val()
+        ,nama_barang_ = $("#xNamaBarang").val()
+        ,satuan_barang_ = $("#Satuan").val()
+        ,satuan_konversi_ = $("#Satuan_Konversi").val()
+        ,satuan_qty_ = $("#Konversi_satuan").val()
+        ,hpp_barang_=$("#hpp_add").val()
+        ,qty_barang_=$("#QtyOrder").val()
+        ,Subtotal=hpp_barang_*qty_barang_
+        ,total_barang_=Subtotal
+        
+        if (kode_barang == ''){
+            toast('Silahkan masukkan nama barang yang dipilih!','warning');
+            $("#xNamaBarang").focus();
+            return false;
+        }
+        if (qty_barang_ == ''){
+            toast('Silahkan masukkan qty !','warning');
+            $("#QtyOrder").focus();
+            return false;
+        }
+
+        if($('#totalrow_closing').val()==0){
+            var count =0;
+            var countid =0;
+          }else{
+            var count = parseFloat($('#totalrow_closing').val());
+            var  countid = parseFloat($('#datadetail >tbody >tr:last').attr('id'));
+          }
+
+          for (i = 1; i <= count; i++) { 
+            if (kode_barang == $("#kode_barang"+$('#datadetail tr').eq(i).attr('id')).val() ){
+                swal({
+                    title: "Warning",
+                    text: nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!',
+                    icon: "warning",
+                });
+                toast(nama_barang_+' sudah ada di list! Tidak dapat input barang yang sama! Mohon diperiksa kembali!','warning');
+                return false;
+            }
+        }
+
+        countid = countid + 1;
+        count = count + 1;
+        $('#totalrow_closing').val(count);
+
+        output = `
+        <tr id="${countid}">
+        <td>${kode_barang }<input type='hidden' name='kode_barang[]' id='kode_barang${countid}' class='kode_barang${countid}' value='${kode_barang }' ></font></td>
+        <td><font size='1'>${nama_barang_}<input type='hidden'  name='nama_barang_[]' id='nama_barang_${countid}' value='${nama_barang_}' ></font></td>
+        <td><input  size='2'  type='text' onkeydown='FormatCell(this)'  name='qty_barang_[]' id='qty_barang_${countid}' value='${ qty_barang_}' ><input size='1'  value='${satuan_konversi_}' type='hidden' name='satuan_konversi_[]'   id='satuan_konversi_${countid}' ></td>
+        <td>${satuan_konversi_}<input type='hidden' name='satuan_barang_[]' id='satuan_barang_${countid}' value='${satuan_barang_}'></td>
+        <td>${satuan_qty_}<input size='1'  value='${satuan_qty_}' type='hidden' name='satuan_qty_[]'   id='satuan_qty_${countid}' ></td>
+        <td><input size='5' readonly  type='text' name='hpp_barang_[]' onkeydown='FormatCell(this)'  id='hpp_barang_${countid }' class='harga'  value='${hpp_barang_ }' ></td>
+        <td><input size='1' readonly value='${total_barang_}' type='text' name='total_barang_[]'   id='total_barang_${countid}'></td>
+        <td> <button type='button' name='remove_details' class='btn btn-gold btn-xs remove_details btn-rounded' id='${countid}' ><i class="fa fa-close"></i> Delete</Hapus></td>
+        </tr>
+        `;
+
+        $('#user_data_closing').append(output);
+
+        $("#xNamaBarang").val("");
+        $("#Satuan").val("");
+        $("#Satuan_Konversi").val("");
+        $("#QtyStok").val('');
+        $("#QtyOrder").val('');
+        $("#hpp_add").val('');
+        $("#nama_Barang").val('');
+        $("#nama_Barang").focus();
+        CalculateALL()
+    } catch (err) {
+        toast(err, "error")
+    }
+}
+
+async function getHargaJualFix(idbarang){  
+    const data = await gogetHargaJualFix(idbarang);
+    updategogetHargaJualFix(data);
+}
+function updategogetHargaJualFix(params){
+
+    if (params.status) {
+        $("#hpp_add").val(params.data);
+    } else {
+        $("#hpp_add").val('0');
+       toast(params.message, "error") 
+    } 
+}
+function gogetHargaJualFix(idbarang) {
+
+    var kodebarang = idbarang; 
+    var NoRegistrasi = $("#NoRegistrasi").val(); 
+    var KodeGroupJaminan = $("#GroupJaminan").val();   
+    var Kelasid = $("#IDKelas").val();     
+    var tgl = document.getElementById("TglTransaksi").value; 
+    var TransasctionDate = tgl.replace('Z', '').replace('T', ' ').replace('.000', '');
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/InventoryCharged/gogetHargaJualFix/';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'kodebarang=' + kodebarang + '&NoRegistrasi=' + NoRegistrasi + '&GroupJaminan=' + KodeGroupJaminan + '&TransasctionDate=' + TransasctionDate 
+        + '&Kelasid=' + Kelasid 
     })
         .then(response => {
             if (!response.ok) {

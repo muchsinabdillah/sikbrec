@@ -156,7 +156,7 @@
                                         <label for="inputEmail3">Qty</label>
                                         <input type="text" class="form-control" autocomplete="off" name="Qty" id="Qty" maxlength="25">
                                     </div>
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-2" style="display: none;">
                                         <label for="inputEmail3">Signa Terjemahan</label>
                                         <input type="text" class="form-control" name="SignaTerjemahan" id="SignaTerjemahan">
                                     </div>
@@ -219,9 +219,6 @@
                                         <thead>
                                             <tr>
                                                 <th align='center'>
-                                                    <font size='1'>No</font>
-                                                </th> 
-                                                <th align='center'>
                                                     <font size='1'>Satuan</font>
                                                 </th>
                                                 <th align='center'>
@@ -245,9 +242,9 @@
                                                 <th align='center'>
                                                     <font size='1'>Grand Total</font>
                                                 </th>
-                                                <!-- <th align='center'>
+                                                <th align='center'>
                                                     <font size='1'>Action</font>
-                                                </th> -->
+                                                </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -255,7 +252,7 @@
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="4">
+                                                <th colspan="3">
                                                     <font size="2">GRANDTOTAL :</font>
                                                 </th>
                                                
@@ -293,9 +290,9 @@
                                                         <div id="Grandtotal"></div>
                                                     </font><input type="hidden" name="totalrow" id="totalrow" class="form-control totalrow" readonly /><input type="hidden" name="grandtotalxl" id="grandtotalxl" class="form-control grandtotalxl" readonly /><font size="2"><span id="grandtotalxl_tmp"></span></font>
                                                 </th>
-                                                <!-- <th>
+                                                <th>
                                                     <font size="1"> </font>
-                                                </th> -->
+                                                </th>
 
                                             </tr>
                                         </tfoot>
@@ -309,7 +306,7 @@
                                 <button type="button" class="btn btn-maroon waves-effect btn-rounded" id="btnSimpan" name="btnSimpan" disabled><span class="glyphicon glyphicon-floppy-disk" aria-hidden="true"></span> Simpan</button>
                                 <button type="button" class="btn btn-gold btn-rounded" id="btn_batal" name="btn_batal" disabled><i class="fa fa-trash" aria-hidden="true"></i>Hapus</button>
                                 <!-- <button class="btn btn-black btn-rounded " id="btnprint" name="btnprint" data-toggle='modal'>
-                                    <i class="fa fa-print"></i>PRINT</button> -->
+                                    <i class="fa fa-print"></i>Print</button> -->
                                 <button type="button" class="btn btn-grey btn-rounded" id="btn_kembali" name="btn_kembali" onclick="MyBack()"><i class="fa fa-home" aria-hidden="true"></i>Kembali</button>
                             </div>
 
@@ -385,7 +382,7 @@
 <!--#END Modal Approve--------------------------------------------->
 <!-- #modal cari pasien------>
 <div class="modal fade" id="btnSearching_modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg" style="width:80%">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
@@ -578,11 +575,34 @@
                             <div class="modal-dialog  modal-md" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
                                         <h4 class="modal-title" id="myModalLabel">Cetak</h4>
                                     </div>
 
+                                    <br>
+                                    <div class="row">
+                                        <!-- <div class="col-sm-4">
+                                            <a href="#" id="btnCetakResep" name="btnCetakResep">
+                                            <p class="text-center"><strong>Cetak Resep</strong></p>
+                                            <img src="<?= BASEURL; ?>/images/jenisPrint/cetakresep.Png" id="logocetaklabelpasien" class="img-round" alt="Cetak Label" width="100" height="100" style="margin-left:35px"></a>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <a href="#" id="btnCopyResep" name="btnCopyResep">
+                                            <p class="text-center"><strong>Copy Resep</strong></p>
+                                            <img src="<?= BASEURL; ?>/images/jenisPrint/copyresep.png" id="logocetaklabelpasien" class="img-round" alt="Cetak Label" width="100" height="100" style="margin-left:35px"></a>
+                                        </div> -->
+
+                                        <div class="col-sm-4">
+                                            <a href="#" id="btnPrintLabelAll" name="btnPrintLabelAll">
+                                            <p class="text-center"><strong>Label Pasien</strong></p>
+                                            <img src="<?= BASEURL; ?>/images/jenisPrint/kartu-identitas.Png" id="logocetaklabelpasien" class="img-round" alt="Cetak Label" width="100" height="100" style="margin-left:35px"></a>
+                                        </div>
+                                    </div>
+                                    <br>
+
                                     <div class="modal-footer">
-                                        <div class="btn-group" role="group">
+                                        <!-- <div class="btn-group" role="group">
                                             <button type="button" class="btn btn-success btn-wide btn-rounded" id="btnCetakResep" name="btnCetakResep"><i class="fa fa-print"></i> Cetak Resep</button>
                                         </div>
                                         <div class="btn-group" role="group">
@@ -591,7 +611,7 @@
                                         <div class="btn-group" role="group">
                                         <button type="button" class="btn btn-success btn-wide btn-rounded" id="btnPrintLabelAll" name="btnPrintLabelAll"><i class="fa fa-print"></i> Cetak Label</button>
                                         </div>
-                                        
+                                         -->
                                            
                                     </div>
                                 </div>

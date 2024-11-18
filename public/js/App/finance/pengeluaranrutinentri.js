@@ -60,7 +60,7 @@ function FinishPengeluaranRutin() {
     var base_url = window.location.origin;
     var IDNoTrsPencairan = document.getElementById("IDNoTrs2").value; 
     var TglPenyelesaian = document.getElementById("TglPenyelesaian").value;  
-    let url = base_url + '/ESIRYARSI/public/PengeluaranRutin/FinishTrs';
+    let url = base_url + '/SIKBREC/public/PengeluaranRutin/FinishTrs';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -123,7 +123,7 @@ function CreateDetailPenyelesaianKasbon() {
     var KeteranganBiaya = document.getElementById("KeteranganBiaya").value;
     var Unit = document.getElementById("Unit").value;
     
-    let url = base_url + '/ESIRYARSI/public/PengeluaranRutin/CreateDetil';
+    let url = base_url + '/SIKBREC/public/PengeluaranRutin/CreateDetil';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -210,7 +210,7 @@ function CreatePEngeluaranRutin() {
     var RekeningKas = $("#RekeningKas").val();
     var Keterangan = $("#Keterangan").val(); 
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/PengeluaranRutin/Create';
+    let url = base_url + '/SIKBREC/public/PengeluaranRutin/Create';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -308,7 +308,7 @@ function loadheaders() {
     var IDNoTrs = $("#IDNoTrs2").val();
     
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/PengeluaranRutin/getHeader';
+    let url = base_url + '/SIKBREC/public/PengeluaranRutin/getHeader';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -352,7 +352,7 @@ function updateUIloadUnit(params) {
 }
 function loadUnit() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataUnit/getAllDataUnit';
+    let url = base_url + '/SIKBREC/public/MasterDataUnit/getAllDataUnit';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -390,7 +390,7 @@ function showdetailPenyelesaian() {
         "ordering": false,
         //"order": [[ 2, "desc" ]],
         "ajax": {
-            "url": base_url + "/ESIRYARSI/public/PengeluaranRutin/ShowDetail",
+            "url": base_url + "/SIKBREC/public/PengeluaranRutin/ShowDetail",
             "dataSrc": "",
             "deferRender": true,
             "type": "POST",
@@ -468,7 +468,7 @@ function updateUIdataDeleteDetailKasbon(params) {
 function DeleteDetailKasbon(params) {
     var base_url = window.location.origin;
     var IDDetails = params; 
-    let url = base_url + '/ESIRYARSI/public/PengeluaranRutin/deleteIdDetail';
+    let url = base_url + '/SIKBREC/public/PengeluaranRutin/deleteIdDetail';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -512,7 +512,7 @@ function updateUIdataloadBebanHarian(params) {
 }
 function loadBebanHarian() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/PencairanKasbon/getDataGroupBiaya';
+    let url = base_url + '/SIKBREC/public/PencairanKasbon/getDataGroupBiaya';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -563,5 +563,5 @@ function toast(data, status) {
 }
 function MyBack() {
     const base_url = window.location.origin;
-    window.location = base_url + "/ESIRYARSI/public/PengeluaranRutin/listpengeluaranrutin/";
+    window.location = base_url + "/SIKBREC/public/PengeluaranRutin/listpengeluaranrutin/";
 }

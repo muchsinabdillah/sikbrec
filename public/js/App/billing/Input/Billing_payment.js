@@ -251,6 +251,7 @@ async function goSaveTrsPayment() {
     try {
         const dataSaveTrsPayment = await SaveTrsPayment();
         updateUIdataSaveTrsPayment(dataSaveTrsPayment);
+
     } catch (err) {
         toast(err.message, "error")
     }
@@ -260,17 +261,35 @@ function updateUIdataSaveTrsPayment(params) {
     let response = params;
     $("#idkuitansi").val(convertEntities(response.paramsid));
     if (response.status == "success") {
-        toast(response.message, "success")
+        // toast(response.message, "success")
         swal({
-            title: "Simpan Berhasil!",
-            text: response.message,
+            title: "Simpan Berhasil!",  
+            // text: response.message,
+            text: "Terimakasih",
             icon: "success",
-        })
-        var base_url = window.location.origin;
-        printkuitansi(base_url);
-        printrincian(base_url);
-        location.reload();
-        // getDataApproveFarmasi();
+        }).then((willDelete) => {
+            if (willDelete) {
+                location.reload();
+                // printkuitansi();
+                // swal({
+                //     title: "Cetak Kuitansi Berhasil!",  
+                //     // text: response.message,
+                //     text: "Cetak Nota Pembayaran",
+                //     icon: "success",
+                // }).then((willDelete) => {
+                //     if (willDelete) {
+                //         printrincian();
+                //         location.reload();
+                //     }
+                //     else{
+                //         location.reload();
+                //     }
+                // });
+            }
+            else{
+                location.reload();
+            }
+        });
     }else{
         toast(response.message, "error")
     }  
@@ -292,9 +311,6 @@ function SaveTrsPayment() {
     var totalbayar = $("#TotalPembayaran").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
 
-    // console.log(Penjamin);
-    // console.log(kodepjm);= ''
-    // }
 
     if(kodepjm == '315'){
         billtox  = namapasien;
@@ -408,23 +424,32 @@ function CountCetak(notrs, signAlasanCetak, jeniscetakan,kodereg) {
         })
 }
 
-async function printkuitansi(base_url) {
-    var base_url = base_url;
+async function printkuitansi() {
+    var base_url = window.location.origin;
     var jeniscetak = 'PrintKuitansiDetail';
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
     var lang = $("#idkuitansi").val();
-    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs, "_blank",
-            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    // window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs,
+    //         "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/" + lang +"/"+kodereg+"/"+notrs);
+    // console.log(base_url);
 }
 
-async function printrincian(base_url) {
-    var base_url = base_url;
+async function printrincian() {
+    // var base_url = window.location.origin;
+    // var notrs = $("#NoRegistrasi").val();
+    // var kodereg = $("#NoRegistrasi").val().slice(0,2);
+    // var lang = $("#idkuitansi").val();
+    // window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs,
+    // "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+
+    var base_url = window.location.origin;
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0,2);
     var lang = $("#idkuitansi").val();
-    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs, "_blank",
-    "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRinciandetail"+kodereg+"/"+lang +"/"+notrs);
+    // location.reload();
 }
 
 
@@ -1069,7 +1094,7 @@ function getBillto(param){
         var attr = null;
         getDataDetailBilling_Payment(attr);
     }
-    else if(param=='Tunai' || param=='Piutang Rawat Inap' || param=='Setor Bank' || param=='Transfer Bank' || param=='Voucher'){
+    else if(param=='Tunai' || param=='Piutang Rawat Inap' || param=='Setor Bank' || param=='Transfer Bank' || param=='Voucher' || param=='QRIS'){
        
         $('#card_ui').fadeOut().fadeOut('fast') 
         $('#telahterima_ui2').fadeOut().fadeOut('fast') 

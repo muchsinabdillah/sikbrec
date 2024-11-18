@@ -20,7 +20,7 @@ $(document).ready(function () {
                 });
     });
 });
-function getDataListPasienRawat() { 
+function getDataListPasienRawat_old() { 
     var base_url = window.location.origin;
     // $('#permintaanrawat_all').dataTable({
     //        "bDestroy": true
@@ -128,7 +128,7 @@ function getDataListPasienRawat() {
 }    
 
 
-function getDataListPasienRawat_old() { 
+function getDataListPasienRawat() { 
     var base_url = window.location.origin;
     $('#permintaanrawat_all').dataTable({
            "bDestroy": true

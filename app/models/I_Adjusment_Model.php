@@ -142,6 +142,24 @@ class I_Adjusment_Model
             $nourut=0;
             $rows = array();
             for($x=0;$x<$jumlah_dipilih;$x++){
+
+                if ($batch_number_[$x] == "") {
+                    $callback = array(
+                        'status' => 'warning',
+                        'errorname' => 'Batch '. $nama_barang_[$x].'  Masih Kosong !',
+                    );
+                    return $callback;
+                    exit;
+                } 
+
+                if ($expired_[$x] == "") {
+                    $callback = array(
+                        'status' => 'warning',
+                        'errorname' => 'Expired Date '.$nama_barang_[$x].' Batch Masih Kosong !',
+                    );
+                    return $callback;
+                    exit;
+                } 
                 
                 //END CEK
                 $nourut++;
@@ -199,6 +217,66 @@ class I_Adjusment_Model
                 $urlAddKelompok
             );
             return $addSatuan;
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function getAdjusmentbyID($data)
+    {
+        try { 
+            $session = SessionManager::getCurrentSession();
+            $UserCreate = $session->username;
+            $TransactionCode = $data['TransasctionCode'];
+            // 1. Gen Token
+            $method = "POST";
+            $URL = "genToken";
+            $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+
+            // 2. add Data Group Barang 
+            $method_getgroup = "POST";
+            // 2. add Data Golongan
+            $postData = '{
+                "TransasctionCode" : "'.$TransactionCode.'" 
+            }';
+            $urlAddKelompok = "transaction/adjusment/getAdjusmentbyID/";
+            $addSatuan = $this->curl_request(
+                GenerateTokenRS::headers_api_token($token['access_token']),
+                $method_getgroup,
+                $postData,
+                $urlAddKelompok
+            );
+            return $addSatuan['data'];
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+
+    public function getAdjusmentDetailbyID($data)
+    {
+        try {
+            $session = SessionManager::getCurrentSession();
+            $UserCreate = $session->username;
+            $NoTrs = $data['TransasctionCode'];
+            // 1. Gen Token
+            $method = "POST";
+            $URL = "genToken";
+            $token = $this->curl_request_token(GenerateTokenRS::headers_api(), $method, $URL);
+
+            // 2. add Data Group Barang 
+            $method_getgroup = "POST";
+            // 2. add Data Golongan
+            $postData = '{ 
+                "TransactionCode" : "' . $NoTrs . '" 
+            }';
+            $urlAddKelompok = "transaction/adjusment/getAdjusmentDetailbyID/";
+            $addSatuan = $this->curl_request(
+                GenerateTokenRS::headers_api_token($token['access_token']),
+                $method_getgroup,
+                $postData,
+                $urlAddKelompok
+            );
+            return $addSatuan['data'];
         } catch (PDOException $e) {
             die($e->getMessage());
         }

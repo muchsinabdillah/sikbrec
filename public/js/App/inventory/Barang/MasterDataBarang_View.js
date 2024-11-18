@@ -547,7 +547,6 @@ async function asyncShowMain() {
         updateUIdatagetgetFormularium(datagetgetFormularium);   
         const datagetKodePDP = await getKodePDP(); 
         updateUIgetKodePDP(datagetKodePDP);
-
         const datagetgetSupplier = await getSupplier(); 
         updateUIdatagetgetSupplier(datagetgetSupplier); 
         
@@ -556,8 +555,8 @@ async function asyncShowMain() {
             const datagetBarangbyId = await getBarangbyId(); 
             updateUIdatagetBarangbyId(datagetBarangbyId); 
 
-            getBarangbySuppliers();
-            getBarangbyFormulariums();
+            // getBarangbySuppliers();
+            // getBarangbyFormulariums();
 
         }
         

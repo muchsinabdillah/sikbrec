@@ -44,18 +44,55 @@ class A_PencairanKasbon_Model
             return $callback;
         }
     }
+    public function showDataRealisasiPencairanbyUser($data)
+    {
+        try {
+            $this->db->query("SELECT a.ID, A.No_Transaksi,b.Nama,c.[First Name],a.Nominal,a.Keterangan,
+                            replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-') as tgltransaksi ,a.Tgl_Penyelesaian,
+                            d.No_Transaksi as NoOrder,d.Tgl_Transaksi as TglOrder,case when a.Status_Finish ='0' then 'BELUM REALISASI' ELSE '' END as statustransaski
+                            from Keuangan.dbo.T_Kasbon a
+                            inner join HRDYARSI.dbo.[Data Pegawai] b on a.Pegawai=b.ID_Data
+                            inner join MasterDataSQL.dbo.Employees c on a.Petugas_Input_First collate Latin1_General_CI_AS =c.Nopin collate Latin1_General_CI_AS
+                            left join Keuangan.DBO.T_Order_Kasbon d on d.No_Transaksi_Kasbon = a.No_Transaksi
+                            where a.Batal='0'  and  a.Status_Finish ='0'
+                            order by replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-')");
+            $data =  $this->db->resultSet();
+            $rows = array();
+            $array = array();
+            $no = 0;
+            foreach ($data as $key) {
+                $no++;
+           
+                $pasing['no'] = $no;
+                $pasing['ID'] = $key['ID'];
+                $pasing['No_Transaksi'] = $key['No_Transaksi']; 
+                $pasing['Nama'] = $key['Nama'];
+                $pasing['Nominal'] = $key['Nominal'];
+                $pasing['Keterangan'] = $key['Keterangan'];  
+                $pasing['TglOrder'] = date('d/m/Y', strtotime($key['tgltransaksi'])); 
+                $rows[] = $pasing;
+            }
+            return $rows;
+        } catch (PDOException $e) {
+            $callback = array(
+                'status' => "error", // Set array nama  
+                'message' => $e
+            );
+            return $callback;
+        }
+    }
     public function shwoOutstandingPenyelesaian($data)
     {
         
-            // $this->db->query("SELECT a.*,b.Nama,c.[First Name],
-            //                 replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-') as tgltransaksi ,a.Tgl_Penyelesaian,
-            //                 d.No_Transaksi as NoOrder,d.Tgl_Transaksi as TglOrder,case when a.Status_Finish ='0' then 'BELUM REALISASI' ELSE '' END as statustransaski
-            //                 from Keuangan.dbo.T_Kasbon a
-            //                 inner join HRDYARSI.dbo.[Data Pegawai] b on a.Pegawai=b.ID_Data
-            //                 inner join MasterDataSQL.dbo.Employees c on a.Petugas_Input_First collate Latin1_General_CI_AS =c.Nopin collate Latin1_General_CI_AS
-            //                 left join Keuangan.DBO.T_Order_Kasbon d on d.No_Transaksi_Kasbon = a.No_Transaksi
-            //                 where Batal='0' 
-            //                 order by replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-')");
+            $this->db->query("SELECT a.*,b.Nama,c.[First Name],
+                            replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-') as tgltransaksi ,a.Tgl_Penyelesaian,
+                            d.No_Transaksi as NoOrder,d.Tgl_Transaksi as TglOrder,case when a.Status_Finish ='0' then 'BELUM REALISASI' ELSE '' END as statustransaski
+                            from Keuangan.dbo.T_Kasbon a
+                            inner join HRDYARSI.dbo.[Data Pegawai] b on a.Pegawai=b.ID_Data
+                            inner join MasterDataSQL.dbo.Employees c on a.Petugas_Input_First collate Latin1_General_CI_AS =c.Nopin collate Latin1_General_CI_AS
+                            left join Keuangan.DBO.T_Order_Kasbon d on d.No_Transaksi_Kasbon = a.No_Transaksi
+                            where Batal='0' 
+                            order by replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-')");
             // $data =  $this->db->resultSet();
             // $rows = array();
             // $array = array();
@@ -92,11 +129,11 @@ class A_PencairanKasbon_Model
 $table =<<<EOT
 (SELECT a.Nominal,a.id,a.Keterangan,b.Nama,c.[First Name] ,
 replace(CONVERT(VARCHAR(11), a.Tgl_Transaksi, 111), '/','-') as tgltransaksi , 
-d.No_Transaksi as NoOrder,d.Tgl_Transaksi as TglOrder,case when a.Status_Finish ='0' then 'BELUM REALISASI' ELSE '' END as statustransaski
+a.No_Transaksi as NoOrder,d.Tgl_Transaksi as TglOrder,case when a.Status_Finish ='0' then 'BELUM REALISASI' ELSE '' END as statustransaski,a.Tgl_Penyelesaian,a.Nilai_Penyelesaian,a.TipeKasbon
 from Keuangan.dbo.T_Kasbon a
 inner join HRDYARSI.dbo.[Data Pegawai] b on a.Pegawai=b.ID_Data
 inner join MasterDataSQL.dbo.Employees c on a.Petugas_Input_First collate Latin1_General_CI_AS =c.Nopin collate Latin1_General_CI_AS
-left join Keuangan.DBO.T_Order_Kasbon d on d.No_Transaksi_Kasbon = a.No_Transaksi
+left join Keuangan.DBO.T_Order_Kasbon d on d.No_Transaksi_Kasbon = a.No_Transaksi where a.batal='0'
 ) temp 
 EOT;
 
@@ -109,10 +146,13 @@ EOT;
                 array( 'db' => 'Nama',     'dt' => 'NamaPegawaiPencairan' ), 
                 array( 'db' => 'Keterangan',     'dt' => 'Keterangan' ),
                 array( 'db' => 'statustransaski',     'dt' => 'statustransaski' ),
-                array( 'db' => 'Nominal',     'dt' => 'NominalPencairan' )
+                array( 'db' => 'Nominal',     'dt' => 'NominalPencairan' ),
+                array( 'db' => 'Tgl_Penyelesaian',     'dt' => 'Tgl_Penyelesaian' ),
+                array( 'db' => 'Nilai_Penyelesaian',     'dt' => 'Nilai_Penyelesaian' ),
+                array( 'db' => 'TipeKasbon',     'dt' => 'TipeKasbon' ),
             );
 
-            require( 'ssp.class.php' ); 
+            //require( 'ssp.class.php' ); 
 
             
             return  SSP::simple( $_POST, $sql_details, $table, $primaryKey, $columns );
@@ -590,7 +630,7 @@ EOT;
                                 (:notransaksi,:tgl_trs,:pegawai,
                                 :nominal,:keterangan,:tgl_trss,:operator,:TipeKasbon)");
                 $this->db->bind('notransaksi', $notransaksi);
-                $this->db->bind('tgl_trs', $tgl_trs);
+                $this->db->bind('tgl_trs', $TglPencairan);
                 $this->db->bind('pegawai', $IDPegawaiOrder);
                 $this->db->bind('nominal', $NilaiPengajuan);
                 $this->db->bind('keterangan', $KeteranganPengajuan);
@@ -653,7 +693,7 @@ EOT;
                             (:notransaksi,:tgl_trs,:operator,
                             :nominal,:nominal2,:nominal3,:sts,:keterangan)");
             $this->db->bind('notransaksi', $notransaksi);
-            $this->db->bind('tgl_trs', $tgl_trs);
+            $this->db->bind('tgl_trs', $TglPencairan);
             $this->db->bind('nominal', $NilaiPengajuan);
             $this->db->bind('nominal2', $NilaiPengajuan);
             $this->db->bind('nominal3', $NilaiPengajuan);
@@ -1093,7 +1133,7 @@ EOT;
             if ($data['TglPenyelesaian'] == "") {
                 $callback = array(
                     'status' => 'warning',
-                    'errorname' => 'Silahkan Masukan Tgl Penyesuaian !',
+                    'errorname' => 'Silahkan Masukan Tgl Realisasi !',
                 );
                 return $callback;
                 exit;
@@ -1101,7 +1141,7 @@ EOT;
             if ($data['NilaiPenyelesaian'] == "" || $data['NilaiPenyelesaian'] == "0") {
                 $callback = array(
                     'status' => 'warning',
-                    'errorname' => 'Silahkan Masukan Nilai Penyelesaian !',
+                    'errorname' => 'Silahkan Masukan Nilai Realisasi !',
                 );
                 return $callback;
                 exit;
@@ -1459,22 +1499,22 @@ EOT;
             $Batal = $dttotal['Batal']; 
             $Status_Finish = $dttotal['Status_Finish']; 
              
-            // if ($Batal == "1") {
-            //     $callback = array(
-            //         'status' => 'warning',
-            //         'errorname' => 'Transaksi Sudah di batalkan !' 
-            //     );
-            //     return $callback;
-            //     exit;
-            // }
-            // if ($Status_Finish == "1") {
-            //     $callback = array(
-            //         'status' => 'warning',
-            //         'errorname' => 'Transaksi Sudah di Realisasi, Tidak bisa di batalkan !' 
-            //     );
-            //     return $callback;
-            //     exit;
-            // }
+            if ($Batal == "1") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'Transaksi Sudah di batalkan !' 
+                );
+                return $callback;
+                exit;
+            }
+            if ($Status_Finish == "1") {
+                $callback = array(
+                    'status' => 'warning',
+                    'errorname' => 'Transaksi Sudah di Realisasi, Tidak bisa di batalkan !' 
+                );
+                return $callback;
+                exit;
+            }
  
             //UPDATE SELESAI TABEL KASBON
             $this->db->query("UPDATE Keuangan.dbo.T_Kasbon 
@@ -1588,16 +1628,16 @@ EOT;
  
             //UPDATE SELESAI TABEL KASBON
             $this->db->query("UPDATE Keuangan.dbo.T_Kasbon 
-                            SET Batal=:Batal,
-                            Petugas_Batal=:Petugas_Batal,
-                            Tgl_Batal=:Tgl_Batal,
-                            Alasan_Batal=:Alasan_Batal 
+                            SET Status_Finish=:Status_Finish,
+                            Tgl_Penyelesaian=:Tgl_Penyelesaian,
+                            Nilai_Penyelesaian=:Nilai_Penyelesaian,
+                            PetugasPenyelesaian=:PetugasPenyelesaian 
                             WHERE No_Transaksi=:No_Transaksi");
-            $this->db->bind('Batal', '1');
-            $this->db->bind('Petugas_Batal',  $userid); 
-            $this->db->bind('Tgl_Batal',  $TGLENTRI); 
+            $this->db->bind('Status_Finish', '0');
+            $this->db->bind('Tgl_Penyelesaian',  null); 
+            $this->db->bind('Nilai_Penyelesaian',  null); 
             $this->db->bind('No_Transaksi',  $IDNoTrsPencairan); 
-            $this->db->bind('Alasan_Batal', $AlasanBatal); 
+            $this->db->bind('PetugasPenyelesaian', null); 
             $this->db->execute();
 
             $this->db->query("UPDATE Keuangan.dbo.T_Kasbon_2 
@@ -1612,15 +1652,17 @@ EOT;
             $this->db->execute();
 
             //DELETE TABEL TA_JURNAL_HDR
+            $notrsjurnal = $IDNoTrsPencairan.'-P';
             $this->db->query("DELETE Keuangan.dbo.TA_JURNAL_HDR
-                           where fs_KD_jurnal = :FS_kd_REFF  ");
-            $this->db->bind('FS_kd_REFF', $IDNoTrsPencairan); 
+                           where fs_KD_jurnal = :fs_KD_jurnal  ");
+            $this->db->bind('fs_KD_jurnal', $notrsjurnal); 
             $this->db->execute();
 
 
             $this->db->query("DELETE Keuangan.dbo.TA_JURNAL_DTL
-            where FS_KD_REFF=:FS_kd_REFF  ");
-            $this->db->bind('FS_kd_REFF', $IDNoTrsPencairan); 
+            where fs_KD_jurnal=:fs_KD_jurnal and FS_KD_REG = :FS_KD_REG ");
+            $this->db->bind('fs_KD_jurnal', $notrsjurnal); 
+            $this->db->bind('FS_KD_REG', 'PENYELESAIANKASBON'); 
             $this->db->execute();
 
              

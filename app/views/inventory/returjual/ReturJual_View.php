@@ -360,13 +360,22 @@
                                     <thead>
                                         <tr>
                                             <th align='center' style="width: 3em;">
-                                                <font size="1">No
+                                                <font size="1">Transaction Code
                                             </th>
                                             <th align='center'>
                                                 <font size="1">No. Resep
                                             </th>
                                             <th align='center'>
                                                 <font size="1">Tgl Resep
+                                            </th>
+                                            <th align='center'>
+                                                <font size="1">Nama Pasien
+                                            </th>
+                                            <th align='center'>
+                                                <font size="1">Tgl Lahir
+                                            </th>
+                                            <th align='center'>
+                                                <font size="1">Group Transaksi
                                             </th>
                                             <th align='center'>
                                                 <font size="1">No Registrasi

@@ -116,13 +116,13 @@ class PDF extends FPDF
 
 
         //Line 1
-        $this->SetFont('Arial', '', 20);
+        $this->SetFont('Arial', '', 13);
         $this->Cell(0, 7, $GLOBALS['judul'], 0, 1, 'C');
 
         //BR
         $this->Cell(0, 4, '', 0, 1);
 
-        $this->SetFont('Arial', '', 20);
+        $this->SetFont('Arial', '', 13);
         $this->Cell(0, 7, 'Rumah Sakit Yarsi', 0, 1, 'C');
 
         $this->SetFont('Arial', '', 9);
@@ -182,7 +182,7 @@ class PDF extends FPDF
         $this->Cell(10, $h, 'Alergi', 0, 0);
         $this->Cell(15, $h, '', 0, 0);
         $this->Cell(2, $h, ':', 0, 0);
-        $this->Cell(40, $h, $GLOBALS['identitas_pasien']['Alergi'] == null ? '-' : $GLOBALS['identitas_pasien']['Alergi'], 0, 0);
+        $this->CellFitScale(40, $h, $GLOBALS['identitas_pasien']['Alergi'] == null ? '-' : $GLOBALS['identitas_pasien']['Alergi'], 0, 0);
         //row 2 (right)
         $this->Cell(10, $h, 'Berat Badan', 0, 0);
         $this->Cell(15, $h, '', 0, 0);
@@ -297,6 +297,8 @@ foreach ($data['listdata'] as $row) {
             }
             //BR
             $pdf->Cell(0, 1, '', 0, 1);
+
+            $isracik = false;
         }
 
         if ($row['Racik'] <> 0){
@@ -369,11 +371,12 @@ foreach ($data['listdata'] as $row) {
             }
             
             $lastitem = $row['Racik'];
+            $isracik = true;
             
             
         }
     
-        if ($row === end($data['listdata'])) {
+        if ($row === end($data['listdata']) && $isracik) {
             $gety = $pdf->getY();
                 $pdf->Line(16, $gety, 120, $gety);
                 $pdf->Cell(0, 1, '', 0, 1);
@@ -381,6 +384,7 @@ foreach ($data['listdata'] as $row) {
                 $pdf->Cell(6, 4, '', 0, 0);
                 $pdf->Cell(0, 4, $row['Instruksi'] . ' No. ' . numberToRomanRepresentation($row['QryRealisasi']), 0, 1);
                 //$pdf->Cell(0,4,$row['MF'],0,1);
+                
     
                 $pdf->Cell(6, 4, '', 0, 0);
                 $pdf->Cell(0, 4, 'S. ' . $signaracik . ' ' . $ket1racik . ' ' . $ket2racik, 0, 1);

@@ -279,6 +279,69 @@ function showID(str) {
     window.open(base_url + '/SIKBREC/public/aBillingPasien/' + str , "_blank");
 }
 
+function PrintbyID(noregistrasi){
+    swal("Pilih Document yang Masuk di Print", {
+        buttons: { 
+            cancel: "Cancel",
+            defeat: false,
+            voucher: {
+            text: "Surat Keterangan Sakit",
+            value: "SuketSakit",
+          },
+            deposit: {
+            text: "Surat Keterangan Sehat",
+            value: "SuketSehat",
+          },
+          catch: {
+            text: "Surat Keterangan Mata",
+            value: "SuketMata",
+          },
+          closing: {
+            text: "Resep Kacamata",
+            value: "SuketResepKacamata",
+          },
+         
+          
+        },
+      })
+      .then((value) => {
+        switch (value) {
+
+        case "SuketSakit": 
+            var base_url = window.location.origin;
+            var jeniscetak = 'PrintSuratKeteranganSakit';
+            var noreg = noregistrasi;
+            window.open(base_url + "/SIKBREC/public/aEMR/"+jeniscetak+"/"+noreg, "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            break;
+
+        case "SuketSehat":
+            var base_url = window.location.origin;
+            var noreg = noregistrasi;
+            window.open(base_url + "/SIKBREC/public/aEMR/PrintSuratKeteranganSehat/"+noreg, "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            break;
+
+        case "SuketMata":
+            var base_url = window.location.origin;
+            var jeniscetak = 'PrintSuratKeteranganMata';
+            var noreg = noregistrasi;
+            window.open(base_url + "/SIKBREC/public/aEMR/"+jeniscetak+"/"+noreg, "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            break;
+        case "SuketResepKacamata":
+            var base_url = window.location.origin;
+            var jeniscetak = 'PrintResepKacamata';
+            var noreg = noregistrasi;
+            window.open(base_url + "/SIKBREC/public/aEMR/"+jeniscetak+"/"+noreg, "_blank",
+            "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
+            break;
+       
+          default:
+           // swal("Got away safely!");
+        }
+      });
+}
 // Primary function always
 function toast(data, status) {
     toastr.options = {

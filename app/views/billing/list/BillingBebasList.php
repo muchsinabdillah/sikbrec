@@ -91,16 +91,16 @@ thead>tr>th {
                                                 <thead>
                                                     <tr>
                                                         <th>
-                                                            <font size="1">No. Registrasi</font>
+                                                            <font size="1">No</font>
                                                         </th>
                                                         <th>
-                                                            <font size="1">Nama Pasien</font>
+                                                            <font size="1">NO Transaksi</font>
                                                         </th>
                                                         <th>
                                                             <font size="1">Tanggal Kunjungan</font>
                                                         </th>
                                                         <th>
-                                                            <font size="1">Unit</font>
+                                                            <font size="1">Nama</font>
                                                         </th>
                                                         <th>
                                                             <font size="1">Status</font>
@@ -145,16 +145,16 @@ thead>tr>th {
                                                 <thead>
                                                     <tr>
                                                         <th>
-                                                            <font size="1">No. Registrasi</font>
+                                                            <font size="1">No</font>
                                                         </th>
                                                         <th>
-                                                            <font size="1">Nama Pasien</font>
+                                                            <font size="1">NO Transaksi</font>
                                                         </th>
                                                         <th>
                                                             <font size="1">Tanggal Kunjungan</font>
                                                         </th>
                                                         <th>
-                                                            <font size="1">Unit</font>
+                                                            <font size="1">Nama</font>
                                                         </th>
                                                         <th>
                                                             <font size="1">Status</font>

@@ -1,4 +1,4 @@
- <div class="main-page">
+<div class="main-page">
      <div class="container-fluid">
          <div class="row page-title-div">
              <div class="col-md-6">
@@ -103,3 +103,4 @@
  <script src="<?= BASEURL; ?>/js/DataTables/datatables.min.js"></script>
  <script src="<?= BASEURL; ?>/js/jquery/jquery-2.2.4.min.js"></script>
  <script src="<?= BASEURL; ?>/js/App/MasterData/MasterDataMenu/MasterDataMenu_V01.js"></script>
+ <script src="<?= BASEURL; ?>/js/App/MasterData/MasterLoginUser/A_Hak_Akses_V02.js"></script>

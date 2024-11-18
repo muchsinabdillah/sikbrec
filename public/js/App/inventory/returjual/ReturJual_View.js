@@ -334,8 +334,9 @@ function ShowApprovedDatabyDate() {
     }).fnDestroy();
     $('#example').DataTable({
         "ordering": true,
+        "order": [2,'desc'],
         "ajax": {
-            "url": base_url + "/SIKBREC/public/aPenjualanTanpaResep/getSalesbyPeriode",
+            "url": base_url + "/SIKBREC/public/aPenjualanDenganResep/getSalesbyPeriodeResep",
             "type":"POST",
             "data": {
                 "tglawal" : tglawal,
@@ -366,7 +367,27 @@ function ShowApprovedDatabyDate() {
                     return html
                 }
             }, 
-
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.NamaPembeli + ' </font>  ';
+                    return html
+                }
+            },
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.TglLahirPembeli + ' </font>  ';
+                    return html
+                }
+            },
+            {
+                "render": function (data, type, row) { // Tampilkan kolom aksi
+                    var html = ""
+                    var html = '<font size="1"> ' + row.Group_Transaksi + ' </font>  ';
+                    return html
+                }
+            },
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
@@ -499,6 +520,14 @@ function updateUIdatagetReturJualbyID(dataResponse) {
     $("#UnitSales").val(dataResponse.data[0].UunitSales);
     $("#Notes").val(dataResponse.data[0].Notes);
     $("#NoResep").val(dataResponse.data[0].NoResep);
+
+    $("#JenisKelamin").val(dataResponse.data[0].GenderPembeli);
+    $("#Tgl_Lahir").val(dataResponse.data[0].TglLahirPembeli);
+    $("#NamaPasien").val(dataResponse.data[0].NamaPembeli);
+    $("#Alamat").val(dataResponse.data[0].AlamatPembeli);
+    $("#TipePasien").val(dataResponse.data[0].GroupJaminan);
+    $("#Jaminan").val(dataResponse.data[0].NamaJaminan);
+    $("#KodeJaminan").val(dataResponse.data[0].KodeJaminan);
     
   
 

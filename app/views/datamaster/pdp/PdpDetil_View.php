@@ -52,6 +52,9 @@
                                                  <font size="1">Kode Tipe Pdp
                                              </th>
                                              <th align='center'>
+                                                 <font size="1">Nama Tipe Pdp
+                                             </th>
+                                             <th align='center'>
                                                  <font size="1">Nilai Prosen
                                              </th>
                                              <th align='center'>

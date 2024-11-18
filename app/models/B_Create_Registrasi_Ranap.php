@@ -111,7 +111,7 @@ EOT;
             die($e->getMessage());
         }
     }
-    public function getDataListPasienRawat_old()
+    public function getDataListPasienRawat()
     {
         try {
             // $this->db->query("SELECT *, replace(CONVERT(VARCHAR(11), StartDate, 111), '/','-')AS VisitDate,  
@@ -177,7 +177,7 @@ EOT;
         }
     }
 
-    public function getDataListPasienRawat()
+    public function getDataListPasienRawat_old()
     {
         try {
 
@@ -1516,12 +1516,12 @@ EOT;
                 $this->db->bind('noregisrwj', $noregisrwj);
                 $this->db->execute();
 
-                // // UPDATE TABEL EMR_ORDEROPERASI
-                // $this->db->query("UPDATE MedicalRecord.dbo.EMR_OrderOperasi
-                //     SET NoRegistrasi=:nofinalreg where NoMR=:nomr and left(NoRegistrasi,2) = 'RJ' and StatusOrder not in('Close' , 'Batal', 'cancel') ");
-                // $this->db->bind('nofinalreg', $nofinalreg);
-                // $this->db->bind('nomr', $nomr);
-                // $this->db->execute();
+                // UPDATE TABEL EMR_ORDEROPERASI
+                $this->db->query("UPDATE MedicalRecord.dbo.EMR_OrderOperasi
+                    SET NoRegistrasi=:nofinalreg where NoMR=:nomr and NoRegistrasi=:noregisrwj ");
+                $this->db->bind('nofinalreg', $nofinalreg);
+                $this->db->bind('noregisrwj', $noregisrwj);
+                $this->db->execute();
 
                 // // UPDATE TABEL EMR_ORDEROPERASI
                 // $this->db->query("UPDATE MedicalRecord.dbo.MR_LaporanOperasi

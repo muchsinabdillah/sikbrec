@@ -29,7 +29,8 @@
                                     <label for=" inputEmail3" class="col-sm-1 control-label"> Unit <sup
                                             class="color-danger">*</sup></label>
                                     <div class="col-sm-3">
-                                        <select name="Unit" id="Unit" class="form-control">
+                                    <input type="hidden" name="Unit" id="Unit" />
+                                        <select name="Unit_Select" id="Unit_Select" class="form-control" onchange="getIDUnit(this)">
                                         </select>
                                     </div>
                                 </div>
@@ -43,7 +44,7 @@
                                     <label for=" inputEmail3" class="col-sm-2 control-label"> Keterangan <sup
                                             class="color-danger">*</sup></label>
                                     <div class="col-sm-3">
-                                        <input type="text" class="form-control" name="Notes" id="Notes">
+                                    <textarea class="form-control input-sm " id="Notes" name="Notes" placeholder="Ketik Keterangan Disini"></textarea>
                                     </div>
                                 </div>
                             </form>
@@ -65,7 +66,7 @@
                                     <input type="text" class="form-control" autocomplete="off" readonly name="xNamaBarang" id="xNamaBarang" maxlength="25">
                                     <input type="hidden" class="form-control" autocomplete="off" readonly name="xIdBarang" id="xIdBarang" maxlength="25">
                                 </div>
-                                    <div class="form-group col-md-2">
+                                    <div class="form-group col-md-1">
                                         <label for="inputEmail3">Satuan</label>
                                         <input type="text" class="form-control" autocomplete="off" name="Satuan" id="Satuan" readonly>
                                         <input type="hidden" class="form-control" autocomplete="off" name="Satuan_Konversi" id="Satuan_Konversi" readonly>
@@ -80,14 +81,22 @@
                                         <input type="text" class="form-control" autocomplete="off" name="QtyCurrent" id="QtyCurrent" maxlength="25">
                                     </div>
                                     <div class="form-group col-md-1">
-                                        <label for="inputEmail3">Qty Adj</label>
-                                        <input type="text" class="form-control" autocomplete="off" name="QtyAdj" id="QtyAdj" maxlength="25">
+                                        <label for="inputEmail3">Batch</label>
+                                        <input type="text" class="form-control" autocomplete="off" name="BatchAdd" id="BatchAdd" >
+                                        
+                                        <input type="hidden" class="form-control" autocomplete="off" name="QtyAdj" id="QtyAdj" maxlength="25">
                                         <input type="hidden" class="form-control" autocomplete="off" name="hpp_add" id="hpp_add" maxlength="25">
-                                         
                                     </div> 
+                                    <div class="form-group col-md-1">
+                                        <label for="inputEmail3">Expired Date</label>
+                                        <input type="date" class="form-control" autocomplete="off" name="ExpiredDateAdd" id="ExpiredDateAdd" >
+                                    </div> 
+                                    <!-- <div class="form-group col-md-1">
+                                        <label for="inputEmail3">Qty Adj</label>
+                                    </div>  -->
                                     <div class="orm-group col-md-2">
                                         <label for="inputEmail3" class="color-white">-</label>
-                                        <a class="btn btn-maroon btn-rounded waves-effect" id="btnAdd" name="btnAdd"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add</a>
+                                        <button type="button" class="btn btn-maroon btn-rounded waves-effect" id="btnAdd" name="btnAdd"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add</button>
                                     </div>
                             </div>
                             <form id="user_form">
@@ -140,20 +149,20 @@
                                                     <font size="1">GRANDTOTAL :</font>
                                                 </th>
                                                 <th>
-                                                    <font size="1"><input type="text" name="grantotalOrder_closing" id="grantotalOrder_closing" class="form-control" readonly /></font>
+                                                    <font size="1"><input type="text" name="ttl_qtyAkhir" id="ttl_qtyAkhir" class="form-control" readonly /></font>
                                                 </th>
                                                 <th>
-                                                    <font size="1"><input type="text" name="ttl_qtyAkhir" id="ttl_qtyAkhir" class="form-control" readonly /></font>
+                                                    <font size="1"><input type="hidden" name="grantotalOrder_closing" id="grantotalOrder_closing" class="form-control" readonly /></font>
                                                 </th>
                                                 <th>
                                                     <font size="1">
                                                         <div id="LTaxRp"></div>
-                                                    </font><input type="text" name="totalrow_closing" id="totalrow_closing" class="form-control" readonly />
+                                                    </font><input type="text" name="grandtotalxl" id="grandtotalxl" class="form-control grandtotalxl" readonly />
                                                 </th>
                                                 <th>
                                                     <font size="1">
                                                         <div id="Grandtotal"></div>
-                                                    </font><input type="text" name="grandtotalxl" id="grandtotalxl" class="form-control grandtotalxl" readonly />
+                                                    </font><input type="hidden" name="totalrow_closing" id="totalrow_closing" class="form-control" readonly />
                                                 </th>
                                                 <th>
                                                     <font size="1">

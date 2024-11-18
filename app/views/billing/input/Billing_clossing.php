@@ -7,26 +7,26 @@ $datetimenow = date("Y-m-d\TH:i:s");
 <link type="text/css" href="//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css"
     rel="stylesheet" />
 <style>
-table {
-    border: 2px solid #6C6A61;
-    border-collapse: collapse;
-    font-size: 10px;
-}
+    table {
+        border: 2px solid #6C6A61;
+        border-collapse: collapse;
+        font-size: 10px;
+    }
 
-th,
-td {
-    border: 1px solid #bbb;
-    padding: 2px 8px 0;
-    font-size: 10px;
-}
+    th,
+    td {
+        border: 1px solid #bbb;
+        padding: 2px 8px 0;
+        font-size: 10px;
+    }
 
-thead>tr>th {
-    background-color: #C0C0C0;
-    border-bottom: 2px solid #999;
-    font-size: 10px;
-}
+    thead>tr>th {
+        background-color: #C0C0C0;
+        border-bottom: 2px solid #999;
+        font-size: 10px;
+    }
 
-/* .border-ranap {
+    /* .border-ranap {
     border-left-color: #1E90FF;
     border-left-style: groove;
     border-left-width: 7px;
@@ -55,45 +55,45 @@ thead>tr>th {
 } */
 
 
-/* input transparant */
-input {
-    /* width: 300px; */
-    padding: 10px 20px;
-    border-color: transparent;
-    border-bottom: 5px solid darkgrey;
-    font-size: 15px;
-    background: transparent;
-}
+    /* input transparant */
+    input {
+        /* width: 300px; */
+        padding: 10px 20px;
+        border-color: transparent;
+        border-bottom: 5px solid darkgrey;
+        font-size: 15px;
+        background: transparent;
+    }
 
-input:focus {
-    outline: none;
-}
+    input:focus {
+        outline: none;
+    }
 
-input::-webkit-input-placeholder {
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input::-webkit-input-placeholder {
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input:-moz-placeholder {
-    /* Firefox 18- */
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input:-moz-placeholder {
+        /* Firefox 18- */
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input::-moz-placeholder {
-    /* Firefox 19+ */
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input::-moz-placeholder {
+        /* Firefox 19+ */
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 
-input:-ms-input-placeholder {
-    padding-left: 5px;
-    font-size: 15px;
-    color: #3c3c3c;
-}
+    input:-ms-input-placeholder {
+        padding-left: 5px;
+        font-size: 15px;
+        color: #3c3c3c;
+    }
 </style>
 <div class="main-page">
     <section class="section" style="margin-top: -20px;">
@@ -142,7 +142,7 @@ input:-ms-input-placeholder {
                                                 <label for="inputEmail3" class="col-sm-2 control-label"> Tgl Transaksi
                                                 </label>
                                                 <div class="col-sm-4">
-                                                    <input type="date" name="TglMasuk" id="TglMasuk" readonly
+                                                    <input type="date" name="TglMasuk" id="TglMasuk"
                                                         style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                                 </div>
                                                 <label for=" inputEmail3" class="col-sm-2 control-label">

@@ -36,3 +36,5 @@ require_once __DIR__ . "/core/Eklaim.php";
 require_once __DIR__ . "/core/trait/Edocuments.php";
 require_once __DIR__ . "/core/trait/ApiMySDI.php";
 require_once __DIR__ . "/core/SSP.php";
+require_once __DIR__ . "/core/trait/ApiGenerateEmaterai.php";
+require_once __DIR__ . "/core/GenerateEmaterai.php";

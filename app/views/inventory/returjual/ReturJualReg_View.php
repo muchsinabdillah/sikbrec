@@ -396,8 +396,8 @@
 <!-- /.row -->
 
 <!-- #modal cari pasien------>
-<div class="modal fade" id="btnSearching_modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog modal-lg">
+<div class="modal fade" id="btnSearching_modal" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" style="width:80%">
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">

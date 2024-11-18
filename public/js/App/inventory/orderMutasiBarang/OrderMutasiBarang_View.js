@@ -342,6 +342,12 @@ function updateUIdataGocreateHdr(dataResponse) {
         });
         $('#IdAuto').val(dataResponse);
         $("#btnNewPurchase").attr('disabled', true);
+        
+    
+    $('#LayananOrderMutasi option:not(:selected)').prop('disabled', true);
+    $('#LayananTujuanMutasi option:not(:selected)').prop('disabled', true);
+    $('#JenisStok option:not(:selected)').prop('disabled', true);
+    $('#jenistransaksi option:not(:selected)').prop('disabled', true);
         enableAll();
     }else{
         swal({
@@ -399,6 +405,7 @@ function disableAll() {
     // $("#nama_Barang").attr('disabled', true);
     // $("#qty_Barang").attr('disabled', true);
     $("#nama_Barang").attr('disabled', true);
+    $("#btnPaket").attr('disabled',true);
 }
 function enableAll() {
     $("#nama_Barang").attr('disabled', false);
@@ -417,7 +424,7 @@ function enableAll() {
     $("#btnSave").attr('disabled', false);
     // $("#nama_Barang").attr('disabled', false);
     // $("#qty_Barang").attr('disabled', false);
-    
+    $("#btnPaket").attr('disabled',false);
 }
 
 async function AddRow(){
@@ -628,6 +635,14 @@ function updateUIdatagetOrderMutasibyID(dataResponse) {
     $("#jenistransaksi").val(dataResponse.data[0].JenisMutasi);
     $("#JenisStok").val(dataResponse.data[0].JenisStok);
     $("#Notes").val(dataResponse.data[0].Notes);
+    $('#LayananOrderMutasi option:not(:selected)').prop('disabled', true);
+    $('#LayananTujuanMutasi option:not(:selected)').prop('disabled', true);
+    $('#JenisStok option:not(:selected)').prop('disabled', true);
+    $('#jenistransaksi option:not(:selected)').prop('disabled', true);
+
+    $("#TglTransaksi").attr('readonly',true);
+    // $("#LayananOrderMutasi").select2();
+    // $("#LayananTujuanMutasi").select2();
 }
 function getOrderMutasibyID() {
     var base_url = window.location.origin;
@@ -1049,19 +1064,21 @@ function updateUIdataGocreateDtlPaket(dataResponse) {
     if(dataResponse.status == false){
         toast(dataResponse.message, "error")
     }else{
+        //console.log(dataResponse);
         // toast(dataResponse.message, "success")
-         var arrayLength = dataResponse['data'].length;
+         //var arrayLength = dataResponse['data'].length;
         // for (var i = 0; i < arrayLength; i++) {
         //     console.log(dataResponse.data[i]);
         // }
-        if (arrayLength > 0){
+        if (Object.hasOwn(dataResponse, 'data')){
             var icon = 'warning'
             var title = 'Berhasil Input Paket Dengan Catatan!'
+            var text = dataResponse['data'].join("\r\n");
         }else{
-            var icon = 'Success'
+            var icon = 'success'
             var title = 'Berhasil Input Paket!'
+            var text = 'Berhasil Input Paket ! Silahkan Dicek Kembali !'
         }
-        const text = dataResponse['data'].join("\r\n");
             swal({
             title: title,
             text: text,

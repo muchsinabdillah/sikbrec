@@ -486,28 +486,29 @@ class A_Pengeluaran_Rutin_Model
                 $kodeRegAwal = "PN";
                         $datenow2 = date('Y-m-d');
                         $formatDateJurnal =  Utils::idtrsByDateOnly();
-                        //auto number jurnal
+                         //auto number jurnal
                         $this->db->query("SELECT  TOP 1 FS_KD_JURNAL,right(FS_KD_JURNAL,4) as urutregx,right(FS_KD_JURNAL,4)+1 as urutregxplus
-                                        FROM Keuangan.dbo.TA_JURNAL_HDR  WHERE  
-                                        SUBSTRING(FS_KD_JURNAL,3,6)=:formatDateJurnal AND LEFT(FS_KD_JURNAL,2)=:kodeRegAwal  
-                                        ORDER BY FS_KD_JURNAL DESC");
+                        FROM Keuangan.dbo.TA_JURNAL_HDR  WHERE  
+                        SUBSTRING(FS_KD_JURNAL,3,6)=:formatDateJurnal AND LEFT(FS_KD_JURNAL,2)=:kodeRegAwal  
+                        ORDER BY urutregx DESC");
                         $this->db->bind('formatDateJurnal', $formatDateJurnal);
                         $this->db->bind('kodeRegAwal', $kodeRegAwal); 
                         $this->db->execute();
                         $data =  $this->db->single();
                         $nourut = $data['urutregx'];
+
                         if (empty($nourut)) {
                             //jika gk ada record
                             $nourut = "0001";
                         } else {
                             //jika ada record
                             // $nourut++;
-                            $nourut = $data['urutregxplus'];
+                            $nourut = $data['urutregxplus']++;
                         }
                         $nourutfix = Utils::generateAutoNumberFourDigit($nourut); 
                         $idxt = Utils::idtrsByDateOnly();
                         $nokasbonAuto = $idxt;
-                        $notransaksiJurnal = $kodeRegAwal  . $nokasbonAuto . '-' . $no.$nourutfix;
+                        $notransaksiJurnal = $kodeRegAwal  . $nokasbonAuto . '-' .  $nourutfix;
 
                         //UPDATE SELESAI TABEL KASBON
                         $this->db->query("UPDATE Keuangan.dbo.T_Kas_Keluar 
