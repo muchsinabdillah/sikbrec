@@ -1,0 +1,13 @@
+{
+    "name": "user/jwt",
+    "description": "Jwt Login",
+    "authors": [
+        {
+            "name": "muchsin",
+            "email": "muchsin@rsyarsi.co.id"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^5.2"
+    }
+}
