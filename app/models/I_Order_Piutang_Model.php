@@ -168,7 +168,7 @@ class I_Order_Piutang_Model
             die($e->getMessage());
         }
     }
-    public function kirimtagihagoGenerateSelisihn($data)
+    public function kirimtagihan($data)
     {
         try {
             $this->db->transaksi();
@@ -1441,10 +1441,10 @@ class I_Order_Piutang_Model
                     inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegistrasi  collate Latin1_General_CI_AS
                     inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
                     inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
+                   inner join Billing_Pasien.dbo.FO_T_KASIR_2 e on e.NO_TRS_REFF = a.PAYMENT_NO
                     WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey1 )    and a.FB_TAGIH='1'
                     and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
-                    AND A.kode_jaminan=:kodejaminan1 and e.TipePembayaran='Piutang Asuransi'   
+                    AND A.kode_jaminan=:kodejaminan1 and e.TIPE_PEMBAYARAN='Piutang Asuransi'   
                     and a.FB_BATAL='0'
                     UNION ALL
                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
@@ -1456,104 +1456,24 @@ class I_Order_Piutang_Model
                     inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoRegistrasi  collate Latin1_General_CI_AS 
                     inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
                     inner join MasterdataSQL.dbo.Admision d on d.NoMR collate Latin1_General_CI_AS  = b.NoMR collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
+                     inner join Billing_Pasien.dbo.FO_T_KASIR_2 e on e.NO_TRS_REFF = a.PAYMENT_NO
                     where  a.FB_TAGIH='0' 
                     and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
-                    AND A.kode_jaminan=:kodejaminan2 and e.TipePembayaran='Piutang Asuransi'  
+                    AND A.kode_jaminan=:kodejaminan2  and e.TIPE_PEMBAYARAN='Piutang Asuransi'  
                     and a.FB_BATAL='0'
-                    UNION ALL
-                     SELECT a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a 
-                     INNER JOIN Keuangan.dbo.TA_JURNAL_DTL B 
-                     on a.NO_TRANSAKSI collate Latin1_General_CI_AS   = b.FS_KD_JURNAL   collate Latin1_General_CI_AS
-                     where a.FB_BATAL='0'   AND  a.FB_TAGIH='0' 
-                     and a.TipePiutang='RAJAL' and a.TipeJaminan='Asuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3 
-                     AND A.kode_jaminan=:kodejaminan3  and a.FB_BATAL='0'
-                     UNION ALL
-                     SELECT  a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegistrasi  collate Latin1_General_CI_AS
-                    inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
-                    inner join MasterdataSQL.dbo.Admision_walkin d on d.NoMR = b.NoMR
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey2 )  and a.FB_TAGIH='1'
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode4 AND :periodeAkhir4
-                    AND A.kode_jaminan=:kodejaminan4 and e.TipePembayaran='Piutang Asuransi'  
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                    SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                      replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                    d.PatientName collate Latin1_General_CI_AS  ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoRegistrasi  collate Latin1_General_CI_AS 
-                    inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
-                    inner join MasterdataSQL.dbo.Admision_walkin d on d.NoMR collate Latin1_General_CI_AS  = b.NoMR collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    where  a.FB_TAGIH='0' 
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode5 AND :periodeAkhir5
-                    AND A.kode_jaminan=:kodejaminan5 and e.TipePembayaran='Piutang Asuransi'   
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                    replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                b.[Ship Name]  collate Latin1_General_CI_AS as PatientName ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join [Apotik_V1.1SQL].dbo.Orders b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoResep  collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    where  a.FB_TAGIH='0' 
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode6 AND :periodeAkhir6
-                    AND A.kode_jaminan=:kodejaminan6 and e.TipePembayaran='Piutang Asuransi'   
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                    replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                b.[Ship Name]  collate Latin1_General_CI_AS as PatientName ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join [Apotik_V1.1SQL].dbo.Orders b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoResep  collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    where  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey3)  and a.FB_TAGIH='1'
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode7 AND :periodeAkhir7
-                    AND A.kode_jaminan=:kodejaminan7 and e.TipePembayaran='Piutang Asuransi'    
-                    and a.FB_BATAL='0'";
+                   ";
                     $this->db->query($query);
                     $this->db->bind('periode1', $TglPeriode1);
-                    $this->db->bind('periode2', $TglPeriode1);
-                    $this->db->bind('periode3', $TglPeriode1);
-                    $this->db->bind('periode4', $TglPeriode1);
-                    $this->db->bind('periode5', $TglPeriode1);
-                    $this->db->bind('periode6', $TglPeriode1);
-                    $this->db->bind('periode7', $TglPeriode1);
+                    $this->db->bind('periode2', $TglPeriode1); 
 
                     $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    $this->db->bind('periodeAkhir2', $TglPeriode2);
-                    $this->db->bind('periodeAkhir3', $TglPeriode2);
-                    $this->db->bind('periodeAkhir4', $TglPeriode2);
-                    $this->db->bind('periodeAkhir5', $TglPeriode2);
-                    $this->db->bind('periodeAkhir6', $TglPeriode2);
-                    $this->db->bind('periodeAkhir7', $TglPeriode2);
+                    $this->db->bind('periodeAkhir2', $TglPeriode2); 
 
 
                     $this->db->bind('kodejaminan1', $kodejaminan);
-                    $this->db->bind('kodejaminan2', $kodejaminan);
-                    $this->db->bind('kodejaminan3', $kodejaminan);
-                    $this->db->bind('kodejaminan4', $kodejaminan);
-                    $this->db->bind('kodejaminan5', $kodejaminan);
-                    $this->db->bind('kodejaminan6', $kodejaminan);
-                    $this->db->bind('kodejaminan7', $kodejaminan);
+                    $this->db->bind('kodejaminan2', $kodejaminan); 
 
-                    $this->db->bind('myKey1', $myKey);
-                    $this->db->bind('myKey2',  $myKey);
-                    $this->db->bind('myKey3',  $myKey);
+                    $this->db->bind('myKey1', $myKey); 
 
                     // $this->db->execute();
                     $data =  $this->db->resultSet();
@@ -1574,15 +1494,15 @@ class I_Order_Piutang_Model
                     }
                 } else {
                     $query = "SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
+                    FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
                     from Keuangan.dbo.PIUTANG_PASIEN a
                     inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegistrasi  collate Latin1_General_CI_AS
                     inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
                     inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
+                     inner join Billing_Pasien.dbo.FO_T_KASIR_2 e on e.NO_TRS_REFF = a.PAYMENT_NO
                     WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey1 ) and a.FB_TAGIH='1'
                     and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
-                    AND A.kode_jaminan=:kodejaminan1 and e.TipePembayaran<>'Piutang Asuransi' and a.FB_BATAL='0'
+                    AND A.kode_jaminan=:kodejaminan1  and e.TIPE_PEMBAYARAN<>'Piutang Asuransi' and a.FB_BATAL='0' and e.BATAL='0'
                     UNION ALL
                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
                 FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,d.PatientName collate Latin1_General_CI_AS  , '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
@@ -1590,101 +1510,21 @@ class I_Order_Piutang_Model
                     inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegistrasi  collate Latin1_General_CI_AS 
                     inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
                     inner join MasterdataSQL.dbo.Admision d on d.NoMR  collate Latin1_General_CI_AS = b.NoMR  collate Latin1_General_CI_AS
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
+                     inner join Billing_Pasien.dbo.FO_T_KASIR_2 e on e.NO_TRS_REFF = a.PAYMENT_NO
                     AND  a.FB_TAGIH='0' 
                     and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
-                    AND A.kode_jaminan=:kodejaminan2 and e.TipePembayaran<>'Piutang Asuransi' 
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                    SELECT a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a 
-                     where a.FB_BATAL='0' AND  a.FB_TAGIH='0' 
-                     and a.TipePiutang='RAJAL' and a.TipeJaminan='NonAsuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3
-                     AND A.kode_jaminan=:kodejaminan3 and a.FB_BATAL='0'
-                     UNION ALL
-                     SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegistrasi  collate Latin1_General_CI_AS
-                    inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
-                    inner join MasterdataSQL.dbo.Admision_walkin d on d.NoMR = b.NoMR
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey2 ) and a.FB_TAGIH='1'
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode4 AND :periodeAkhir4
-                    AND A.kode_jaminan=:kodejaminan4 and e.TipePembayaran<>'Piutang Asuransi' 
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                    SELECT   a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                      replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                    d.PatientName collate Latin1_General_CI_AS  ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join PerawatanSQL.dbo.Visit b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoRegistrasi  collate Latin1_General_CI_AS 
-                    inner join MasterdataSQL.dbo.MstrUnitPerwatan c on c.ID = b.Unit
-                    inner join MasterdataSQL.dbo.Admision_walkin d on d.NoMR collate Latin1_General_CI_AS  = b.NoMR collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    AND  a.FB_TAGIH='0' 
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode5 AND :periodeAkhir5
-                    AND A.kode_jaminan=:kodejaminan5 and e.TipePembayaran<>'Piutang Asuransi' 
-                    and a.FB_BATAL='0'
-                    UNION ALL
-                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                    replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                b.[Ship Name]  collate Latin1_General_CI_AS as PatientName ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join [Apotik_V1.1SQL].dbo.Orders b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoResep  collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    AND  a.FB_TAGIH='0' 
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode6 AND :periodeAkhir6
-                    AND A.kode_jaminan=:kodejaminan6 and e.TipePembayaran<>'Piutang Asuransi'   
-                    and a.FB_BATAL='0' 
-                      UNION ALL
-                     SELECT  a.KD_PIUTANG collate Latin1_General_CI_AS ,a.FB_TAGIH, 
-                    replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                    FD_TGL_PIUTANG  , b.NoRegistrasi collate Latin1_General_CI_AS  as NoRegistrasi ,
-                b.[Ship Name]  collate Latin1_General_CI_AS as PatientName ,
-                    '' as NamaUnit   ,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-                    from Keuangan.dbo.PIUTANG_PASIEN a
-                    inner join [Apotik_V1.1SQL].dbo.Orders b on a.NO_TRANSAKSI collate Latin1_General_CI_AS  = B.NoResep  collate Latin1_General_CI_AS 
-                    inner join PerawatanSQL.dbo.PaymentDetails e on e.PaymentID = a.PAYMENT_NO
-                    where  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey3 ) and a.FB_TAGIH='1' 
-                    and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode7 AND :periodeAkhir7
-                    AND A.kode_jaminan=:kodejaminan7  and e.TipePembayaran<>'Piutang Asuransi'   
-                    and a.FB_BATAL='0' ";
+                    AND A.kode_jaminan=:kodejaminan2 and e.TIPE_PEMBAYARAN<>'Piutang Asuransi' 
+                    and a.FB_BATAL='0' and e.BATAL='0'";
                     $this->db->query($query);
-                    $this->db->bind('periode1', $TglPeriode1);
-                    $this->db->bind('periode2', $TglPeriode1);
-                    $this->db->bind('periode3', $TglPeriode1);
-                    $this->db->bind('periode4', $TglPeriode1);
-                    $this->db->bind('periode5', $TglPeriode1);
-                    $this->db->bind('periode6', $TglPeriode1);
-                    $this->db->bind('periode7', $TglPeriode1);
-                    $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    $this->db->bind('periodeAkhir2', $TglPeriode2);
-                    $this->db->bind('periodeAkhir3', $TglPeriode2);
-                    $this->db->bind('periodeAkhir4', $TglPeriode2);
-                    $this->db->bind('periodeAkhir5', $TglPeriode2);
-                    $this->db->bind('periodeAkhir6', $TglPeriode2);
-                    $this->db->bind('periodeAkhir7', $TglPeriode2);
-
+                    $this->db->bind('periode1', $TglPeriode1); 
+                    $this->db->bind('periodeAkhir1', $TglPeriode2); 
+                    $this->db->bind('periode2', $TglPeriode1); 
+                    $this->db->bind('periodeAkhir2', $TglPeriode2); 
 
                     $this->db->bind('kodejaminan1', $kodejaminan);
-                    $this->db->bind('kodejaminan2', $kodejaminan);
-                    $this->db->bind('kodejaminan3', $kodejaminan);
-                    $this->db->bind('kodejaminan4', $kodejaminan);
-                    $this->db->bind('kodejaminan5', $kodejaminan);
-                    $this->db->bind('kodejaminan6', $kodejaminan);
-                    $this->db->bind('kodejaminan7', $kodejaminan);
+                    $this->db->bind('kodejaminan2', $kodejaminan); 
 
-                    $this->db->bind('myKey1', $myKey);
-                    $this->db->bind('myKey2',  $myKey);
-                    $this->db->bind('myKey3',  $myKey);
+                    $this->db->bind('myKey1', $myKey); 
                     $this->db->execute();
                     $data =  $this->db->resultSet();
                     $rows = array();
@@ -1706,236 +1546,236 @@ class I_Order_Piutang_Model
                 }
             }
 
-            if ($JenisRegistrasi == "RI") {
-                if ($jenisjaminan == "Asuransi") {
-                    $query = "SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-              from Keuangan.dbo.PIUTANG_PASIEN a
-              inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
-              inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-              inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
-              WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey1 )
-                and a.FB_TAGIH='1' 
-              and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
-              and e.TipePembayaran='Piutang Asuransi' AND A.kode_jaminan=:kodejaminan1 
-              and a.FB_BATAL='0'
-              UNION ALL
-              SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-              from Keuangan.dbo.PIUTANG_PASIEN a
-             inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
-              inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-              inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
-              AND  a.FB_TAGIH='0'
-              and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
-              and e.TipePembayaran='Piutang Asuransi' AND A.kode_jaminan=:kodejaminan2 
-              and a.FB_BATAL='0'";
-                    $this->db->query($query);
-                    $this->db->bind('periode1', $TglPeriode1);
-                    $this->db->bind('periode2', $TglPeriode1);
+            // if ($JenisRegistrasi == "RI") {
+            //     if ($jenisjaminan == "Asuransi") {
+            //         $query = "SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //     FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
+            //   from Keuangan.dbo.PIUTANG_PASIEN a
+            //   inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
+            //   inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
+            //   inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
+            //   WHERE  FS_KD_TAGIH in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey1 )
+            //     and a.FB_TAGIH='1' 
+            //   and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
+            //   and e.TipePembayaran='Piutang Asuransi' AND A.kode_jaminan=:kodejaminan1 
+            //   and a.FB_BATAL='0'
+            //   UNION ALL
+            //   SELECT a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //     FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName, '' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
+            //   from Keuangan.dbo.PIUTANG_PASIEN a
+            //  inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
+            //   inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
+            //   inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
+            //   AND  a.FB_TAGIH='0'
+            //   and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
+            //   and e.TipePembayaran='Piutang Asuransi' AND A.kode_jaminan=:kodejaminan2 
+            //   and a.FB_BATAL='0'";
+            //         $this->db->query($query);
+            //         $this->db->bind('periode1', $TglPeriode1);
+            //         $this->db->bind('periode2', $TglPeriode1);
 
 
 
-                    $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    $this->db->bind('periodeAkhir2', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir1', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir2', $TglPeriode2);
 
 
 
-                    $this->db->bind('kodejaminan1', $kodejaminan);
-                    $this->db->bind('kodejaminan2', $kodejaminan);
+            //         $this->db->bind('kodejaminan1', $kodejaminan);
+            //         $this->db->bind('kodejaminan2', $kodejaminan);
 
 
-                    $this->db->bind('myKey1', $myKey);
-                    $this->db->execute();
-                    $data =  $this->db->resultSet();
-                    $rows = array();
-                    // var_dump($data);
-                    // exit;
-                    foreach ($data as $row) {
-                        $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
-                        $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
-                        $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
-                        $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
-                        $pasing['PatientName'] = $row['PatientName'];
-                        $pasing['NamaUnit'] = $row['NamaUnit'];
-                        $pasing['Fn_piutang'] = $row['Fn_piutang'];
-                        $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+            //         $this->db->bind('myKey1', $myKey);
+            //         $this->db->execute();
+            //         $data =  $this->db->resultSet();
+            //         $rows = array();
+            //         // var_dump($data);
+            //         // exit;
+            //         foreach ($data as $row) {
+            //             $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
+            //             $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
+            //             $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
+            //             $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
+            //             $pasing['PatientName'] = $row['PatientName'];
+            //             $pasing['NamaUnit'] = $row['NamaUnit'];
+            //             $pasing['Fn_piutang'] = $row['Fn_piutang'];
+            //             $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
 
 
-                        $rows[] = $pasing;
-                    }
-                } else {
-                    $query = "SELECT  a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName,'' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-              from Keuangan.dbo.PIUTANG_PASIEN a
-              inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
-              inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-              inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
-              WHERE FS_KD_TAGIH   in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey2 )
-                and a.FB_TAGIH='1' 
-              and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3
-              and e.TipePembayaran<>'Piutang Asuransi' AND A.kode_jaminan=:kodejaminan3  
-              and a.FB_BATAL='0'
-              UNION ALL
-              SELECT  a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName,  '' as  NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
-              from Keuangan.dbo.PIUTANG_PASIEN a
-              inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
+            //             $rows[] = $pasing;
+            //         }
+            //     } else {
+            //         $query = "SELECT  a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //     FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName,'' as NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
+            //   from Keuangan.dbo.PIUTANG_PASIEN a
+            //   inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
+            //   inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
+            //   inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
+            //   WHERE FS_KD_TAGIH   in (SELECT FS_KD_TRS FROM Keuangan.DBO.TA_ORDER_PIUTANG WHERE ID=:myKey2 )
+            //     and a.FB_TAGIH='1' 
+            //   and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3
+            //   and e.TipePembayaran<>'Piutang Asuransi' AND A.kode_jaminan=:kodejaminan3  
+            //   and a.FB_BATAL='0'
+            //   UNION ALL
+            //   SELECT  a.KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //     FD_TGL_PIUTANG, b.NoRegRI as NoRegistrasi,d.PatientName,  '' as  NamaUnit,a.Fn_piutang,isnull(a.FS_NO_REFF_BRIDGING,'') as FS_NO_REFF_BRIDGING
+            //   from Keuangan.dbo.PIUTANG_PASIEN a
+            //   inner join RawatInapSQL.dbo.Inpatient b on a.NO_TRANSAKSI collate Latin1_General_CI_AS = B.NoRegRI  collate Latin1_General_CI_AS
            
-              inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
-              inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
-              AND  a.FB_TAGIH='0'
-              and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN  :periode4 AND :periodeAkhir4
-              and e.TipePembayaran<>'Piutang Asuransi' AND A.kode_jaminan=:kodejaminan4 
-              and a.FB_BATAL='0'";
-                    $this->db->query($query);
-                    // $this->db->bind('periode1', $TglPeriode1);
-                    // $this->db->bind('periode2', $TglPeriode1);
-                    $this->db->bind('periode3', $TglPeriode1);
-                    $this->db->bind('periode4', $TglPeriode1);
+            //   inner join MasterdataSQL.dbo.Admision d on d.NoMR = b.NoMR
+            //   inner join  RawatInapSQL.dbo.DepositDetails  e on e.IDDeposit = a.PAYMENT_NO
+            //   AND  a.FB_TAGIH='0'
+            //   and replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN  :periode4 AND :periodeAkhir4
+            //   and e.TipePembayaran<>'Piutang Asuransi' AND A.kode_jaminan=:kodejaminan4 
+            //   and a.FB_BATAL='0'";
+            //         $this->db->query($query);
+            //         // $this->db->bind('periode1', $TglPeriode1);
+            //         // $this->db->bind('periode2', $TglPeriode1);
+            //         $this->db->bind('periode3', $TglPeriode1);
+            //         $this->db->bind('periode4', $TglPeriode1);
 
 
-                    // $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    // $this->db->bind('periodeAkhir2', $TglPeriode2);
-                    $this->db->bind('periodeAkhir3', $TglPeriode2);
-                    $this->db->bind('periodeAkhir4', $TglPeriode2);
+            //         // $this->db->bind('periodeAkhir1', $TglPeriode2);
+            //         // $this->db->bind('periodeAkhir2', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir3', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir4', $TglPeriode2);
 
 
-                    // $this->db->bind('kodejaminan1', $kodejaminan);
-                    // $this->db->bind('kodejaminan2', $kodejaminan);
-                    $this->db->bind('kodejaminan3', $kodejaminan);
-                    $this->db->bind('kodejaminan4', $kodejaminan);
+            //         // $this->db->bind('kodejaminan1', $kodejaminan);
+            //         // $this->db->bind('kodejaminan2', $kodejaminan);
+            //         $this->db->bind('kodejaminan3', $kodejaminan);
+            //         $this->db->bind('kodejaminan4', $kodejaminan);
 
 
-                    // $this->db->bind('myKey1', $myKey);
-                    $this->db->bind('myKey2', $myKey);
-                    $this->db->execute();
-                    $data =  $this->db->resultSet();
-                    $rows = array();
-                    // var_dump($data);
-                    // exit;
-                    foreach ($data as $row) {
-                        $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
-                        $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
-                        $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
-                        $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
-                        $pasing['PatientName'] = $row['PatientName'];
-                        $pasing['NamaUnit'] = $row['NamaUnit'];
-                        $pasing['Fn_piutang'] = $row['Fn_piutang'];
-                        $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+            //         // $this->db->bind('myKey1', $myKey);
+            //         $this->db->bind('myKey2', $myKey);
+            //         $this->db->execute();
+            //         $data =  $this->db->resultSet();
+            //         $rows = array();
+            //         // var_dump($data);
+            //         // exit;
+            //         foreach ($data as $row) {
+            //             $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
+            //             $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
+            //             $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
+            //             $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
+            //             $pasing['PatientName'] = $row['PatientName'];
+            //             $pasing['NamaUnit'] = $row['NamaUnit'];
+            //             $pasing['Fn_piutang'] = $row['Fn_piutang'];
+            //             $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
 
 
-                        $rows[] = $pasing;
-                    }
-                }
-            }
+            //             $rows[] = $pasing;
+            //         }
+            //     }
+            // }
 
-            if ($JenisRegistrasi == "SA") {
-                if ($jenisjaminan == "Asuransi") {
-                    $query = "SELECT A.kode_jaminan, a.TipeJaminan,a.TipePiutang,a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a  
-                     where a.FB_BATAL='0'   AND  a.FB_TAGIH='1' 
-                     and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='Asuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
-                     AND A.kode_jaminan=:kodejaminan1 and a.FB_BATAL='0'
-                     UNION ALL
-                     SELECT A.kode_jaminan, a.TipeJaminan,a.TipePiutang,a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a  
-                     where a.FB_BATAL='0'   AND  a.FB_TAGIH='0' 
-                     and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='Asuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
-                     AND A.kode_jaminan=:kodejaminan2   and a.FB_BATAL='0'";
-                    $this->db->query($query);
-                    $this->db->bind('periode1', $TglPeriode1);
-                    $this->db->bind('periode2', $TglPeriode1);
-
-
-                    $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    $this->db->bind('periodeAkhir2', $TglPeriode2);
+            // if ($JenisRegistrasi == "SA") {
+            //     if ($jenisjaminan == "Asuransi") {
+            //         $query = "SELECT A.kode_jaminan, a.TipeJaminan,a.TipePiutang,a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //          FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
+            //      A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
+            //          FROM Keuangan.dbo.PIUTANG_PASIEN a  
+            //          where a.FB_BATAL='0'   AND  a.FB_TAGIH='1' 
+            //          and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='Asuransi'  
+            //          and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode1 AND :periodeAkhir1
+            //          AND A.kode_jaminan=:kodejaminan1 and a.FB_BATAL='0'
+            //          UNION ALL
+            //          SELECT A.kode_jaminan, a.TipeJaminan,a.TipePiutang,a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG ,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //          FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
+            //      A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
+            //          FROM Keuangan.dbo.PIUTANG_PASIEN a  
+            //          where a.FB_BATAL='0'   AND  a.FB_TAGIH='0' 
+            //          and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='Asuransi'  
+            //          and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode2 AND :periodeAkhir2
+            //          AND A.kode_jaminan=:kodejaminan2   and a.FB_BATAL='0'";
+            //         $this->db->query($query);
+            //         $this->db->bind('periode1', $TglPeriode1);
+            //         $this->db->bind('periode2', $TglPeriode1);
 
 
-
-                    $this->db->bind('kodejaminan1', $kodejaminan);
-                    $this->db->bind('kodejaminan2', $kodejaminan);
-
-                    $this->db->execute();
+            //         $this->db->bind('periodeAkhir1', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir2', $TglPeriode2);
 
 
-                    $data =  $this->db->resultSet();
-                    $rows = array();
-                    foreach ($data as $row) {
-                        $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
-                        $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
-                        $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
-                        $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
-                        $pasing['PatientName'] = $row['PatientName'];
-                        $pasing['NamaUnit'] = $row['NamaUnit'];
-                        $pasing['Fn_piutang'] = $row['Fn_piutang'];
-                        $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+
+            //         $this->db->bind('kodejaminan1', $kodejaminan);
+            //         $this->db->bind('kodejaminan2', $kodejaminan);
+
+            //         $this->db->execute();
 
 
-                        $rows[] = $pasing;
-                    }
-                } else {
-                    $query = "SELECT a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a 
+            //         $data =  $this->db->resultSet();
+            //         $rows = array();
+            //         foreach ($data as $row) {
+            //             $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
+            //             $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
+            //             $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
+            //             $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
+            //             $pasing['PatientName'] = $row['PatientName'];
+            //             $pasing['NamaUnit'] = $row['NamaUnit'];
+            //             $pasing['Fn_piutang'] = $row['Fn_piutang'];
+            //             $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+
+
+            //             $rows[] = $pasing;
+            //         }
+            //     } else {
+            //         $query = "SELECT a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //          FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
+            //      A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
+            //          FROM Keuangan.dbo.PIUTANG_PASIEN a 
                      
-                     where a.FB_BATAL='0' AND  a.FB_TAGIH='0' 
-                     and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='NonAsuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3 
-                     AND A.kode_jaminan=:kodejaminan3 and a.FB_BATAL='0'
-                     UNION ALL  
-                     SELECT a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
-                     FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
-                 A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
-                     FROM Keuangan.dbo.PIUTANG_PASIEN a 
+            //          where a.FB_BATAL='0' AND  a.FB_TAGIH='0' 
+            //          and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='NonAsuransi'  
+            //          and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode3 AND :periodeAkhir3 
+            //          AND A.kode_jaminan=:kodejaminan3 and a.FB_BATAL='0'
+            //          UNION ALL  
+            //          SELECT a.KD_PIUTANG collate Latin1_General_CI_AS KD_PIUTANG,a.FB_TAGIH, replace(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/','-') as 
+            //          FD_TGL_PIUTANG, a.NO_TRANSAKSI collate Latin1_General_CI_AS  as NoRegistrasi, 
+            //      A.FS_kET  collate Latin1_General_CI_AS  as PatientName,'' as NamaUnit,a.Fn_piutang,'' as FS_NO_REFF_BRIDGING
+            //          FROM Keuangan.dbo.PIUTANG_PASIEN a 
                      
-                     where a.FB_BATAL='0' AND  a.FB_TAGIH='0' 
-                     and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='NonAsuransi'  
-                     and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode4 AND :periodeAkhir4 
-                     AND A.kode_jaminan=:kodejaminan4 and a.FB_BATAL='0'";
-                    $this->db->query($query);
-                    // $this->db->bind('periode1', $TglPeriode1);
-                    // $this->db->bind('periode2', $TglPeriode1);
-                    $this->db->bind('periode3', $TglPeriode1);
-                    $this->db->bind('periode4', $TglPeriode1);
+            //          where a.FB_BATAL='0' AND  a.FB_TAGIH='0' 
+            //          and a.TipePiutang='LAIN-LAIN' and a.TipeJaminan='NonAsuransi'  
+            //          and  replace(CONVERT(VARCHAR(11), A.fd_tgL_piutang, 111), '/','-') BETWEEN :periode4 AND :periodeAkhir4 
+            //          AND A.kode_jaminan=:kodejaminan4 and a.FB_BATAL='0'";
+            //         $this->db->query($query);
+            //         // $this->db->bind('periode1', $TglPeriode1);
+            //         // $this->db->bind('periode2', $TglPeriode1);
+            //         $this->db->bind('periode3', $TglPeriode1);
+            //         $this->db->bind('periode4', $TglPeriode1);
 
-                    // $this->db->bind('periodeAkhir1', $TglPeriode2);
-                    // $this->db->bind('periodeAkhir2', $TglPeriode2);
-                    $this->db->bind('periodeAkhir3', $TglPeriode2);
-                    $this->db->bind('periodeAkhir4', $TglPeriode2);
-
-
-                    // $this->db->bind('kodejaminan1', $kodejaminan);
-                    // $this->db->bind('kodejaminan2', $kodejaminan);
-                    $this->db->bind('kodejaminan3', $kodejaminan);
-                    $this->db->bind('kodejaminan4', $kodejaminan);
-                    $this->db->execute();
+            //         // $this->db->bind('periodeAkhir1', $TglPeriode2);
+            //         // $this->db->bind('periodeAkhir2', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir3', $TglPeriode2);
+            //         $this->db->bind('periodeAkhir4', $TglPeriode2);
 
 
-                    $data =  $this->db->resultSet();
-                    $rows = array();
-                    foreach ($data as $row) {
-                        $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
-                        $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
-                        $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
-                        $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
-                        $pasing['PatientName'] = $row['PatientName'];
-                        $pasing['NamaUnit'] = $row['NamaUnit'];
-                        $pasing['Fn_piutang'] = $row['Fn_piutang'];
-                        $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+            //         // $this->db->bind('kodejaminan1', $kodejaminan);
+            //         // $this->db->bind('kodejaminan2', $kodejaminan);
+            //         $this->db->bind('kodejaminan3', $kodejaminan);
+            //         $this->db->bind('kodejaminan4', $kodejaminan);
+            //         $this->db->execute();
 
 
-                        $rows[] = $pasing;
-                    }
-                }
-            }
+            //         $data =  $this->db->resultSet();
+            //         $rows = array();
+            //         foreach ($data as $row) {
+            //             $pasing['KD_PIUTANG'] = $row['KD_PIUTANG'];
+            //             $pasing['FB_TAGIH'] = $row['FB_TAGIH'];
+            //             $pasing['FD_TGL_PIUTANG'] = date('d/m/Y', strtotime($row['FD_TGL_PIUTANG']));
+            //             $pasing['NoRegistrasi'] = $row['NoRegistrasi'];
+            //             $pasing['PatientName'] = $row['PatientName'];
+            //             $pasing['NamaUnit'] = $row['NamaUnit'];
+            //             $pasing['Fn_piutang'] = $row['Fn_piutang'];
+            //             $pasing['FS_NO_REFF_BRIDGING'] = $row['FS_NO_REFF_BRIDGING'];
+
+
+            //             $rows[] = $pasing;
+            //         }
+            //     }
+            // }
             return $rows;
         } catch (PDOException $e) {
             die($e->getMessage());
@@ -2043,10 +1883,11 @@ class I_Order_Piutang_Model
         try {
 
             $JenisPenjamin = $data['JenisPenjamin'];
+            // var_dump($JenisPenjamin);
+            // exit;
             if ($JenisPenjamin == "Asuransi") {
                 $this->db->query("SELECT ID,NamaPerusahaan FROM MasterDataSQL.dbo.MstrPerusahaanAsuransi where StatusAktif='1'");
                 $data =  $this->db->resultSet();
-                $this->db->execute();
                 $rows = array();
                 $array = array();
                 foreach ($data as $row) {
@@ -2057,7 +1898,6 @@ class I_Order_Piutang_Model
             } elseif ($JenisPenjamin == "Perusahaan") {
                 $this->db->query("SELECT ID,NamaPerusahaan FROM MasterDataSQL.dbo.MstrPerusahaanJPK where StatusAktif='1'");
                 $data =  $this->db->resultSet();
-                $this->db->execute();
                 $rows = array();
                 $array = array();
                 foreach ($data as $row) {
@@ -2068,7 +1908,6 @@ class I_Order_Piutang_Model
             } else {
                 $this->db->query("SELECT ID,NamaPerusahaan FROM MasterDataSQL.dbo.MstrPerusahaanJPK where StatusAktif='1' and 1=0");
                 $data =  $this->db->resultSet();
-                $this->db->execute();
                 $rows = array();
                 $array = array();
                 foreach ($data as $row) {
@@ -2127,7 +1966,9 @@ class I_Order_Piutang_Model
             $callback = array(
                 'status' => 'success',
                 'Alamat' => $Alamat, // Set array status dengan success 
-                'Alamat' => $Alamat, // Set array status dengan success 
+                'message' => 'berhasil', // Set array status dengan success 
+
+                // 'Alamat' => $Alamat, // Set array status dengan success 
             );
             return $callback;
         } catch (PDOException $e) {
@@ -2259,7 +2100,8 @@ class I_Order_Piutang_Model
                 $codeBA = "KEU-RJ";
                 $this->db->query("SELECT value_number+1 as autonum FROM Keuangan.dbo._ParamNumber where name_param='no_ba_rj'");
                 $data =  $this->db->single();
-                $autonum = $data['autonum']; 
+                $autonum = $data['autonum'];
+
                 // GENERATE NO REGISTRASI
                 if (strlen($autonum) == 1) {
                     $fixvalue_number = "000" . $autonum;
@@ -2270,7 +2112,7 @@ class I_Order_Piutang_Model
                 } else if (strlen($autonum) == 4) {
                     $fixvalue_number = $autonum;
                 }
-                
+
                 $this->db->query("UPDATE Keuangan.dbo._ParamNumber set 
                 value_number=:fixvalue_number
                 where name_param='no_ba_rj'");
@@ -2332,7 +2174,7 @@ class I_Order_Piutang_Model
                 $getBlnRomawi = "XII";
             }
 
-            $AutoNumberBAFix = $value_number . '/RSU-YARSI/' . $codeBA . '/INV/' . $getBlnRomawi . '/' . $getTahunBA;
+            $AutoNumberBAFix = $value_number . '/BREC/' . $codeBA . '/INV/' . $getBlnRomawi . '/' . $getTahunBA;
             $pasing['AutoNumberBAFix'] = $AutoNumberBAFix;
 
             $this->db->commit();
@@ -2976,7 +2818,6 @@ class I_Order_Piutang_Model
             return $callback;
         }
     }
-
     public function loadInforekap($data)
     {
         try {
@@ -3114,18 +2955,20 @@ class I_Order_Piutang_Model
             // var_dump($TglAwal, $TglAkhir, $optJenisInfo);
             // exit;
             $this->db->query("SELECT FS_KD_CUSTOMER, NamaPerusahaan,
-            isnull([0_TO_45_HARI],0) noltoempatlima,
-            isnull([45_TO_60_HARI],0) empatlimatoenampuluh,
-            isnull([60_TO_90_HARI],0) enampuluhtosembilanpuluh,
-            isnull([90_TO_120_HARI],0) sembilanpuluhtoseratusduapuluh, 
+            isnull([BELUM_JATUH_TEMPO],0) blmjatuh,
+            isnull([45_HARI],0) empatlimahari,
+            isnull([60_HARI],0) enampuluhhari,
+            isnull([90_HARI],0) sembilanplhhari,
+            isnull([120_HARI],0) seratuduapuluhhari,
             isnull([120_HARI_LEBIH],0) lebihseratuduapuluhhari
             FROM (
             SELECT FS_KD_CUSTOMER,b.NamaPerusahaan,
             CASE
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) > 0 and DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45  THEN '0_TO_45_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=45 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '45_TO_60_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=60 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '60_TO_90_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=90 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '90_TO_120_HARI' 
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) = 0 THEN 'BELUM_JATUH_TEMPO'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45 THEN '45_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '60_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '90_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '120_HARI'
             WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >120 THEN '120_HARI_LEBIH'
             END AS [Quarter],SUM(C.fn_sisa) [REGISTRASI Count]
             FROM Keuangan.DBO.TA_ORDER_PIUTANG A
@@ -3138,34 +2981,13 @@ class I_Order_Piutang_Model
             and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal and :TglAkhir
             and C.fn_sisa >0
             GROUP BY FS_KD_CUSTOMER,b.NamaPerusahaan, DATEDIFF(d, Fd_Tgl_Diterima,GETDATE())
-            UNION ALL
-			SELECT FS_KD_CUSTOMER,b.NamaPerusahaan,
-            CASE
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) > 0 and DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45  THEN '0_TO_45_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=45 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '45_TO_60_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=60 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '60_TO_90_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=90 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '90_TO_120_HARI' 
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >120 THEN '120_HARI_LEBIH'
-            END AS [Quarter],SUM(C.fn_sisa) [REGISTRASI Count]
-            FROM Keuangan.DBO.TA_ORDER_PIUTANG A
-            inner join MasterdataSQL.dbo.MstrPerusahaanJPK b
-            on a.FS_KD_CUSTOMER = b.ID
-            INNER JOIN Keuangan.DBO.PIUTANG_PASIEN C ON C.FS_KD_TAGIH = A.FS_KD_TRS
-            WHERE FS_KD_PETUGAS_VOID is null and Fb_selesai='1'
-            and FS_JENIS_CUSTOMER<>'Asuransi' and Fd_Tgl_Diterima is not null
-            and Fd_Tgl_Diterima <>'1900-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal2 and :TglAkhir2
-            and C.fn_sisa >0
-            GROUP BY FS_KD_CUSTOMER,b.NamaPerusahaan, DATEDIFF(d, Fd_Tgl_Diterima,GETDATE())
             ) AS QuarterlyData
             PIVOT( SUM([REGISTRASI Count])
-            FOR Quarter IN ([0_TO_45_HARI],
-            [45_TO_60_HARI],[60_TO_90_HARI],[90_TO_120_HARI],[120_HARI_LEBIH])) AS QPivot
+            FOR Quarter IN ([BELUM_JATUH_TEMPO],[45_HARI],
+            [60_HARI],[90_HARI],[120_HARI],[120_HARI_LEBIH])) AS QPivot
             order by NamaPerusahaan asc");
             $this->db->bind('TglAwal', $TglAwal);
             $this->db->bind('TglAkhir', $TglAkhir);
-            $this->db->bind('TglAwal2', $TglAwal);
-            $this->db->bind('TglAkhir2', $TglAkhir);
             $data =  $this->db->resultSet();
 
             $rows = array();
@@ -3175,10 +2997,11 @@ class I_Order_Piutang_Model
                 $pasing['no'] = $no++;
                 $pasing['FS_KD_CUSTOMER'] = $row['FS_KD_CUSTOMER'];
                 $pasing['NamaPerusahaan'] = $row['NamaPerusahaan'];
-                $pasing['noltoempatlima'] = $row['noltoempatlima'];
-                $pasing['empatlimatoenampuluh'] = $row['empatlimatoenampuluh'];
-                $pasing['enampuluhtosembilanpuluh'] = $row['enampuluhtosembilanpuluh'];
-                $pasing['sembilanpuluhtoseratusduapuluh'] = $row['sembilanpuluhtoseratusduapuluh']; 
+                $pasing['blmjatuh'] = $row['blmjatuh'];
+                $pasing['empatlimahari'] = $row['empatlimahari'];
+                $pasing['enampuluhhari'] = $row['enampuluhhari'];
+                $pasing['sembilanplhhari'] = $row['sembilanplhhari'];
+                $pasing['seratuduapuluhhari'] = $row['seratuduapuluhhari'];
                 $pasing['lebihseratuduapuluhhari'] = $row['lebihseratuduapuluhhari'];
 
                 $rows[] = $pasing;
@@ -3197,18 +3020,20 @@ class I_Order_Piutang_Model
             // var_dump($TglAwal, $TglAkhir, $optJenisInfo);
             // exit;
             $this->db->query("SELECT FS_KD_CUSTOMER, NamaPerusahaan,
-            isnull([0_TO_45_HARI],0) noltoempatlima,
-            isnull([45_TO_60_HARI],0) empatlimatoenampuluh,
-            isnull([60_TO_90_HARI],0) enampuluhtosembilanpuluh,
-            isnull([90_TO_120_HARI],0) sembilanpuluhtoseratusduapuluh, 
+            isnull([BELUM_JATUH_TEMPO],0) blmjatuh,
+            isnull([45_HARI],0) empatlimahari,
+            isnull([60_HARI],0) enampuluhhari,
+            isnull([90_HARI],0) sembilanplhhari,
+            isnull([120_HARI],0) seratuduapuluhhari,
             isnull([120_HARI_LEBIH],0) lebihseratuduapuluhhari
             FROM (
             SELECT FS_KD_CUSTOMER,b.NamaPerusahaan,
             CASE
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) > 0 and DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45  THEN '0_TO_45_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=45 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '45_TO_60_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=60 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '60_TO_90_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=90 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '90_TO_120_HARI' 
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) = 0 THEN 'BELUM_JATUH_TEMPO'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45 THEN '45_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '60_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '90_HARI'
+            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '120_HARI'
             WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >120 THEN '120_HARI_LEBIH'
             END AS [Quarter],SUM(C.fn_sisa) [REGISTRASI Count]
             FROM Keuangan.DBO.TA_ORDER_PIUTANG A
@@ -3221,34 +3046,13 @@ class I_Order_Piutang_Model
             and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal and :TglAkhir
             and C.fn_sisa >0
             GROUP BY FS_KD_CUSTOMER,b.NamaPerusahaan, DATEDIFF(d, Fd_Tgl_Diterima,GETDATE())
-            UNION ALL
-			SELECT FS_KD_CUSTOMER,b.NamaPerusahaan,
-            CASE
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) > 0 and DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=45  THEN '0_TO_45_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=45 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=60 THEN '45_TO_60_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=60 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=90 THEN '60_TO_90_HARI'
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >=90 AND DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) <=120 THEN '90_TO_120_HARI' 
-            WHEN DATEDIFF(d, Fd_Tgl_Diterima,GETDATE()) >120 THEN '120_HARI_LEBIH'
-            END AS [Quarter],SUM(C.fn_sisa) [REGISTRASI Count]
-            FROM Keuangan.DBO.TA_ORDER_PIUTANG A
-            inner join MasterdataSQL.dbo.MstrPerusahaanJPK b
-            on a.FS_KD_CUSTOMER = b.ID
-            INNER JOIN Keuangan.DBO.PIUTANG_PASIEN C ON C.FS_KD_TAGIH = A.FS_KD_TRS
-            WHERE FS_KD_PETUGAS_VOID is null and Fb_selesai='1'
-            and FS_JENIS_CUSTOMER<>'Asuransi' and Fd_Tgl_Diterima is not null
-            and Fd_Tgl_Diterima <>'1900-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal2 and :TglAkhir2
-            and C.fn_sisa >0
-            GROUP BY FS_KD_CUSTOMER,b.NamaPerusahaan, DATEDIFF(d, Fd_Tgl_Diterima,GETDATE())
             ) AS QuarterlyData
             PIVOT( SUM([REGISTRASI Count])
-            FOR Quarter IN ([0_TO_45_HARI],
-            [45_TO_60_HARI],[60_TO_90_HARI],[90_TO_120_HARI],[120_HARI_LEBIH])) AS QPivot
+            FOR Quarter IN ([BELUM_JATUH_TEMPO],[45_HARI],
+            [60_HARI],[90_HARI],[120_HARI],[120_HARI_LEBIH])) AS QPivot
             order by NamaPerusahaan asc");
             $this->db->bind('TglAwal', $TglAwal);
             $this->db->bind('TglAkhir', $TglAkhir);
-            $this->db->bind('TglAwal2', $TglAwal);
-            $this->db->bind('TglAkhir2', $TglAkhir);
             $data =  $this->db->resultSet();
 
             $rows = array();
@@ -3258,10 +3062,11 @@ class I_Order_Piutang_Model
                 $pasing['no'] = $no++;
                 $pasing['FS_KD_CUSTOMER'] = $row['FS_KD_CUSTOMER'];
                 $pasing['NamaPerusahaan'] = $row['NamaPerusahaan'];
-                $pasing['noltoempatlima'] = $row['noltoempatlima'];
-                $pasing['empatlimatoenampuluh'] = $row['empatlimatoenampuluh'];
-                $pasing['enampuluhtosembilanpuluh'] = $row['enampuluhtosembilanpuluh'];
-                $pasing['sembilanpuluhtoseratusduapuluh'] = $row['sembilanpuluhtoseratusduapuluh']; 
+                $pasing['blmjatuh'] = $row['blmjatuh'];
+                $pasing['empatlimahari'] = $row['empatlimahari'];
+                $pasing['enampuluhhari'] = $row['enampuluhhari'];
+                $pasing['sembilanplhhari'] = $row['sembilanplhhari'];
+                $pasing['seratuduapuluhhari'] = $row['seratuduapuluhhari'];
                 $pasing['lebihseratuduapuluhhari'] = $row['lebihseratuduapuluhhari'];
 
                 $rows[] = $pasing;
@@ -3281,7 +3086,7 @@ class I_Order_Piutang_Model
             // var_dump($TglAwal, $TglAkhir, $JenisJaminan);
             // exit;
             if ($JenisJaminan  == "0") {
-                $this->db->query("SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3289,8 +3094,6 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanAsuransi B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
             and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
@@ -3298,7 +3101,7 @@ class I_Order_Piutang_Model
                 $this->db->bind('TglAwal', $TglAwal);
                 $this->db->bind('TglAkhir', $TglAkhir);
             } elseif ($JenisJaminan  == "1") {
-                $this->db->query("  SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("  SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3306,8 +3109,6 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanJPK B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
             and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
@@ -3316,7 +3117,7 @@ class I_Order_Piutang_Model
                 $this->db->bind('TglAwal', $TglAwal);
                 $this->db->bind('TglAkhir', $TglAkhir);
             } elseif ($JenisJaminan  == "2") {
-                $this->db->query("SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3324,14 +3125,12 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanAsuransi B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
             and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
             and A.FS_JENIS_CUSTOMER='Asuransi'
             UNION ALL
-            SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+            SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3339,8 +3138,6 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanJPK B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
             and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal1 and :TglAkhir1
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
@@ -3390,7 +3187,7 @@ class I_Order_Piutang_Model
             // var_dump($TglAwal, $TglAkhir, $JenisJaminan);
             // exit;
             if ($JenisJaminan  == "0") {
-                $this->db->query("SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3398,16 +3195,14 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanAsuransi B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal and :TglAkhir
+            and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
             and A.FS_JENIS_CUSTOMER='Asuransi'");
                 $this->db->bind('TglAwal', $TglAwal);
                 $this->db->bind('TglAkhir', $TglAkhir);
             } elseif ($JenisJaminan  == "1") {
-                $this->db->query("  SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("  SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3415,17 +3210,15 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanJPK B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal and :TglAkhir
+            and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
             and A.FS_JENIS_CUSTOMER='Perusahaan'");
 
                 $this->db->bind('TglAwal', $TglAwal);
                 $this->db->bind('TglAkhir', $TglAkhir);
             } elseif ($JenisJaminan  == "2") {
-                $this->db->query("SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+                $this->db->query("SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3433,14 +3226,12 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanAsuransi B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal and :TglAkhir
+            and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal and :TglAkhir
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
             and A.FS_JENIS_CUSTOMER='Asuransi'
             UNION ALL
-            SELECT A.FS_KD_TRS,C.fd_tgL_piutang as FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
+            SELECT A.FS_KD_TRS,A.FD_TGL_TRS,A.FS_JENIS_CUSTOMER,A.FS_KD_CUSTOMER,b.NamaPerusahaan,A.FS_KET,
             A.FN_TOTAL_TAGIH,A.fd_periode1,A.fd_periode2,CASE WHEN A.Fs_Code_Jenis_Reg = 'RJ' THEN 'RAWAT JALAN' WHEN  A.Fs_Code_Jenis_Reg = 'RI' THEN 'RAWAT INAP' end as Fs_Code_Jenis_Reg,
             replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') as FD_TGL_INPUT,
             replace(CONVERT(VARCHAR(11), A.Fd_Tgl_Dikirim, 111), '/','-') as Fd_Tgl_Dikirim,
@@ -3448,10 +3239,8 @@ class I_Order_Piutang_Model
             FROM Keuangan.DBO.TA_ORDER_PIUTANG a
             INNER JOIN MasterdataSQL.DBO.MstrPerusahaanJPK B
             ON A.FS_KD_CUSTOMER = B.ID
-            inner join Keuangan.dbo.PIUTANG_PASIEN C
-			ON C.FS_KD_TAGIH = a.FS_KD_TRS
             WHERE FD_TGL_VOID='3000-01-01 00:00:00.000'
-            and replace(CONVERT(VARCHAR(11), c.fd_tgL_piutang, 111), '/','-') between :TglAwal1 and :TglAkhir1
+            and replace(CONVERT(VARCHAR(11), A.FD_TGL_INPUT, 111), '/','-') between :TglAwal1 and :TglAkhir1
             and A.Fd_Tgl_Diterima='3000-01-01 00:00:00.000'
             and A.FS_JENIS_CUSTOMER='Perusahaan'");
                 $this->db->bind('TglAwal', $TglAwal);
@@ -3489,6 +3278,7 @@ class I_Order_Piutang_Model
             die($e->getMessage());
         }
     }
+
     public function getInfoRekapPiutangInvoice($data)
     {
         try {
@@ -4290,151 +4080,151 @@ class I_Order_Piutang_Model
             die($e->getMessage());
         }
     }
-    
-
-    public function goGenerateSelisih($data)
+    public function PrintHeaderSurat($data)
     {
         try {
-            $this->db->transaksi();
-            $NoRegistrasi = $data['NoRegistrasi'];
 
-            // TRIGER SEBELUM SIMPAN DATA
-            // 1. TRIGER PASIEN JIKA JENIS BELUM DIISI  
-            if ($NoRegistrasi == "") {
-                $callback = array(
-                    'status' => 'warning',
-                    'errorname' => 'NoRegistrasi Kosong!',
-                );
-                echo json_encode($callback);
-                exit;
-            }
-            $timenow = Date('H:i:s');
+                $query = "SELECT replace(CONVERT(VARCHAR(11), FD_TGL_TRS, 103), '/','-') as FD_TGL_TRSx 
+                , * from Keuangan.dbo.TA_ORDER_PIUTANG where FS_KD_TRS=:NoJurnal";
+                $this->db->query($query);
+                $this->db->bind('NoJurnal', $data['NoJurnal']);
+                // $this->db->bind('id2', $data['notrs']);
+                $datas =  $this->db->single();
+           
+                $pasing['keterangan'] = $datas['FS_KET'];
+                $pasing['jenis_pembayaran'] = $datas['FS_JENIS_CUSTOMER'];
+                $pasing['kode_jaminan'] = $datas['FS_KD_CUSTOMER'];
+                $pasing['FD_TGL_TRSx'] = $datas['FD_TGL_TRSx'];
+                $pasing['FN_TOTAL_TAGIH'] = $datas['FN_TOTAL_TAGIH'];
+                $pasing['FS_Alamat_Tagih'] = $datas['FS_Alamat_Tagih'];
+                $pasing['FS_JENIS_CUSTOMER'] = $datas['FS_JENIS_CUSTOMER'];
+                $pasing['Fs_Code_Jenis_Reg'] =  $datas['Fs_Code_Jenis_Reg'];
 
-            $query_cekpiutang = "SELECT * from Keuangan.dbo.PIUTANG_PASIEN
-            where NO_TRANSAKSI=:NoRegistrasi AND FB_BATAL='0'";
-            $this->db->query($query_cekpiutang);
-            $this->db->bind('NoRegistrasi', $NoRegistrasi);
-            $datacekpiutang =  $this->db->single(); 
-            if ($datacekpiutang) {
-                $callback = array(
-                    'status' => 'warning',
-                    'errorname' => 'Piutang sudah ada!',
-                );
-                echo json_encode($callback);
-                exit;
-            }
+                if ($datas['FS_JENIS_CUSTOMER']=='Perusahaan'){  
+                $query="SELECT  ID,NamaPerusahaan,Alamat FROM MasterdataSQL.dbo.MstrPerusahaanJPK WHERE ID=:kode_jaminan ";
+                $this->db->query($query);
+                $this->db->bind('kode_jaminan', $datas['FS_KD_CUSTOMER']);
+                // $this->db->bind('id2', $data['notrs']);
+                $data3 =  $this->db->single();
+                $pasing['namaperusahaan'] = $data3['NamaPerusahaan'];
+                $pasing['alamat'] = $data3['Alamat'];
+                $pasing['idJaminanx'] = $data3['ID'];
+                }elseif($datas['FS_JENIS_CUSTOMER']=='Asuransi'){
+                    var_dump('njir');exit;
+                $query="SELECT  ID,NamaPerusahaan,Alamat FROM MasterdataSQL.dbo.MstrPerusahaanAsuransi WHERE ID=:kode_jaminan ";
+                $this->db->query($query);
+                $this->db->bind('kode_jaminan', $datas['FS_KD_CUSTOMER']);
+                // $this->db->bind('id2', $data['notrs']);
+                $data3 =  $this->db->single();
+                $namaperusahaan = $data3['NamaPerusahaan'];
+                $alamat = $data3['Alamat'];
+                $idJaminanx = $data3['ID'];
+                }
 
-            $query2 = "SELECT a.FD_TGL_JURNAL,b.FN_KREDIT,c.KodeJaminan,d.[First Name],case when c.TipePasien=2  then 'Asuransi' else 'Perusahaan' end as TipeJaminan,a.FS_KET,'RJ' as TipePiutang  
-            from Keuangan.dbo.TA_JURNAL_HDR a
-            inner join Keuangan.dbo.TA_JURNAL_DTL b on a.FS_KD_JURNAL=b.FS_KD_JURNAL
-            inner join DashboardData.dbo.dataRWJ c on b.FS_KD_REG=c.NoRegistrasi collate Latin1_General_CI_AS
-			inner join MasterdataSQL.dbo.Employees d on a.FS_KD_PETUGAS=d.NoPIN collate Latin1_General_CI_AS
-            where b.FS_KD_REG=:NoRegistrasi and a.FD_TGL_VOID='3000-01-01 00:00:00.000' and b.FB_VOID='0' and b.FS_REK='15400001'
-            and b.FN_KREDIT>0
-            union all
-             select a.FD_TGL_JURNAL,b.FN_KREDIT,c.KodeJaminan,d.[First Name],case when c.TipePasien=2  then 'Asuransi' else 'Perusahaan' end as TipeJaminan,a.FS_KET,'RI' as TipePiutang  
-             from Keuangan.dbo.TA_JURNAL_HDR a
-            inner join Keuangan.dbo.TA_JURNAL_DTL b on a.FS_KD_JURNAL=b.FS_KD_JURNAL
-            inner join DashboardData.dbo.dataRWI c on b.FS_KD_REG=c.NoRegistrasi collate Latin1_General_CI_AS
-            inner join MasterdataSQL.dbo.Employees d on a.FS_KD_PETUGAS=d.NoPIN collate Latin1_General_CI_AS
-            where b.FS_KD_REG=:NoRegistrasi2 and a.FD_TGL_VOID='3000-01-01 00:00:00.000' and b.FB_VOID='0' and b.FS_REK='15400001'
-            and b.FN_KREDIT>0";
-            $this->db->query($query2);
-            $this->db->bind('NoRegistrasi', $NoRegistrasi);
-            $this->db->bind('NoRegistrasi2', $NoRegistrasi);
-            $datax =  $this->db->single(); 
-            $tgl_payment = $datax['FD_TGL_JURNAL'];
-            $totalinput = $datax['FN_KREDIT'];
-            $KodeJaminan = $datax['KodeJaminan'];
-            $userinput = $datax['First Name'];
-            $TipeJaminan = $datax['TipeJaminan'];
-            $TipePiutang = $datax['TipePiutang'];
-            $FS_KET = $datax['FS_KET'];
 
-            if (!$datax) {
-                $callback = array(
-                    'status' => 'warning',
-                    'errorname' => 'NoRegistrasi Tidak Ditemukan!',
-                );
-                echo json_encode($callback);
-                exit;
-            }
+           
 
-            $TglTrs = date('Y-m-d', strtotime($tgl_payment));
-            $formatDateJurnal = date('dmy', strtotime($tgl_payment));
-            $dateTransaksi =$TglTrs.' '.$timenow;
-           $kodeHT = "PU";
-            $q_getlastkdpiutang = "SELECT  TOP 1 KD_PIUTANG,right(KD_PIUTANG,4) as urutregx
-            FROM Keuangan.dbo.PIUTANG_PASIEN  WHERE  
-            replace(CONVERT(VARCHAR(11), fd_tgL_piutang, 111), '/','-')=:TglTrs
-            AND LEFT(KD_PIUTANG,2)=:kodeHT
-            ORDER BY KD_PIUTANG DESC";
-            $this->db->query($q_getlastkdpiutang);
-            $this->db->bind('kodeHT', $kodeHT);
-            $this->db->bind('TglTrs', $TglTrs);
-            $data2 =  $this->db->single(); 
-
-            $no_reg = $data2['urutregx'];  
-            $idReg = $no_reg;
-            $idReg++;
-                  // GENERATE NO REGISTRASI
-                  if(strlen($idReg)==1)
-                  {
-                      $noUrutJurnal = "000".$idReg;
-                  }
-                  else if(strlen($idReg)==2)
-                  {
-                      $noUrutJurnal = "00".$idReg;
-                  }
-                  else if(strlen($idReg)==3)
-                  {
-                      $noUrutJurnal = "0".$idReg;
-                  }
-                  else if(strlen($idReg)==4)
-                  {
-                      $noUrutJurnal = $idReg;
-                  }
-            $nofinalpiutang = $kodeHT.$formatDateJurnal.'-'.$noUrutJurnal;
-
-            $this->db->query("INSERT INTO Keuangan.dbo.PIUTANG_PASIEN (KD_PIUTANG,fd_tgL_piutang,NO_TRANSAKSI,kode_jaminan,
-            fn_piutang,fn_sisa,fs_kd_petugas,PAYMENT_NO,TipePiutang,TipeJaminan,FS_kET,FS_kET2,FS_REKENING)
-            VALUES
-            (:nofinalpiutang,:datetime_payment,:noreg,:idjaminan,
-            :totalinput,:totalinput2,:user_id,:idkwitansi,:TipePiutang,:tipejaminan,:ket,:noreg2,:kd_rekening)");
-            $this->db->bind('nofinalpiutang', $nofinalpiutang);
-            $this->db->bind('datetime_payment', $tgl_payment);
-            $this->db->bind('noreg', $NoRegistrasi);
-            $this->db->bind('idjaminan', $KodeJaminan);
-            $this->db->bind('totalinput', $totalinput);
-            $this->db->bind('totalinput2', $totalinput);
-            $this->db->bind('user_id', $userinput);
-            $this->db->bind('idkwitansi', 0);
-            $this->db->bind('TipePiutang', $TipePiutang);
-            $this->db->bind('tipejaminan', $TipeJaminan);
-            $this->db->bind('ket', $FS_KET);
-            $this->db->bind('noreg2', $NoRegistrasi);
-            $this->db->bind('kd_rekening', '15400003');
-            $this->db->execute();
-
-            $this->db->query("INSERT INTO Keuangan.dbo.PIUTANG_PASIEN_2 (kd_piutang,fn_piutang)
-            VALUES
-            (:nofinalpiutang,:totalinput)");
-            $this->db->bind('nofinalpiutang', $nofinalpiutang);
-            $this->db->bind('totalinput', $totalinput);
-            $this->db->execute();
-            
-            $this->db->commit();
-            $callback = array(
-                'status' => 'success',
-                'message' => 'Generate Berhasil Disimpan !',
-            );
-            return $callback;
+            return $pasing;
         } catch (PDOException $e) {
-            $callback = array(
-                'status' => "error", // Set array nama  
-                'message' => $e
-            );
-            return $callback;
+            die($e->getMessage());
         }
+    }
+    private function getHeader($noJurnal)
+{
+    $query = "SELECT * FROM Keuangan.dbo.TA_ORDER_PIUTANG WHERE FS_KD_TRS = :NoJurnal";
+    $this->db->query($query);
+    $this->db->bind('NoJurnal', $noJurnal);
+    $data = $this->db->single();
+
+    if (!$data) return null;
+
+    return [
+        'keterangan' => $data['FS_KET'],
+        'jenis_pembayaran' => $data['FS_JENIS_CUSTOMER'],
+        'kode_jaminan' => $data['FS_KD_CUSTOMER'],
+        'fd_periode1' => $data['fd_periode1'],
+        'fd_periode2' => $data['fd_periode2'],
+        'Fs_Code_Jenis_Reg' => $data['Fs_Code_Jenis_Reg']
+    ];
+}
+    public function PrintHeaderRincian($data)
+    {
+        try {
+            $header = $this->getHeader($data['NoJurnal']);
+            if (!$header) return ['error' => 'Data tidak ditemukan'];
+
+            $customer = $this->getCustomerDetail($header['jenis_pembayaran'], $header['kode_jaminan']);
+            $details = $this->getPatientDetails($data['NoJurnal'], $header['Fs_Code_Jenis_Reg']);
+
+            return [
+                'header' => array_merge($header, $customer),
+                'details' => $details
+            ];
+        } catch (PDOException $e) {
+            die($e->getMessage());
+        }
+    }
+    private function getCustomerDetail($jenisCustomer, $kodeJaminan)
+    {
+        if ($jenisCustomer === 'Perusahaan') {
+            $query = "SELECT ID, NamaPerusahaan, Alamat FROM MasterdataSQL.dbo.MstrPerusahaanJPK WHERE ID = :kode_jaminan";
+        } elseif ($jenisCustomer === 'Asuransi') {
+            $query = "SELECT ID, NamaPerusahaan, Alamat FROM MasterdataSQL.dbo.MstrPerusahaanAsuransi WHERE ID = :kode_jaminan";
+        } else {
+            return [
+                'namaperusahaan' => '',
+                'alamat' => '',
+                'idJaminanx' => ''
+            ];
+        }
+
+        $this->db->query($query);
+        $this->db->bind('kode_jaminan', $kodeJaminan);
+        $data = $this->db->single();
+
+        return [
+            'namaperusahaan' => $data['NamaPerusahaan'] ?? '',
+            'alamat' => $data['Alamat'] ?? '',
+            'idJaminanx' => $data['ID'] ?? ''
+        ];
+    }
+    private function getPatientDetails($noJurnal, $jenisReg)
+    {
+        if ($jenisReg === 'RI') {
+            $query = "SELECT a.KD_PIUTANG, a.FB_TAGIH, 
+                            REPLACE(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/', '-') AS FD_TGL_PIUTANG,
+                            b.NoRegRI AS NoRegistrasi, d.PatientName, '' AS NamaUnit,
+                            a.Fn_piutang, ISNULL(a.FS_NO_REFF_BRIDGING, '') AS FS_NO_REFF_BRIDGING
+                    FROM Keuangan.dbo.PIUTANG_PASIEN a
+                    INNER JOIN RawatInapSQL.dbo.Inpatient b ON a.NO_TRANSAKSI COLLATE Latin1_General_CI_AS = b.NoRegRI COLLATE Latin1_General_CI_AS
+                    INNER JOIN MasterdataSQL.dbo.Admision d ON d.NoMR = b.NoMR
+                    WHERE a.FS_KD_TAGIH = :NoJurnal AND a.FB_BATAL = '0'";
+        } else {
+            $query = "SELECT a.KD_PIUTANG, a.FB_TAGIH, 
+                            REPLACE(CONVERT(VARCHAR(11), a.FD_TGL_PIUTANG, 111), '/', '-') AS FD_TGL_PIUTANG,
+                            b.NoRegRI AS NoRegistrasi, d.PatientName, '' AS NamaUnit,
+                            a.Fn_piutang, ISNULL(a.FS_NO_REFF_BRIDGING, '') AS FS_NO_REFF_BRIDGING
+                    FROM Keuangan.dbo.PIUTANG_PASIEN a
+                    INNER JOIN PerawatanSQL.dbo.Visit b ON a.NO_TRANSAKSI COLLATE Latin1_General_CI_AS = b.NoRegistrasi COLLATE Latin1_General_CI_AS
+                    INNER JOIN MasterdataSQL.dbo.Admision d ON d.NoMR = b.NoMR
+                    WHERE a.FS_KD_TAGIH = :NoJurnal AND a.FB_BATAL = '0'";
+        }
+
+        $this->db->query($query);
+        $this->db->bind('NoJurnal', $noJurnal);
+        $datareg = $this->db->resultSet();
+
+        $results = [];
+        $no = 1;
+        foreach ($datareg as $key) {
+            $results[] = [
+                'No' => $no++,
+                'namapasien' => $key['PatientName'],
+                'tgltransaksi' => $key['FD_TGL_PIUTANG'],
+                'nominal' => $key['Fn_piutang']
+            ];
+        }
+
+        return $results;
     }
 }

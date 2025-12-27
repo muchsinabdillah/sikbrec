@@ -92,13 +92,13 @@ $pdf->Cell(10, 5, ' ', 0, 0);
 $pdf->Cell(10, 5, ' ', 0, 0);
 $pdf->Cell(10, 5, ' ', 0, 0);
 $pdf->Cell(10, 5, ' ', 0, 0);
-$pdf->Cell(3, 2, 'Financial Department YARSI Hospital', 0, 1);
+$pdf->Cell(3, 2, '', 0, 1);
 
 
 $pdf->Cell(65, 0, '', 0, 1);
 
 $pdf->SetFont('Arial', 'I', 5);
-$pdf->Cell(3, 5, 'Complete the information and obtain approvals below. Forward the completed and approved form to the Purchasing Department (RSU FI.2). Forms that are not approverd or incomplete will be returned to the applocant.', 0, 1);
+$pdf->Cell(3, 5, 'Complete the information and obtain approvals below. Forward the completed and approved form to the Apotek. Forms that are not approverd or incomplete will be returned to the applocant.', 0, 1);
 
 
 //make a dummy empty cell as a vertical spacer
@@ -177,10 +177,10 @@ $pdf->Cell(34, 5, ' ***Approved By : ', 'LTR', 1, 'L', 0);
 
 $pdf->CellFitScale(27, 20,  ' ', 'LBR', 0, 1, 0);
 //$pdf->image($data['listdata1']['data'][0]["TTD_UserCreated"], 11, 120, -250); // (content, kanankiri, atasbawah, ukuran)
-$pdf->image($data['listdata1']['data'][0]["TTD_UserCreated"], 11, $pdf->getY(),35); // (content, kanankiri, atasbawah, ukuran)
+// $pdf->image($data['listdata1']['data'][0]["TTD_UserCreated"], 11, $pdf->getY(),35); // (content, kanankiri, atasbawah, ukuran)
 $pdf->CellFitScale(39, 20, '  ', 'LBR', 0, 1, 0);
 $pdf->CellFitScale(34, 20, ' ', 'LBR', 0, 1, 0);
-$pdf->image($data['listdata1']['data'][0]["TTD_UserApproved"], $pdf->getX()-30, $pdf->getY(),35);
+// $pdf->image($data['listdata1']['data'][0]["TTD_UserApproved"], $pdf->getX()-30, $pdf->getY(),35);
 $pdf->CellFitScale(36, 20, '  ', 'LBR', 0, 1, 0);
 $pdf->CellFitScale(34, 20, '  ', 'LBR', 1, 1, 0);
 

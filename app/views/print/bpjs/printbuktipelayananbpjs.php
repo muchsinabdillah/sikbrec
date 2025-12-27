@@ -105,13 +105,13 @@ $pdf->SetFont('Arial', '', 7);
 $pdf->Cell(50, 4, 'No:031/FRM/IRJ/BPJS/RSY/Rev0/II/2021', 1, 1, 'L');
 $pdf->Cell(0, 2, '', 0, 1);
 $pdf->Cell(135, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Jl. Letjen Suprapto, Kav. 13 Cempaka Putih, ', 0, 1, 'L');
+$pdf->Cell(25, 3, 'Jl. angkasa No.19, Dukuhkrikil', 0, 1, 'L');
 $pdf->Cell(135, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Jakarta Pusat 10510', 0, 1, 'L');
+$pdf->Cell(25, 3, '-', 0, 1, 'L');
 $pdf->Cell(135, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Telp: 021-80618618, 80618619 (Hunting),', 0, 1, 'L');
+$pdf->Cell(25, 3, '-', 0, 1, 'L');
 $pdf->Cell(135, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'www.rsyarsi.co.id', 0, 1, 'L');
+$pdf->Cell(25, 3, '-, 0, 1, 'L');
 
 //garis----
 // $pdf->SetFont('Arial', 'U', 10);

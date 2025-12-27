@@ -335,7 +335,7 @@ class BonSementara_Model
 
     {
         try {
-            $this->db->query("SELECT a.Nominal,a.Keterangan, b.Nama
+            $this->db->query("SELECT a.Nominal,a.Keterangan, b.Nama,convert(date,a.Tgl_Transaksi) as Tgl_Transaksi
                         FROM Keuangan.DBO.T_Kasbon a
                         inner join HRDYARSI.dbo.[Data Pegawai] b on a.Pegawai=b.ID_Data
                         WHERE a.ID=:ID");
@@ -345,6 +345,7 @@ class BonSementara_Model
             $passing['Nominal'] = $row['Nominal'];
             $passing['Keterangan'] = $row['Keterangan'];
             $passing['Nama'] = $row['Nama'];
+            $passing['xTgl_Transaksi'] = $row['Tgl_Transaksi'];
 
             return $passing;
         } catch (PDOException $e) {

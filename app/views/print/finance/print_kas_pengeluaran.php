@@ -78,7 +78,7 @@ $pdf = new PDF('P', 'mm', 'A4');
 $daterreal = Utils::datenowcreateNotFull();
 
 $pdf->AddPage();
-$pdf->Image('../public/images/yarsi.png', 10, 5, 38);
+$pdf->Image('../public/images/2yarsi.png', 10, 5, 38);
 $pdf->Ln(5);
 // cell(widht, height, text, border, end line , [ALIGN] )
 
@@ -88,7 +88,7 @@ $pdf->setFont('Arial', '', 9);
 // cell(widht, height, text, border, end line , [ALIGN] )
 $pdf->Cell(110, 4, '', 0, 0);
 $pdf->SetFont('Arial', '', 10);
-$pdf->Cell(75, 4, 'Jl. Letjen Suprapto, Cempaka Putih, Jakarta 10510', 0, 1, 'R');
+$pdf->Cell(75, 4, 'Jl. angkasa No.19, Dukuhkrikil', 0, 1, 'R');
 
 //garis----
 $pdf->SetFont('Arial', 'U', 10);
@@ -126,7 +126,7 @@ $pdf->Cell(10, 8, $data['listdata1']['Keterangan'], 0, 3);
 $pdf->Cell(5, 7, '', 0, 5);
 $pdf->Cell(5, 15, '', 0, 5);
 $pdf->Cell(5, 7, '', 0, 10);
-$pdf->Cell(30, 5, '                                                                                                          Jakarta , ' . date('d/m/Y', strtotime($datenow)), 0, 0,1);
+$pdf->Cell(30, 5, '                                                                                                          Brebes, ' . date('d/m/Y', strtotime($data['listdata1']['xTgl_Transaksi'])), 0, 0,1);
 $pdf->Cell(3, 18, '', 0, 1);
 
 $pdf->Cell(8, 7, '', 0, 0);

@@ -233,4 +233,49 @@ class piutang extends Controller
     {
         echo json_encode($this->model('I_Order_Piutang_Model')->goGenerateSelisih($_POST));
     }
+    public function InformasiPiutang()
+    {
+        $session = SessionManager::getCurrentSession();
+        $data['judul'] = 'Informasi Sisa Piutang';
+        $data['judul_child'] = 'List';
+        // $data['mhs'] = $this->model('Mahasiswa_model')->getAllMahasiswa();
+        $this->View('templates/header', $session);
+        $this->View('Piutang/InfoPiutangSisa', $data);
+        $this->View('templates/footer');
+    }
+    public function goInformasiPiutang()
+    {
+        echo json_encode($this->model('I_Order_Piutang_Model')->goInformasiPiutang($_POST));
+    }
+    public function InformasiPiutangBelumTagih()
+    {
+        $session = SessionManager::getCurrentSession();
+        $data['judul'] = 'Informasi Piutang Belum di Tagih';
+        $data['judul_child'] = 'List';
+        // $data['mhs'] = $this->model('Mahasiswa_model')->getAllMahasiswa();
+        $this->View('templates/header', $session);
+        $this->View('Piutang/InformasiPiutangBelumTagih', $data);
+        $this->View('templates/footer');
+    }
+    public function goInformasiPiutangBelumTagih()
+    {
+        echo json_encode($this->model('I_Order_Piutang_Model')->goInformasiPiutangBelumTagih($_POST));
+    }
+
+    public function PRINTSURAT($NoJurnal = '')
+    {
+        $session = SessionManager::getCurrentSession();
+        $data['NoJurnal'] = $NoJurnal;
+        $data = $this->model('I_Order_Piutang_Model')->PrintHeaderSurat($data);
+        $this->View('Piutang/hdr_printSurat', $data);
+
+        // $this->View('print/billing/suratdanformulir/PrintPenundaanPembayaran', $data);
+    }
+    public function PRINTRINCIAN($NoJurnal = '')
+    {
+        $session = SessionManager::getCurrentSession();
+        $data['NoJurnal'] = $NoJurnal;
+        $data = $this->model('I_Order_Piutang_Model')->PrintHeaderRincian($data);
+        $this->View('Piutang/hdr_printRincian', $data);
+    }
 }

@@ -208,6 +208,7 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                     <table id="datatable1" class="display" width="100%">
                                                         <thead>
                                                             <tr>
+                                                                <th align='center'>No.</th>
                                                                 <th align='center'>No Transaksi</th>
                                                                 <th align='center'>No Kwitansi </th>
                                                                 <th align='center'>No Episode</th>
@@ -236,6 +237,7 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                         style="display: none">
                                                         <thead>
                                                             <tr>
+                                                                <th align='center'>No.</th>
                                                                 <th align='center'>No Transaksi</th>
                                                                 <th align='center'>No Kwitansi </th>
                                                                 <th align='center'>No Episode</th>

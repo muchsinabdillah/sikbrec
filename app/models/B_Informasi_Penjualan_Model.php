@@ -50,6 +50,7 @@ class B_Informasi_Penjualan_Model
                 $pasing['Grandtotal'] = $row['Grandtotal']; 
                 $pasing['UangR'] = $row['UangR']; 
                 $pasing['Embalase'] = $row['Embalase']; 
+                $pasing['Hpp'] = $row['Hpp']; 
                 $rows[] = $pasing;
             }
             return $rows;

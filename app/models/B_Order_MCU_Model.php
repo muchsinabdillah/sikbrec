@@ -238,71 +238,71 @@ class B_Order_MCU_Model
                 $this->db->bind('namapaketmcutext', $namapaketmcutext); 
                 $this->db->execute();
 
-                $query = "INSERT INTO PerawatanSQL.DBO.[Visit Details] ( NoMR, NoEpisode, 
-                NoRegistrasi, NamaUnit, Tanggal,   
-                ProductID, NamaProduct, Quantity, Tarif, TotalTarif, KategoriTarif,Dokter,NamaDokter,StatusID ,UserInput)
-                SELECT '$noMrPaketMCU' as noMrPaketMCU, '$noepisodePaketMCU' as noepisodePaketMCU, 
-                '$noregistrasipaketmcu' as noregistrasipaketmcu, LokasiPemeriksaan, '$datenowcreate' AS Tanggal, IdTes, 
-                NamaPaket, '1' AS Qty, Tarif, Tarif AS Total, 'Paket MCU' AS CategoryProduct,
-                '$IdDokterMCUx' as IdDokterMCUx, '$namadokterMCUx' as namadokterMCUx,'1' as StatusID,'$useridx' as useridx
-                FROM PerawatanSQL.dbo.Tarif_MCU 
-                WHERE NamaPaket=:namapaketmcutext AND Header='True'
-                ";
-                $this->db->query($query);
-                $this->db->bind('namapaketmcutext', $namapaketmcutext); 
-                $this->db->execute();
+                // $query = "INSERT INTO PerawatanSQL.DBO.[Visit Details] ( NoMR, NoEpisode, 
+                // NoRegistrasi, NamaUnit, Tanggal,   
+                // ProductID, NamaProduct, Quantity, Tarif, TotalTarif, KategoriTarif,Dokter,NamaDokter,StatusID ,UserInput)
+                // SELECT '$noMrPaketMCU' as noMrPaketMCU, '$noepisodePaketMCU' as noepisodePaketMCU, 
+                // '$noregistrasipaketmcu' as noregistrasipaketmcu, LokasiPemeriksaan, '$datenowcreate' AS Tanggal, IdTes, 
+                // NamaPaket, '1' AS Qty, Tarif, Tarif AS Total, 'Paket MCU' AS CategoryProduct,
+                // '$IdDokterMCUx' as IdDokterMCUx, '$namadokterMCUx' as namadokterMCUx,'1' as StatusID,'$useridx' as useridx
+                // FROM PerawatanSQL.dbo.Tarif_MCU 
+                // WHERE NamaPaket=:namapaketmcutext AND Header='True'
+                // ";
+                // $this->db->query($query);
+                // $this->db->bind('namapaketmcutext', $namapaketmcutext); 
+                // $this->db->execute();
 
                 //INSERT LAB-----------------
-                $query = "SELECT  max(LabID) as urutantbllab, max(RecID) as urutantbllabRecID from LaboratoriumSQL.dbo.tblLab ";
-                $this->db->query($query);
-                $this->db->execute();
-                $data = $this->db->single();
-                $no_urutantbllabRecID = $data['urutantbllabRecID'];  
-                $no_urutantbllabRecID++;
+                // $query = "SELECT  max(LabID) as urutantbllab, max(RecID) as urutantbllabRecID from LaboratoriumSQL.dbo.tblLab ";
+                // $this->db->query($query);
+                // $this->db->execute();
+                // $data = $this->db->single();
+                // $no_urutantbllabRecID = $data['urutantbllabRecID'];  
+                // $no_urutantbllabRecID++;
 
-                $query = "SELECT  max(NoLab) as urutantbllablis from LaboratoriumSQL.dbo.tblLab WHERE left([NoLAB],6)=:datenowlis ";
-                $this->db->query($query);
-                $this->db->bind('datenowlis', $datenowlis); 
-                $this->db->execute();
-                $data = $this->db->single();
-                // no urut lab
-                $no_urutantbllablis = $data['urutantbllablis'];  
-                $substringlis = substr($no_urutantbllablis,6);
-                if ($substringlis == null){
-                    $substringlis=0;
-                }
-                $substringlis++;
-                if(strlen($substringlis)==1)
-                {
-                    $nourutfixLis = "000".$substringlis;
-                }
-                else if(strlen($substringlis)==2)
-                {
-                    $nourutfixLis = "00".$substringlis;
-                }
-                else if(strlen($substringlis)==3)
-                {
-                    $nourutfixLis = "0".$substringlis;
-                }else if(strlen($substringlis)==4)
-                {
-                    $nourutfixLis = $substringlis;
-                }
-                $idno_urutantbllablis = $datenowlis.$nourutfixLis;
+                // $query = "SELECT  max(NoLab) as urutantbllablis from LaboratoriumSQL.dbo.tblLab WHERE left([NoLAB],6)=:datenowlis ";
+                // $this->db->query($query);
+                // $this->db->bind('datenowlis', $datenowlis); 
+                // $this->db->execute();
+                // $data = $this->db->single();
+                // // no urut lab
+                // $no_urutantbllablis = $data['urutantbllablis'];  
+                // $substringlis = substr($no_urutantbllablis,6);
+                // if ($substringlis == null){
+                //     $substringlis=0;
+                // }
+                // $substringlis++;
+                // if(strlen($substringlis)==1)
+                // {
+                //     $nourutfixLis = "000".$substringlis;
+                // }
+                // else if(strlen($substringlis)==2)
+                // {
+                //     $nourutfixLis = "00".$substringlis;
+                // }
+                // else if(strlen($substringlis)==3)
+                // {
+                //     $nourutfixLis = "0".$substringlis;
+                // }else if(strlen($substringlis)==4)
+                // {
+                //     $nourutfixLis = $substringlis;
+                // }
+                // $idno_urutantbllablis = $datenowlis.$nourutfixLis;
 
-                $query = "  INSERT INTO LaboratoriumSQL.dbo.tblLab (  [OrderCode], RecID, NoLAB, LabDate, Dokter,
-                NoMR, NoEpisode , NoRegRI , KelasID, Operator,StatusID, [JenisOrder],JamOrder) VALUES
-              ( '$TempIDMCu','$no_urutantbllabRecID','$idno_urutantbllablis','$datenowcreate','$IdDokterMCUx',
-                '$noMrPaketMCU','$noepisodePaketMCU','$noregistrasipaketmcu','3','1','3','BIASA','$datenowcreate'
-              )";
-                $this->db->query($query);
-                $this->db->execute();
+            //     $query = "  INSERT INTO LaboratoriumSQL.dbo.tblLab (  [OrderCode], RecID, NoLAB, LabDate, Dokter,
+            //     NoMR, NoEpisode , NoRegRI , KelasID, Operator,StatusID, [JenisOrder],JamOrder) VALUES
+            //   ( '$TempIDMCu','$no_urutantbllabRecID','$idno_urutantbllablis','$datenowcreate','$IdDokterMCUx',
+            //     '$noMrPaketMCU','$noepisodePaketMCU','$noregistrasipaketmcu','3','1','3','BIASA','$datenowcreate'
+            //   )";
+            //     $this->db->query($query);
+            //     $this->db->execute();
                //$idmax_labid = $this->db->GetLastID();
 
-               $query = "SELECT max(LabID) as LabID from LaboratoriumSQL.dbo.tblLab order by 1 desc";
-                $this->db->query($query);
-                $this->db->execute();
-                $data = $this->db->single();
-                $idmax_labid = $data['LabID']; 
+            //    $query = "SELECT max(LabID) as LabID from LaboratoriumSQL.dbo.tblLab order by 1 desc";
+            //     $this->db->query($query);
+            //     $this->db->execute();
+            //     $data = $this->db->single();
+            //     $idmax_labid = $data['LabID']; 
 
                 // $query = "   INSERT INTO LaboratoriumSQL.dbo.tblLabDetail ( LabID, IdTes, Tarif, Rate, TarifKelas,kode_test )
                 //                                         SELECT '$idmax_labid' AS LabID, a.IdTes, 0 AS Tarif, 0 AS Rate, 0 AS TarifKelas,b.KodeKelompok
@@ -314,17 +314,17 @@ class B_Order_MCU_Model
                 // $this->db->execute();
 
                 //--LIS
-                $query = "INSERT INTO LaboratoriumSQL.dbo.LIS_Order (NoMR,NoEpisode,NoRegistrasi,NoLAB,
-                Title,pname,sex,birth_dt,Address,ptype,
-                locid,locname,clinician_id,
-                clinician_name,request_dt, user_order,asuransi) VALUES
-               ( '$noMrPaketMCU','$noepisodePaketMCU','$noregistrasipaketmcu','$idno_urutantbllablis',
-                 '','$NamapasienMCUxx','$jeniskelaminxxD','$tgllahirxx','$alamatxx','$jenisbayarMCUxxd',
-                 '$idpoliMCUx','$namapolimcux','$IdDokterMCUx', 
-                 '$namadokterMCUx' ,'$datenowcreate', '$useridx','$jaminanxx'
-               )";
-                $this->db->query($query);
-                $this->db->execute();
+            //     $query = "INSERT INTO LaboratoriumSQL.dbo.LIS_Order (NoMR,NoEpisode,NoRegistrasi,NoLAB,
+            //     Title,pname,sex,birth_dt,Address,ptype,
+            //     locid,locname,clinician_id,
+            //     clinician_name,request_dt, user_order,asuransi) VALUES
+            //    ( '$noMrPaketMCU','$noepisodePaketMCU','$noregistrasipaketmcu','$idno_urutantbllablis',
+            //      '','$NamapasienMCUxx','$jeniskelaminxxD','$tgllahirxx','$alamatxx','$jenisbayarMCUxxd',
+            //      '$idpoliMCUx','$namapolimcux','$IdDokterMCUx', 
+            //      '$namadokterMCUx' ,'$datenowcreate', '$useridx','$jaminanxx'
+            //    )";
+            //     $this->db->query($query);
+            //     $this->db->execute();
 
                 //--LIS DETAIL
                 // $query = "INSERT INTO LaboratoriumSQL.dbo.LIS_Order_detail ( NoMR, NoEpisode, NoLAB, kode_test, nama_test, is_cito ) 
@@ -345,82 +345,82 @@ class B_Order_MCU_Model
                  //FOR RADIOLOGI---------------------------------------
                  
 
-                $query = "SELECT *
-                from PerawatanSQL.dbo.Tarif_MCU a
-               inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
-               where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext ";
-                $this->db->query($query);
-                $this->db->bind('namapaketmcutext', $namapaketmcutext);
-                $this->db->execute();
-                $datax = $this->db->resultSet();
+            //     $query = "SELECT *
+            //     from PerawatanSQL.dbo.Tarif_MCU a
+            //    inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
+            //    where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext ";
+            //     $this->db->query($query);
+            //     $this->db->bind('namapaketmcutext', $namapaketmcutext);
+            //     $this->db->execute();
+            //     $datax = $this->db->resultSet();
 
-                foreach ($datax as $key) {
-                    $datenowcreateqx = date("His");
-                    $TRIGGER_DTTMx = date('Ymd', strtotime($datenowcreate));
-                    $TRIGGER_DTTM = $TRIGGER_DTTMx . $datenowcreateqx;
-                    $timecreate = date(" H:i:s");
-                    $datecreate = date('Y-m-d', strtotime($datenowcreate));
-                    $datetimecreate = $datecreate . $timecreate;
-                    $DOB = date('Ymd', strtotime($tgllahirxx));
+            //     foreach ($datax as $key) {
+            //         $datenowcreateqx = date("His");
+            //         $TRIGGER_DTTMx = date('Ymd', strtotime($datenowcreate));
+            //         $TRIGGER_DTTM = $TRIGGER_DTTMx . $datenowcreateqx;
+            //         $timecreate = date(" H:i:s");
+            //         $datecreate = date('Y-m-d', strtotime($datenowcreate));
+            //         $datetimecreate = $datecreate . $timecreate;
+            //         $DOB = date('Ymd', strtotime($tgllahirxx));
 
-                    $query = "SELECT max(WOID) as WOID from RadiologiSQL.DBO.WO_RADIOLOGY order by 1 desc";
-                    $this->db->query($query);
-                    $this->db->execute();
-                    $data = $this->db->single();
-                    $WOID = $data['WOID'];
-                    $WOID++;
+            //         $query = "SELECT max(WOID) as WOID from RadiologiSQL.DBO.WO_RADIOLOGY order by 1 desc";
+            //         $this->db->query($query);
+            //         $this->db->execute();
+            //         $data = $this->db->single();
+            //         $WOID = $data['WOID'];
+            //         $WOID++;
 
-                    $WOIDx = substr($WOID, -2);
-                    $Accession_No = $TRIGGER_DTTM . $WOIDx;
-                    $uid = "1.2.410.2000010.82.111." . $Accession_No;
-                    $nomrx = str_replace("-", "", $noMrPaketMCU);
-                    if (strlen($nomrx) == 6) {
-                        $nourutfixReg = "00" . $nomrx;
-                    } else if (strlen($nomrx) == 7) {
-                        $nourutfixReg = "0" . $nomrx;
-                    } else if (strlen($nomrx) == 8) {
-                        $nourutfixReg = $nomrx;
-                    }
+            //         $WOIDx = substr($WOID, -2);
+            //         $Accession_No = $TRIGGER_DTTM . $WOIDx;
+            //         $uid = "1.2.410.2000010.82.111." . $Accession_No;
+            //         $nomrx = str_replace("-", "", $noMrPaketMCU);
+            //         if (strlen($nomrx) == 6) {
+            //             $nourutfixReg = "00" . $nomrx;
+            //         } else if (strlen($nomrx) == 7) {
+            //             $nourutfixReg = "0" . $nomrx;
+            //         } else if (strlen($nomrx) == 8) {
+            //             $nourutfixReg = $nomrx;
+            //         }
 
-                    $query_wo = "  INSERT INTO  RadiologiSQL.DBO.WO_RADIOLOGY  
-                    (SCHEDULED_DTTM, TRIGGER_DTTM,PROC_PLACER_ORDER_NO,Accession_No, PATIENT_ID,
-                    PATIENT_NAME,  PATIENT_LOCATION, OrderCode, MRN,EPISODE_NUMBER,NoRegistrasi,Order_Date,REQUEST_BY, SCHEDULED_MODALITY,  SCHEDULED_STATION,  SCHEDULED_LOCATION, SCHEDULED_PROC_ID,  SCHEDULED_PROC_DESC,
-                    SCHEDULED_ACTION_CODES, REQUESTED_PROC_ID, REQUESTED_PROC_DESC,Posisition,
-                    Side, REQUESTED_PROC_CODES,  REQUEST_DEPARTMENT, Diagnosis, 
-                    Service_Charge, StatusID, PaymentStatus,Batal,  Note, Tarif) 
-                    SELECT '$TRIGGER_DTTM','$TRIGGER_DTTM','$TRIGGER_DTTM','$Accession_No',
-                    '$nourutfixReg','$NamapasienMCUxx','MCU',Proc_Code,'$noMrPaketMCU',
-                    '$noepisodePaketMCU','$noregistrasipaketmcu','$datetimecreate','$IdDokterMCUx',Modality_Code,Modality_Code,Modality_Code,Proc_Code,
-                    Proc_Description,Proc_ActionCode,Proc_Code,Proc_Description,position,'',
-                    Proc_ActionCode,'YARSI',null,0,'0','0','0',null,0
-                    from PerawatanSQL.dbo.Tarif_MCU a
-                    inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
-                    where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext and b.ID=:IdTes_rad
-                    ";
-                    $this->db->query($query_wo);
-                    $this->db->bind('namapaketmcutext', $namapaketmcutext);
-                    $this->db->bind('IdTes_rad', $key['IdTes']);
-                    $this->db->execute();
-                    $query_mwlwl = "INSERT INTO  RadiologiSQL.DBO.MWLWL (TRIGGER_DTTM,REPLICA_DTTM,EVENT_TYPE,CHARACTER_SET, 
-                    SCHEDULED_AETITLE,SCHEDULED_DTTM,SCHEDULED_MODALITY,SCHEDULED_STATION,
-                    SCHEDULED_LOCATION,SCHEDULED_PROC_ID,SCHEDULED_PROC_DESC,SCHEDULED_ACTION_CODES,
-                    SCHEDULED_PROC_STATUS,REQUESTED_PROC_ID,REQUESTED_PROC_DESC,REQUESTED_PROC_CODES,  
-                    STUDY_INSTANCE_UID,PROC_PLACER_ORDER_NO,REFER_DOCTOR,REQUEST_DEPARTMENT,  
-                    PATIENT_LOCATION,PATIENT_NAME,Patient_ID,PATIENT_BIRTH_DATE,
-                    PATIENT_SEX,DIAGNOSIS,ACCESSION_NO) 
-                    SELECT '$TRIGGER_DTTM','ANY','','ISO_IR 100',
-                    'ANY','$TRIGGER_DTTM',Modality_Code,Modality_Code,Modality_Code,Proc_Code,Proc_Description,Proc_ActionCode,'120',Proc_Code,Proc_Description,Proc_ActionCode,'$uid','$Accession_No','$IdDokterMCUx','YARSI','MCU','$NamapasienMCUxx','$nourutfixReg','$DOB','$jeniskelaminxxD','','$Accession_No'
-                    from PerawatanSQL.dbo.Tarif_MCU a
-                    inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
-                    where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext and b.ID=:IdTes_rad
-                    "; 
-                    $this->db->query($query_mwlwl);
-                    $this->db->bind('namapaketmcutext', $namapaketmcutext); 
-                    $this->db->bind('IdTes_rad', $key['IdTes']); 
-                    $this->db->execute();
+            //         // $query_wo = "  INSERT INTO  RadiologiSQL.DBO.WO_RADIOLOGY  
+            //         // (SCHEDULED_DTTM, TRIGGER_DTTM,PROC_PLACER_ORDER_NO,Accession_No, PATIENT_ID,
+            //         // PATIENT_NAME,  PATIENT_LOCATION, OrderCode, MRN,EPISODE_NUMBER,NoRegistrasi,Order_Date,REQUEST_BY, SCHEDULED_MODALITY,  SCHEDULED_STATION,  SCHEDULED_LOCATION, SCHEDULED_PROC_ID,  SCHEDULED_PROC_DESC,
+            //         // SCHEDULED_ACTION_CODES, REQUESTED_PROC_ID, REQUESTED_PROC_DESC,Posisition,
+            //         // Side, REQUESTED_PROC_CODES,  REQUEST_DEPARTMENT, Diagnosis, 
+            //         // Service_Charge, StatusID, PaymentStatus,Batal,  Note, Tarif) 
+            //         // SELECT '$TRIGGER_DTTM','$TRIGGER_DTTM','$TRIGGER_DTTM','$Accession_No',
+            //         // '$nourutfixReg','$NamapasienMCUxx','MCU',Proc_Code,'$noMrPaketMCU',
+            //         // '$noepisodePaketMCU','$noregistrasipaketmcu','$datetimecreate','$IdDokterMCUx',Modality_Code,Modality_Code,Modality_Code,Proc_Code,
+            //         // Proc_Description,Proc_ActionCode,Proc_Code,Proc_Description,position,'',
+            //         // Proc_ActionCode,'YARSI',null,0,'0','0','0',null,0
+            //         // from PerawatanSQL.dbo.Tarif_MCU a
+            //         // inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
+            //         // where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext and b.ID=:IdTes_rad
+            //         // ";
+            //         // $this->db->query($query_wo);
+            //         // $this->db->bind('namapaketmcutext', $namapaketmcutext);
+            //         // $this->db->bind('IdTes_rad', $key['IdTes']);
+            //         // $this->db->execute();
+            //         // $query_mwlwl = "INSERT INTO  RadiologiSQL.DBO.MWLWL (TRIGGER_DTTM,REPLICA_DTTM,EVENT_TYPE,CHARACTER_SET, 
+            //         // SCHEDULED_AETITLE,SCHEDULED_DTTM,SCHEDULED_MODALITY,SCHEDULED_STATION,
+            //         // SCHEDULED_LOCATION,SCHEDULED_PROC_ID,SCHEDULED_PROC_DESC,SCHEDULED_ACTION_CODES,
+            //         // SCHEDULED_PROC_STATUS,REQUESTED_PROC_ID,REQUESTED_PROC_DESC,REQUESTED_PROC_CODES,  
+            //         // STUDY_INSTANCE_UID,PROC_PLACER_ORDER_NO,REFER_DOCTOR,REQUEST_DEPARTMENT,  
+            //         // PATIENT_LOCATION,PATIENT_NAME,Patient_ID,PATIENT_BIRTH_DATE,
+            //         // PATIENT_SEX,DIAGNOSIS,ACCESSION_NO) 
+            //         // SELECT '$TRIGGER_DTTM','ANY','','ISO_IR 100',
+            //         // 'ANY','$TRIGGER_DTTM',Modality_Code,Modality_Code,Modality_Code,Proc_Code,Proc_Description,Proc_ActionCode,'120',Proc_Code,Proc_Description,Proc_ActionCode,'$uid','$Accession_No','$IdDokterMCUx','YARSI','MCU','$NamapasienMCUxx','$nourutfixReg','$DOB','$jeniskelaminxxD','','$Accession_No'
+            //         // from PerawatanSQL.dbo.Tarif_MCU a
+            //         // inner join RadiologiSQL.dbo.ProcedureRadiology b on a.IdTes=b.ID
+            //         // where a.LokasiPemeriksaan='RADIOLOGI' and NamaPaket=:namapaketmcutext and b.ID=:IdTes_rad
+            //         // "; 
+            //         // $this->db->query($query_mwlwl);
+            //         // $this->db->bind('namapaketmcutext', $namapaketmcutext); 
+            //         // $this->db->bind('IdTes_rad', $key['IdTes']); 
+            //         // $this->db->execute();
 
-                    sleep(1);
-                }
+            //         sleep(1);
+            //     }
 
                 //#END FOR RADIOLOGI ------------------
                 
@@ -442,76 +442,76 @@ class B_Order_MCU_Model
                 $datax = $this->db->resultSet();
 
                 foreach ($datax as $key) {
-                    $datenowcreateqx=date("His");
-                    $TRIGGER_DTTMx = date('Ymd', strtotime($datenowcreate));
-                    $TRIGGER_DTTM = $TRIGGER_DTTMx.$datenowcreateqx;
-                    $timecreate=date(" H:i:s");
-                    $datecreate = date('Y-m-d', strtotime($datenowcreate));
-                    $datetimecreate = $datecreate.$timecreate;
-                    $DOB = date('Ymd', strtotime($tgllahirxx));
+                    // $datenowcreateqx=date("His");
+                    // $TRIGGER_DTTMx = date('Ymd', strtotime($datenowcreate));
+                    // $TRIGGER_DTTM = $TRIGGER_DTTMx.$datenowcreateqx;
+                    // $timecreate=date(" H:i:s");
+                    // $datecreate = date('Y-m-d', strtotime($datenowcreate));
+                    // $datetimecreate = $datecreate.$timecreate;
+                    // $DOB = date('Ymd', strtotime($tgllahirxx));
 
-                $query = "SELECT max(WOID) as WOID from RadiologiSQL.DBO.WO_RADIOLOGY order by 1 desc";
-                $this->db->query($query);
-                $this->db->execute();
-                $data = $this->db->single();
-                $WOID = $data['WOID'];
-                $WOID++;
+                // $query = "SELECT max(WOID) as WOID from RadiologiSQL.DBO.WO_RADIOLOGY order by 1 desc";
+                // $this->db->query($query);
+                // $this->db->execute();
+                // $data = $this->db->single();
+                // $WOID = $data['WOID'];
+                // $WOID++;
 
-                $WOIDxx = substr($WOID, -2);
-                $Accession_No = $TRIGGER_DTTM . $WOIDxx;
-                // $uid="1.2.410.2000010.82.111.".$Accession_No;
-                $nomrx = str_replace("-", "", $noMrPaketMCU);
-                if (strlen($nomrx) == 6) {
-                    $nourutfixReg = "00" . $nomrx;
-                } else if (strlen($nomrx) == 7) {
-                    $nourutfixReg = "0" . $nomrx;
-                } else if (strlen($nomrx) == 8) {
-                    $nourutfixReg = $nomrx;
-                }
+                // $WOIDxx = substr($WOID, -2);
+                // $Accession_No = $TRIGGER_DTTM . $WOIDxx;
+                // // $uid="1.2.410.2000010.82.111.".$Accession_No;
+                // $nomrx = str_replace("-", "", $noMrPaketMCU);
+                // if (strlen($nomrx) == 6) {
+                //     $nourutfixReg = "00" . $nomrx;
+                // } else if (strlen($nomrx) == 7) {
+                //     $nourutfixReg = "0" . $nomrx;
+                // } else if (strlen($nomrx) == 8) {
+                //     $nourutfixReg = $nomrx;
+                // }
 
-                        $query_wo = " INSERT INTO  RadiologiSQL.DBO.WO_RADIOLOGY  
-                        (SCHEDULED_DTTM, TRIGGER_DTTM,PROC_PLACER_ORDER_NO,Accession_No, PATIENT_ID,
-                        PATIENT_NAME,  PATIENT_LOCATION, OrderCode, MRN,EPISODE_NUMBER,NoRegistrasi,Order_Date,REQUEST_BY, SCHEDULED_MODALITY,  SCHEDULED_STATION,  SCHEDULED_LOCATION, SCHEDULED_PROC_ID,  SCHEDULED_PROC_DESC,
-                        SCHEDULED_ACTION_CODES, REQUESTED_PROC_ID, REQUESTED_PROC_DESC,Posisition,
-                        Side, REQUESTED_PROC_CODES,  REQUEST_DEPARTMENT, Diagnosis, 
-                        Service_Charge, StatusID, PaymentStatus,Batal,  Note, Tarif) 
-             SELECT '$TRIGGER_DTTM','$TRIGGER_DTTM','$TRIGGER_DTTM','$Accession_No',
-            '$nourutfixReg','$NamapasienMCUxx','MCU',[Product Code],'$noMrPaketMCU',
-            '$noepisodePaketMCU','$noregistrasipaketmcu','$datetimecreate','$IdDokterMCUx',Modality_Code,Modality_Code,Modality_Code,[Product Code],
-            [Product Name],Proc_ActionCode,[Product Code],[Product Name],'','',
-            Proc_ActionCode,'YARSI',null,0,'0','0','0',null,0
-                         from PerawatanSQL.dbo.Tarif_MCU a
-                        inner join PerawatanSQL.dbo.Tarif_RJ_UGD b on a.IdTes=b.ID
-                        where a.LokasiPemeriksaan='Unit MCU' and NamaPaket=:namapaketmcutext and IdTes is not null
-            and b.PacsOrder='1' and b.ID=:IdTes_rad
-                        ";
-                $this->db->query($query_wo);
-                $this->db->bind('namapaketmcutext', $namapaketmcutext);
-                $this->db->bind('IdTes_rad', $key['IdTes']);
-                $this->db->execute();
+            //             $query_wo = " INSERT INTO  RadiologiSQL.DBO.WO_RADIOLOGY  
+            //             (SCHEDULED_DTTM, TRIGGER_DTTM,PROC_PLACER_ORDER_NO,Accession_No, PATIENT_ID,
+            //             PATIENT_NAME,  PATIENT_LOCATION, OrderCode, MRN,EPISODE_NUMBER,NoRegistrasi,Order_Date,REQUEST_BY, SCHEDULED_MODALITY,  SCHEDULED_STATION,  SCHEDULED_LOCATION, SCHEDULED_PROC_ID,  SCHEDULED_PROC_DESC,
+            //             SCHEDULED_ACTION_CODES, REQUESTED_PROC_ID, REQUESTED_PROC_DESC,Posisition,
+            //             Side, REQUESTED_PROC_CODES,  REQUEST_DEPARTMENT, Diagnosis, 
+            //             Service_Charge, StatusID, PaymentStatus,Batal,  Note, Tarif) 
+            //  SELECT '$TRIGGER_DTTM','$TRIGGER_DTTM','$TRIGGER_DTTM','$Accession_No',
+            // '$nourutfixReg','$NamapasienMCUxx','MCU',[Product Code],'$noMrPaketMCU',
+            // '$noepisodePaketMCU','$noregistrasipaketmcu','$datetimecreate','$IdDokterMCUx',Modality_Code,Modality_Code,Modality_Code,[Product Code],
+            // [Product Name],Proc_ActionCode,[Product Code],[Product Name],'','',
+            // Proc_ActionCode,'YARSI',null,0,'0','0','0',null,0
+            //              from PerawatanSQL.dbo.Tarif_MCU a
+            //             inner join PerawatanSQL.dbo.Tarif_RJ_UGD b on a.IdTes=b.ID
+            //             where a.LokasiPemeriksaan='Unit MCU' and NamaPaket=:namapaketmcutext and IdTes is not null
+            // and b.PacsOrder='1' and b.ID=:IdTes_rad
+            //             ";
+            //     $this->db->query($query_wo);
+            //     $this->db->bind('namapaketmcutext', $namapaketmcutext);
+            //     $this->db->bind('IdTes_rad', $key['IdTes']);
+            //     $this->db->execute();
 
-                        $query_mwlwl = "INSERT INTO  RadiologiSQL.DBO.MWLWL (TRIGGER_DTTM,REPLICA_DTTM,EVENT_TYPE,CHARACTER_SET, 
-                        SCHEDULED_AETITLE,SCHEDULED_DTTM,SCHEDULED_MODALITY,SCHEDULED_STATION,
-                        SCHEDULED_LOCATION,SCHEDULED_PROC_ID,SCHEDULED_PROC_DESC,SCHEDULED_ACTION_CODES,
-                        SCHEDULED_PROC_STATUS,REQUESTED_PROC_ID,REQUESTED_PROC_DESC,REQUESTED_PROC_CODES,  
-                        STUDY_INSTANCE_UID,PROC_PLACER_ORDER_NO,REFER_DOCTOR,REQUEST_DEPARTMENT,  
-                        PATIENT_LOCATION,PATIENT_NAME,Patient_ID,PATIENT_BIRTH_DATE,
-                        PATIENT_SEX,DIAGNOSIS,ACCESSION_NO) 
-                         SELECT '$TRIGGER_DTTM','ANY','','ISO_IR 100',
-                         'ANY','$TRIGGER_DTTM',Modality_Code,Modality_Code,Modality_Code,[Product Code],[Product Name],Proc_ActionCode,
-             '120',[Product Code],[Product Name],Proc_ActionCode,Proc_Instance_UID+'.'+'$Accession_No','$Accession_No','$IdDokterMCUx',
-             'YARSI','MCU',
-             '$NamapasienMCUxx','$nourutfixReg','$DOB','$jeniskelaminxxD','','$Accession_No'
-                         from PerawatanSQL.dbo.Tarif_MCU a
-                        inner join PerawatanSQL.dbo.Tarif_RJ_UGD b on a.IdTes=b.ID
-                        where a.LokasiPemeriksaan='Unit MCU' and NamaPaket=:namapaketmcutext and IdTes is not null
-            and b.PacsOrder='1' and b.ID=:IdTes_rad
-                        ";
+            //             $query_mwlwl = "INSERT INTO  RadiologiSQL.DBO.MWLWL (TRIGGER_DTTM,REPLICA_DTTM,EVENT_TYPE,CHARACTER_SET, 
+            //             SCHEDULED_AETITLE,SCHEDULED_DTTM,SCHEDULED_MODALITY,SCHEDULED_STATION,
+            //             SCHEDULED_LOCATION,SCHEDULED_PROC_ID,SCHEDULED_PROC_DESC,SCHEDULED_ACTION_CODES,
+            //             SCHEDULED_PROC_STATUS,REQUESTED_PROC_ID,REQUESTED_PROC_DESC,REQUESTED_PROC_CODES,  
+            //             STUDY_INSTANCE_UID,PROC_PLACER_ORDER_NO,REFER_DOCTOR,REQUEST_DEPARTMENT,  
+            //             PATIENT_LOCATION,PATIENT_NAME,Patient_ID,PATIENT_BIRTH_DATE,
+            //             PATIENT_SEX,DIAGNOSIS,ACCESSION_NO) 
+            //              SELECT '$TRIGGER_DTTM','ANY','','ISO_IR 100',
+            //              'ANY','$TRIGGER_DTTM',Modality_Code,Modality_Code,Modality_Code,[Product Code],[Product Name],Proc_ActionCode,
+            //  '120',[Product Code],[Product Name],Proc_ActionCode,Proc_Instance_UID+'.'+'$Accession_No','$Accession_No','$IdDokterMCUx',
+            //  'YARSI','MCU',
+            //  '$NamapasienMCUxx','$nourutfixReg','$DOB','$jeniskelaminxxD','','$Accession_No'
+            //              from PerawatanSQL.dbo.Tarif_MCU a
+            //             inner join PerawatanSQL.dbo.Tarif_RJ_UGD b on a.IdTes=b.ID
+            //             where a.LokasiPemeriksaan='Unit MCU' and NamaPaket=:namapaketmcutext and IdTes is not null
+            // and b.PacsOrder='1' and b.ID=:IdTes_rad
+            //             ";
 
-                    $this->db->query($query_mwlwl);
-                    $this->db->bind('namapaketmcutext', $namapaketmcutext); 
-                    $this->db->bind('IdTes_rad', $key['IdTes']); 
-                    $this->db->execute();
+            //         $this->db->query($query_mwlwl);
+            //         $this->db->bind('namapaketmcutext', $namapaketmcutext); 
+            //         $this->db->bind('IdTes_rad', $key['IdTes']); 
+            //         $this->db->execute();
 
                     sleep(1);
                 }

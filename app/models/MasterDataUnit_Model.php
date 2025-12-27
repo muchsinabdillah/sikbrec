@@ -344,6 +344,7 @@ class MasterDataUnit_Model
             $bridging_SatuSehat = $data['bridging_SatuSehat'];
             if($bridging_SatuSehat == "1"){ 
                 $postData = $this->PostLocations($idUnits,$nama);
+               
                 if(isset($postData['issue'][0]['severity']) == "error"){
                     $callback = array(
                         'status' => "warning", // Set array nama  

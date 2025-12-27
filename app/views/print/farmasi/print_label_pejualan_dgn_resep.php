@@ -191,12 +191,15 @@ $pdf = new PDF('L','mm',array(40,65));
 $pdf->AddPage();
 
 $pdf->Ln(-6);
-$pdf->setFont('Arial','',7);
+$pdf->setFont('Arial','',6);
 
 $pdf->Cell(-6,3,'',0,0);//margin
-$pdf->Cell(0,3,'Rumah Sakit Yarsi Jakarta',0,1);
+$pdf->Cell(0,3,'Klinik Utama Brebes Eye Center',0,1);
 $pdf->Cell(-6,3,'',0,0);//margin
-$pdf->Cell(0,3,'Jl. Letjend Suprapto Cempaka Putih, Jakarta 10510',0,1);
+$pdf->Cell(0,3,'Jl. Angkasa No.19, Blubuk, Losari, Brebes.',0,1);
+$pdf->Cell(-6,3,'',0,0);//margin
+$pdf->Cell(0,3,'apt.Silfina Apriyanti, S.Farm / SIPA : NR33292409003638',0,1);
+
 $gety = $pdf->getY();
 $pdf->Line(4, $gety,60 , $gety);
 
@@ -246,8 +249,7 @@ $pdf->setFont('Arial','B',7);
 $pdf->Cell(-6,1,'',0,0);//margin
 $pdf->CellFitScale(56,4,$data['ProductName']. ' ('.$data['QtyRealisasi'].' '.$data['UnitSatuan'].')','TB',1,'C');
 $pdf->setFont('Arial','',7);
-
-$pdf->Cell(0,4,'',0,1);
+ 
 // $pdf->Cell(-6,1,'',0,0);//margin
 // $pdf->Cell(56,4,$data['Composisi'],0,1,'C');
 $pdf->Cell(-6,1,'',0,0);//margin
@@ -257,8 +259,10 @@ $pdf->CellFitScale(56,4,$data['Signa'],0,1,'C');
 // $pdf->Cell(-6,1,'',0,0);//margin
  //$pdf->Cell(56,4,$data['Signa'].' - Expired Date :'.$data['ED'],0,1,'C');
  $pdf->Cell(-6,1,'',0,0);//margin
- $pdf->Cell(56,4,$data['SignaObat'],0,1,'C');
-
+ $pdf->Cell(56,2,$data['SignaObat'],0,1,'C'); 
+ $pdf->Cell(-6,1,'',0,0);//margin
+ $pdf->Cell(56,3,'Layanan Pelanggan : 081119011119',0,1,'C');
+ 
 
 
 $pdf->Output();

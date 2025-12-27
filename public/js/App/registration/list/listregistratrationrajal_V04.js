@@ -58,6 +58,7 @@ function showDataPasienRajalAktif() {
             }
         },
         "columns": [  
+            { "data": "no" },
             { 
                 "render": function (data, type, row) {
                     var html = ""
@@ -109,7 +110,7 @@ function showDataPasienRajalAktif() {
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
-                    var html = '<font size="1"> ' + row.Perusahaan + '</br> <b>' + row.NoSEP_edited + ' </b></font> <br><br><span class="label label-danger">' + row.Company + '</span> ';
+                    var html = '<font size="1"> ' + row.Perusahaan + '</br> <b>' + row.NoSEP_edited + ' </b></font> <br><br>';
                     return html
                 }
             },
@@ -117,7 +118,7 @@ function showDataPasienRajalAktif() {
             {
                 "render": function (data, type, row) {
                     var html = ""
-                    var html = '<button type="button" class="btn btn-default border-primary btn-animated btn-xs"  onclick="ShowDataPasienPoliklinik(' + row.ID + ')" ><span class="visible-content" > View</span></button> &nbsp<button type="button" class="btn btn-default border-primary btn-animated btn-xs" onclick=\'ShowHistoryDocuments("' +  row.NoRegistrasi + '")\' ><span class="visible-content" > E-Documents</span></button>&nbsp<button type="button" class="btn btn-default border-primary btn-animated btn-xs" onclick=\'Icare("' +  row.NoRegistrasi + '")\' ><span class="visible-content" > I-Care</span></button>'
+                    var html = '<button type="button" class="btn btn-default border-primary btn-animated btn-xs"  onclick="ShowDataPasienPoliklinik(' + row.ID + ')" ><span class="visible-content" > View</span></button> &nbsp<button type="button" class="btn btn-default border-primary btn-animated btn-xs" onclick=\'ShowHistoryDocuments("' +  row.NoRegistrasi + '")\' ><span class="visible-content" > E-Documents</span></button>&nbsp<button type="button" class="btn btn-default border-primary btn-animated btn-xs" onclick=\'ShowHistoryDocuments("' +  row.NoRegistrasi + '")\' ><span class="visible-content" > Kirim Satu Sehat</span></button>&nbsp<button type="button" class="btn btn-default border-primary btn-animated btn-xs" onclick=\'Icare("' +  row.NoRegistrasi + '")\' ><span class="visible-content" > I-Care</span></button>'
                     return html
                 }
                 // "render": function (data, type, row) {
@@ -153,6 +154,7 @@ function showDataPasienRajalArsip() {
             }
         },
         "columns": [
+            { "data": "no" },
             { "data": "NoMR" },
             {
                 "render": function (data, type, row) {
@@ -182,7 +184,7 @@ function showDataPasienRajalArsip() {
             {
                 "render": function (data, type, row) { // Tampilkan kolom aksi
                     var html = ""
-                    var html = '<font size="1"> ' + row.Perusahaan + '</br> <b>' + row.NoSEP_edited + ' </b></font>  <br><br><span class="label label-danger">' + row.Company + '</span> ';
+                    var html = '<font size="1"> ' + row.Perusahaan + '</br> <b>' + row.NoSEP_edited + ' </b></font>  <br><br>';
                     return html
                 }
             },

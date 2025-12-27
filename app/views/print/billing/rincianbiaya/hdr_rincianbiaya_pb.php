@@ -179,7 +179,7 @@ function Footer()
                <tbody> 
                  <tr>
                    <td width="40%"></td>
-                   <td width="60%"><font size="9">Jl. Letjen Suprapto, Cempaka Putih, Jakarta 10510</font></td>
+                   <td width="60%"><font size="9">Jl. angkasa No.19, Dukuhkrikil</font></td>
                    </tr>
                  <hr>
                    <tr>

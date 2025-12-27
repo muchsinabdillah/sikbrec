@@ -93,7 +93,7 @@ $pdf->setFont('Arial','',9);
 // cell(widht, height, text, border, end line , [ALIGN] )
 $pdf->Cell(110,4,'',0,0);
 $pdf->SetFont('Arial','',10);
-      $pdf->Cell(75,4,'Jl. Letjen Suprapto, Cempaka Putih, Jakarta 10510',0,1,'R');
+      $pdf->Cell(75,4,'Jl. angkasa No.19, Dukuhkrikil',0,1,'R');
 
       //garis----
                                     $pdf->SetFont('Arial','U',10);

@@ -42,6 +42,9 @@
                                                       <tr>
                                                           <th style="display:none;">Visit Date</th>
                                                           <th align='center' width="10%">
+                                                              <font size="1">No.
+                                                          </th>
+                                                          <th align='center' width="10%">
                                                               <font size="1">No MR
                                                           </th>
                                                           <th align='center'>
@@ -104,6 +107,9 @@
                                                   <thead>
                                                       <tr>
                                                           <th style="display:none;">Visit Date</th>
+                                                          <th align='center'>
+                                                              <font size="1">No.
+                                                          </th>
                                                           <th align='center'>
                                                               <font size="1">No MR
                                                           </th>

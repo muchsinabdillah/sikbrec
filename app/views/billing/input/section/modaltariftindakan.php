@@ -203,7 +203,9 @@
                    </form>
                </div>
                <div class="modal-footer">
-                   <button class="btn bg-warning  btn-wide" id="btnGantiTarif" name="btnGantiTarif" onclick="btnGantiTarif()"><i class="fa fa-save">
+                   <button class="btn bg-danger  btn-wide" id="btnIncludePaket" name="btnIncludePaket" onclick="btnIncludePaket()"><i class="fa fa-save">
+                       </i>Include Paket</button>
+                    <button class="btn bg-warning  btn-wide" id="btnGantiTarif" name="btnGantiTarif" onclick="btnGantiTarif()"><i class="fa fa-save">
                        </i>Ganti Tarif</button>
                    <!-- <button class="btn bg-success  btn-wide" id="btnSaveAll" name="btnSaveAll"><i class="fa fa-save">
                        </i>Simpan</button> -->

@@ -1,4 +1,7 @@
-<?php
+<audio id="notification-sound" autoplay-policy=no-user-gesture-required hidden  controls>
+        <source src="<?= BASEURL; ?>/notofication.wav" type="audio/wav" autoplay="true">
+    </audio>
+<?php 
 date_default_timezone_set('Asia/Jakarta');
 //include "halaman/header.php";
 $datenowcreate = date("Y-m-d");
@@ -37,6 +40,55 @@ thead>tr>th {
     border-left-style: groove;
     border-left-width: 7px;
 }
+
+table#listbillingrajal.dataTable tbody tr.HighlightPerawat > .sorting_1 {
+    background-color: #0486ed;
+}
+
+table#listbillingrajal.dataTable tbody tr.HighlightPerawat {
+    background-color: #0486ed;
+}
+
+table#listbillingrajal.dataTable tbody tr.HighlightDokter > .sorting_1 {
+    background-color: #f2f605;
+}
+
+table#listbillingrajal.dataTable tbody tr.HighlightDokter {
+    background-color: #f2f605;
+}
+
+table#listbillingrajal.dataTable tbody tr.HighlightFarmasi > .sorting_1 {
+    background-color: #0bf300;
+}
+
+table#listbillingrajal.dataTable tbody tr.HighlightFarmasi {
+    background-color: #0bf300;
+}
+
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightPerawat > .sorting_1 {
+    background-color: #0486ed;
+}
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightPerawat {
+    background-color: #0486ed;
+}
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightDokter > .sorting_1 {
+    background-color: #f2f605;
+}
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightDokter {
+    background-color: #f2f605;
+}
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightFarmasi > .sorting_1 {
+    background-color: #0bf300;
+}
+
+table#listbillingrajal_arsip.dataTable tbody tr.HighlightFarmasi {
+    background-color: #0bf300;
+}
 </style>
 <div class="main-page">
 
@@ -67,7 +119,12 @@ thead>tr>th {
                             <div class="tab-content bg-white p-15">
 
                                 <div role="tabpanel" class="tab-pane active" id="pasienaktif">
-
+                                    <div class="alert alert-info alert-dismissible">
+                                                <p> <strong>Info !</strong> KETERANGAN WARNA :</p> 
+                                                <p> <strong>Info !</strong> BIRU - SELESAI PERAWAT</p> 
+                                                <p> <strong>Info !</strong> KUNING - SELESAI DOKTER</p> 
+                                                <p> <strong>Info !</strong> HIJAU - SELESAI FARMASI</p> 
+                                    </div>
                                     <div class="form-group">
                                         <form class="form-horizontal" id="form_periode">
 
@@ -98,6 +155,9 @@ thead>tr>th {
                                                 <thead>
                                                     <tr>
                                                         <th>
+                                                            <font size="1">No.</font>
+                                                        </th>
+                                                        <th>
                                                             <font size="1">No MR</font>
                                                         </th>
                                                         <th>
@@ -122,7 +182,16 @@ thead>tr>th {
                                                             <font size="1">Nama Penjamin</font>
                                                         </th>
                                                         <th>
-                                                            <font size="1">Status</font>
+                                                            <font size="1">P</font> 
+                                                        </th>
+                                                        <th> 
+                                                            <font size="1">D</font> 
+                                                        </th>
+                                                        <th> 
+                                                            <font size="1">O</font> 
+                                                        </th>
+                                                        <th> 
+                                                            <font size="1">F</font> 
                                                         </th>
                                                         <th>
                                                             <font size="1">Action</font>
@@ -166,6 +235,9 @@ thead>tr>th {
                                             <table id="listbillingrajal_arsip" class="display" width="100%">
                                                 <thead>
                                                     <tr>
+                                                    <th>
+                                                            <font size="1">No.</font>
+                                                        </th>
                                                         <th>
                                                             <font size="1">No MR</font>
                                                         </th>
@@ -261,6 +333,22 @@ thead>tr>th {
 
 </div>
 <!-- /.main-wrapper -->
+<div class="modal fade" id="notif_Cetak" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">Izin Notifikasi</h4>
+                </div>
+                    <div class="text">Izinkan SIMRS memberikan Notifikasi Suara Saat Order Baru Masuk ?</div>
+                <div class="modal-footer">
+                    <div class="btn-group" role="group"> 
+                        <button type="button" onclick="play()" class="btn btn-success btn-wide btn-rounded" 
+                        id="btnclosemodalcetak" name="btnclosemodalcetak">ALLOW</button>
+                    </div>
+                </div>
+            </div>
+    </div>               
+</div>
 <!-- ========== COMMON JS FILES ========== -->
 <script src="<?= BASEURL; ?>/js/DataTables/datatables.min.js"></script>
 <script src="<?= BASEURL; ?>/js/jquery/jquery-2.2.4.min.js"></script>

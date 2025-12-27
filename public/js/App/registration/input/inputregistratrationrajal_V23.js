@@ -445,24 +445,24 @@ $(document).on('click', '#logocetakgelangdewasa', function () {
             var substringnoreg = noregistrasi.substring(4, 0);
             console.log(substringnoreg);
             console.log(idlayanan, 'dd');
-            if (substringnoreg == "RJUR") {
-                document.getElementById("btnInputTrsOrderRad").disabled = false;
-                document.getElementById("btnInputTrsOrderLab").disabled = true;
-                document.getElementById("btnInputTrsOrderMCU").disabled = true;
-            } else if (substringnoreg == "RJUL") {
-                document.getElementById("btnInputTrsOrderRad").disabled = true;
-                document.getElementById("btnInputTrsOrderLab").disabled = false;
-                document.getElementById("btnInputTrsOrderMCU").disabled = true;
-            }
-            else if (idlayanan == "53") {
-                document.getElementById("btnInputTrsOrderRad").disabled = false;
-                document.getElementById("btnInputTrsOrderLab").disabled = false;
-                document.getElementById("btnInputTrsOrderMCU").disabled = false;
-            } else {
-                document.getElementById("btnInputTrsOrderRad").disabled = false;
-                document.getElementById("btnInputTrsOrderLab").disabled = false;
-                document.getElementById("btnInputTrsOrderMCU").disabled = true;
-            }
+            // if (substringnoreg == "RJUR") {
+            //     document.getElementById("btnInputTrsOrderRad").disabled = false;
+            //     document.getElementById("btnInputTrsOrderLab").disabled = true;
+            //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+            // } else if (substringnoreg == "RJUL") {
+            //     document.getElementById("btnInputTrsOrderRad").disabled = true;
+            //     document.getElementById("btnInputTrsOrderLab").disabled = false;
+            //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+            // }
+            // else if (idlayanan == "53") {
+            //     document.getElementById("btnInputTrsOrderRad").disabled = false;
+            //     document.getElementById("btnInputTrsOrderLab").disabled = false;
+            //     document.getElementById("btnInputTrsOrderMCU").disabled = false;
+            // } else {
+            //     document.getElementById("btnInputTrsOrderRad").disabled = false;
+            //     document.getElementById("btnInputTrsOrderLab").disabled = false;
+            //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+            // }
 
             $('#notif_Cetak').modal('show');
         }
@@ -1708,24 +1708,24 @@ function updateUIdataCreateRegistrasi(params) {
     var idlayanan = $("#poliklinikid").val();
     console.log(idlayanan, 'dd');
     console.log(substringnoreg);
-    if (substringnoreg == "RJUR") {
-        document.getElementById("btnInputTrsOrderRad").disabled = false;
-        document.getElementById("btnInputTrsOrderLab").disabled = true;
-        document.getElementById("btnInputTrsOrderMCU").disabled = true;
-    } else if (substringnoreg == "RJUL") {
-        document.getElementById("btnInputTrsOrderRad").disabled = true;
-        document.getElementById("btnInputTrsOrderLab").disabled = false;
-        document.getElementById("btnInputTrsOrderMCU").disabled = true;
-    }
-    else if (idlayanan == "53") {
-        document.getElementById("btnInputTrsOrderRad").disabled = true;
-        document.getElementById("btnInputTrsOrderLab").disabled = true;
-        document.getElementById("btnInputTrsOrderMCU").disabled = false;
-    } else {
-        document.getElementById("btnInputTrsOrderRad").disabled = true;
-        document.getElementById("btnInputTrsOrderLab").disabled = true;
-        document.getElementById("btnInputTrsOrderMCU").disabled = true;
-    }
+    // if (substringnoreg == "RJUR") {
+    //     document.getElementById("btnInputTrsOrderRad").disabled = false;
+    //     document.getElementById("btnInputTrsOrderLab").disabled = true;
+    //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+    // } else if (substringnoreg == "RJUL") {
+    //     document.getElementById("btnInputTrsOrderRad").disabled = true;
+    //     document.getElementById("btnInputTrsOrderLab").disabled = false;
+    //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+    // }
+    // else if (idlayanan == "53") {
+    //     document.getElementById("btnInputTrsOrderRad").disabled = true;
+    //     document.getElementById("btnInputTrsOrderLab").disabled = true;
+    //     document.getElementById("btnInputTrsOrderMCU").disabled = false;
+    // } else {
+    //     document.getElementById("btnInputTrsOrderRad").disabled = true;
+    //     document.getElementById("btnInputTrsOrderLab").disabled = true;
+    //     document.getElementById("btnInputTrsOrderMCU").disabled = true;
+    // }
     var RefPoliSimrs = $("#RefPoliSimrs").val();
     var RefKodePoliSimrs =  $("#RefKodePoliSimrs").val();
     $("#NamaPoliklinikBPJS").val(RefPoliSimrs);
@@ -1745,8 +1745,8 @@ function updateUIdataCreateRegistrasi(params) {
         if (IsVerifBPJSPesertax =="1"){ 
             //-----SIGNUP
             swal({
-                title: "Per 1 Januari 2023 Fitur Entri UserID RS YARSI Mobile & Website",
-                text: "Apakah Anda ingin Membuat Akun Login Mobile YARSI dan Mengirimkan Username dan Password ke Pasien Ini ?",
+                title: "INFO",
+                text: "Apakah Anda ingin Membuat Akun Login Lainnya ?",
                 icon: "info",
                 buttons: ['Tidak', "Ya, Buat Akun dan Kirim !"],
                 closeOnClickOutside: false,

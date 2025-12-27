@@ -855,82 +855,82 @@ class B_create_Registrasi_Rajal
 
                 // update ke tabel FO_T_Billing_1
                 // update Administrasi
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1
-                      SET PETUGAS_ENTRY=:namauserx,KODE_TARIF=:idadministrasi,UNIT=:IdGrupPerawatan,GROUP_JAMINAN=:JenisBayar,KODE_JAMINAN=:perusahaanid,NAMA_TARIF=:Nama_Karcis,NILAI_TARIF=:Nilai_Karcis,SUB_TOTAL=:Nilai_Karcis2,SUB_TOTAL_2=:Nilai_Karcis3,GRANDTOTAL=:Nilai_Karcis4
-                      where NO_REGISTRASI=:NoRegistrasiExist and GROUP_TARIF='Administrasi'");
-                $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
-                $this->db->bind('idadministrasi', $idadministrasi);
-                $this->db->bind('Nama_Karcis', $Nama_Karcis);
-                $this->db->bind('Nilai_Karcis', $Nilai_Karcis);
-                $this->db->bind('Nilai_Karcis2', $Nilai_Karcis);
-                $this->db->bind('Nilai_Karcis3', $Nilai_Karcis);
-                $this->db->bind('Nilai_Karcis4', $Nilai_Karcis);
-                $this->db->bind('namauserx', $namauserx);
-                $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
-                $this->db->bind('JenisBayar', $JenisBayar);
-                $this->db->bind('perusahaanid', $perusahaanid);
-                $this->db->execute();
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING_1
+                //       SET PETUGAS_ENTRY=:namauserx,KODE_TARIF=:idadministrasi,UNIT=:IdGrupPerawatan,GROUP_JAMINAN=:JenisBayar,KODE_JAMINAN=:perusahaanid,NAMA_TARIF=:Nama_Karcis,NILAI_TARIF=:Nilai_Karcis,SUB_TOTAL=:Nilai_Karcis2,SUB_TOTAL_2=:Nilai_Karcis3,GRANDTOTAL=:Nilai_Karcis4
+                //       where NO_REGISTRASI=:NoRegistrasiExist and GROUP_TARIF='Administrasi'");
+                // $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
+                // $this->db->bind('idadministrasi', $idadministrasi);
+                // $this->db->bind('Nama_Karcis', $Nama_Karcis);
+                // $this->db->bind('Nilai_Karcis', $Nilai_Karcis);
+                // $this->db->bind('Nilai_Karcis2', $Nilai_Karcis);
+                // $this->db->bind('Nilai_Karcis3', $Nilai_Karcis);
+                // $this->db->bind('Nilai_Karcis4', $Nilai_Karcis);
+                // $this->db->bind('namauserx', $namauserx);
+                // $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
+                // $this->db->bind('JenisBayar', $JenisBayar);
+                // $this->db->bind('perusahaanid', $perusahaanid);
+                // $this->db->execute();
 
                 // update ke tabel FO_T_Billing_1
                 // update Administrasi
-                $this->db->query(" UPDATE Billing_Pasien.dbo.FO_T_BILLING_2
-                      SET KODE_TARIF=A1.KODE_TARIF,UNIT=A1.UNIT,GROUP_JAMINAN=A1.GROUP_JAMINAN,KODE_JAMINAN=A1.KODE_JAMINAN,NAMA_TARIF=A1.NAMA_TARIF,NILAI_TARIF=A1.NILAI_TARIF,SUB_TOTAL=A1.NILAI_TARIF*A1.QTY,SUB_TOTAL_2=
-                      ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100)),NILAI_PDP=(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END )
-					  ,NILAI_DISKON_PDP= (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ),DISC_RP=(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)),DISC=A1.DISC,KD_POSTING=B.KD_POSTING,KD_POSTING_DISC=b.KD_POSTING_DISC
-                      froM Billing_Pasien.DBO.FO_T_BILLING_2 xx 
-					  inner join Billing_Pasien.DBO.FO_T_BILLING A on xx.NO_TRS_BILLING=A.NO_TRS_BILLING
-                     inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
-                     ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
-                     INNER JOIN MasterdataSQL.DBO.MstrKarcisAdministrasi CC 
-                     ON CC.ID = A1.KODE_TARIF
-                     INNER JOIN Keuangan.DBO.BO_M_PDP2 B
-                    ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
-                    INNER JOIN Keuangan.DBO.BO_M_PDP CX
-                    ON CX.KD_PDP = B.KD_PDP
-                      where xx.NO_TRS_BILLING in 
-					  (SELECT z.NO_TRS_BILLING FROM Billing_Pasien.DBO.FO_T_BILLING_1 z 
-					  inner join Billing_Pasien.dbo.FO_T_BILLING x on z.NO_TRS_BILLING=x.NO_TRS_BILLING
-					  where z.NO_REGISTRASI=:NoRegistrasiExist and z.GROUP_ENTRI='KARCIS' AND z.BATAL='0' AND x.BATAL='0')");
-                $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
-                $this->db->execute();
+                // $this->db->query(" UPDATE Billing_Pasien.dbo.FO_T_BILLING_2
+                //       SET KODE_TARIF=A1.KODE_TARIF,UNIT=A1.UNIT,GROUP_JAMINAN=A1.GROUP_JAMINAN,KODE_JAMINAN=A1.KODE_JAMINAN,NAMA_TARIF=A1.NAMA_TARIF,NILAI_TARIF=A1.NILAI_TARIF,SUB_TOTAL=A1.NILAI_TARIF*A1.QTY,SUB_TOTAL_2=
+                //       ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100)),NILAI_PDP=(CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END )
+				// 	  ,NILAI_DISKON_PDP= (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*A1.DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*A1.DISC)/100)*A1.QTY END ),DISC_RP=(A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)),DISC=A1.DISC,KD_POSTING=B.KD_POSTING,KD_POSTING_DISC=b.KD_POSTING_DISC
+                //       froM Billing_Pasien.DBO.FO_T_BILLING_2 xx 
+				// 	  inner join Billing_Pasien.DBO.FO_T_BILLING A on xx.NO_TRS_BILLING=A.NO_TRS_BILLING
+                //      inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
+                //      ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
+                //      INNER JOIN MasterdataSQL.DBO.MstrKarcisAdministrasi CC 
+                //      ON CC.ID = A1.KODE_TARIF
+                //      INNER JOIN Keuangan.DBO.BO_M_PDP2 B
+                //     ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
+                //     INNER JOIN Keuangan.DBO.BO_M_PDP CX
+                //     ON CX.KD_PDP = B.KD_PDP
+                //       where xx.NO_TRS_BILLING in 
+				// 	  (SELECT z.NO_TRS_BILLING FROM Billing_Pasien.DBO.FO_T_BILLING_1 z 
+				// 	  inner join Billing_Pasien.dbo.FO_T_BILLING x on z.NO_TRS_BILLING=x.NO_TRS_BILLING
+				// 	  where z.NO_REGISTRASI=:NoRegistrasiExist and z.GROUP_ENTRI='KARCIS' AND z.BATAL='0' AND x.BATAL='0')");
+                // $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
+                // $this->db->execute();
 
                 //UPDATE TOTAL KE FO_T_BILLING
 
                 // update HDR tabel billing
-                $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING
-                    SET 
-                    where NO_REGISTRASI=:NoRegistrasiExist and SUBSTRING(no_trs_billing,1,2)=:no_trs_billing ");
-                $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
-                $this->db->bind('namauserx', $namauserx);
-                $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
-                $this->db->bind('JenisBayar', $JenisBayar);
-                $this->db->bind('perusahaanid', $perusahaanid);
-                $this->db->bind('no_trs_billing', 'AD');
-                $this->db->execute();
+                // $this->db->query("UPDATE Billing_Pasien.dbo.FO_T_BILLING
+                //     SET 
+                //     where NO_REGISTRASI=:NoRegistrasiExist and SUBSTRING(no_trs_billing,1,2)=:no_trs_billing ");
+                // $this->db->bind('NoRegistrasiExist', $NoRegistrasiExist);
+                // $this->db->bind('namauserx', $namauserx);
+                // $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
+                // $this->db->bind('JenisBayar', $JenisBayar);
+                // $this->db->bind('perusahaanid', $perusahaanid);
+                // $this->db->bind('no_trs_billing', 'AD');
+                // $this->db->execute();
 
 
-                $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
-                    SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,
-                    GRANDTOTAL=B.SUM_GRANDTOTAL,FB_VERIF_JURNAL='0',
-                    PETUGAS_ENTRY=:namauserx,UNIT=:IdGrupPerawatan,GROUP_JAMINAN=:JenisBayar,KODE_JAMINAN=:perusahaanid
-                    FROM Billing_Pasien.DBO.FO_T_BILLING A 
-                    INNER JOIN
-                    (
-                        SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
-                        SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
-                        FROM Billing_Pasien.DBO.FO_T_BILLING_1
-                        WHERE NO_REGISTRASI=:noreg and Batal='0'  and GROUP_ENTRI='KARCIS'
-                        GROUP BY NO_TRS_BILLING
-                    ) B
-                    ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
-                    WHERE A.NO_REGISTRASI=:noreg2");
-                $this->db->bind('noreg', $NoRegistrasiExist);
-                $this->db->bind('noreg2', $NoRegistrasiExist);
-                $this->db->bind('namauserx', $namauserx);
-                $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
-                $this->db->bind('JenisBayar', $JenisBayar);
-                $this->db->bind('perusahaanid', $perusahaanid);
-                $this->db->execute();
+                // $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
+                //     SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,
+                //     GRANDTOTAL=B.SUM_GRANDTOTAL,FB_VERIF_JURNAL='0',
+                //     PETUGAS_ENTRY=:namauserx,UNIT=:IdGrupPerawatan,GROUP_JAMINAN=:JenisBayar,KODE_JAMINAN=:perusahaanid
+                //     FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                //     INNER JOIN
+                //     (
+                //         SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                //         SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                //         FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                //         WHERE NO_REGISTRASI=:noreg and Batal='0'  and GROUP_ENTRI='KARCIS'
+                //         GROUP BY NO_TRS_BILLING
+                //     ) B
+                //     ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                //     WHERE A.NO_REGISTRASI=:noreg2");
+                // $this->db->bind('noreg', $NoRegistrasiExist);
+                // $this->db->bind('noreg2', $NoRegistrasiExist);
+                // $this->db->bind('namauserx', $namauserx);
+                // $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
+                // $this->db->bind('JenisBayar', $JenisBayar);
+                // $this->db->bind('perusahaanid', $perusahaanid);
+                // $this->db->execute();
 
                 if ($iswalkin == 'WALKIN') { //CONVERT No. Mr
                     $idkanan = substr($NoMr, 5); // xx-xx-03 kanan
@@ -2485,88 +2485,88 @@ class B_create_Registrasi_Rajal
                         //var_dump($notrsbill);exit;
 
                         // insert ke tabel FO_T_Billing
-                                $this->db->query("INSERT INTO Billing_Pasien.dbo.FO_T_BILLING
-                                ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],[TOTAL_TARIF],[TOTAL_QTY],[SUBTOTAL],[TOTAL_DISCOUNT],[TOTAL_DISCOUNT_RP],[SUBTOTAL_2],[GRANDTOTAL],[BATAL],[FB_CLOSE_KEUANGAN],[FB_VERIF_JURNAL])
-                          VALUES
-                                (:notrsbill,:datenowx,:namauserx,:NoMrfix,:NoEpisode,:nofixReg,:IdGrupPerawatan,:JenisBayar,:perusahaanid,:totaltarif,:totalqty,:subtotal,:totaldiscount,:totaldiscountrp,:subtotal2,:grandtotal,:batal,:closekeuangan,:verifkeuangan)");
+                        //         $this->db->query("INSERT INTO Billing_Pasien.dbo.FO_T_BILLING
+                        //         ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],[TOTAL_TARIF],[TOTAL_QTY],[SUBTOTAL],[TOTAL_DISCOUNT],[TOTAL_DISCOUNT_RP],[SUBTOTAL_2],[GRANDTOTAL],[BATAL],[FB_CLOSE_KEUANGAN],[FB_VERIF_JURNAL])
+                        //   VALUES
+                        //         (:notrsbill,:datenowx,:namauserx,:NoMrfix,:NoEpisode,:nofixReg,:IdGrupPerawatan,:JenisBayar,:perusahaanid,:totaltarif,:totalqty,:subtotal,:totaldiscount,:totaldiscountrp,:subtotal2,:grandtotal,:batal,:closekeuangan,:verifkeuangan)");
 
-                                $this->db->bind('notrsbill', $notrsbill);
-                                $this->db->bind('datenowx', Utils::seCurrentDateTime());
-                                $this->db->bind('namauserx', $namauserx);
-                                $this->db->bind('NoMrfix', $NoMrfix);
-                                $this->db->bind('NoEpisode', $NoEpisode);
-                                $this->db->bind('nofixReg', $nofixReg);
-                                $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
-                                $this->db->bind('JenisBayar', $JenisBayar);
-                                $this->db->bind('perusahaanid', $perusahaanid);
-                                $this->db->bind('totaltarif', 0);
-                                $this->db->bind('totalqty', 0);
-                                $this->db->bind('subtotal', 0);
-                                $this->db->bind('totaldiscount', 0);
-                                $this->db->bind('totaldiscountrp', 0);
-                                $this->db->bind('subtotal2', 0);
-                                $this->db->bind('grandtotal', 0);
-                                $this->db->bind('batal', 0);
-                                $this->db->bind('closekeuangan', 0);
-                                $this->db->bind('verifkeuangan', 0);
-                                $this->db->execute();
+                        //         $this->db->bind('notrsbill', $notrsbill);
+                        //         $this->db->bind('datenowx', Utils::seCurrentDateTime());
+                        //         $this->db->bind('namauserx', $namauserx);
+                        //         $this->db->bind('NoMrfix', $NoMrfix);
+                        //         $this->db->bind('NoEpisode', $NoEpisode);
+                        //         $this->db->bind('nofixReg', $nofixReg);
+                        //         $this->db->bind('IdGrupPerawatan', $IdGrupPerawatan);
+                        //         $this->db->bind('JenisBayar', $JenisBayar);
+                        //         $this->db->bind('perusahaanid', $perusahaanid);
+                        //         $this->db->bind('totaltarif', 0);
+                        //         $this->db->bind('totalqty', 0);
+                        //         $this->db->bind('subtotal', 0);
+                        //         $this->db->bind('totaldiscount', 0);
+                        //         $this->db->bind('totaldiscountrp', 0);
+                        //         $this->db->bind('subtotal2', 0);
+                        //         $this->db->bind('grandtotal', 0);
+                        //         $this->db->bind('batal', 0);
+                        //         $this->db->bind('closekeuangan', 0);
+                        //         $this->db->bind('verifkeuangan', 0);
+                        //         $this->db->execute();
 
-                              // insert ke tabel FO_T_Billing_1
-                              // Insert Administrasi
-                            $this->db->query("INSERT INTO  Billing_Pasien.dbo.FO_T_BILLING_1
-                            ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[KODE_TARIF],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],[NAMA_TARIF],[GROUP_TARIF],[KD_KELAS],[QTY],[NILAI_TARIF],[SUB_TOTAL],[DISC],[DISC_RP],[SUB_TOTAL_2],[GRANDTOTAL],[KD_DR],[NM_DR],[BATAL],[PETUGAS_BATAL],[GROUP_ENTRI],
-                            BAYAR,KLAIM,KEKURANGAN,ID_TR_TARIF_PAKET,ID_TRS_Payment)
-                            SELECT '$notrsbill' as notrsbill, '$datenowcreate' as datenow,'$namauserx' as namauserx,'$NoMrfix' AS NoMR, '$NoEpisode' AS xNoEpisode,'$nofixReg' as NoReg,ID,
-                            '$IdGrupPerawatan' as Unit,'$JenisBayar' as GroupJaminan,'$perusahaanid' as kdjaminan, Nama_Karcis,'Administrasi' as adm, null as kdkelas, 1 as Qty, Nilai_Karcis, Nilai_Karcis, 0 as Disc, 0 as disc2, Nilai_Karcis, Nilai_Karcis, null as kddokter, null as nmdokter, 0 as batal,null as petugasbatal,'KARCIS',
-                            '0','0',Nilai_Karcis,null,null
-                            FROM MasterdataSQL.dbo.MstrKarcisAdministrasi
-                            WHERE ID=:idadministrasi");
-                            $this->db->bind('idadministrasi', $idadministrasi); 
-                            $this->db->execute();
+                        //       // insert ke tabel FO_T_Billing_1
+                        //       // Insert Administrasi
+                        //     $this->db->query("INSERT INTO  Billing_Pasien.dbo.FO_T_BILLING_1
+                        //     ([NO_TRS_BILLING],[TGL_BILLING],[PETUGAS_ENTRY],[NO_MR],[NO_EPISODE],[NO_REGISTRASI],[KODE_TARIF],[UNIT],[GROUP_JAMINAN],[KODE_JAMINAN],[NAMA_TARIF],[GROUP_TARIF],[KD_KELAS],[QTY],[NILAI_TARIF],[SUB_TOTAL],[DISC],[DISC_RP],[SUB_TOTAL_2],[GRANDTOTAL],[KD_DR],[NM_DR],[BATAL],[PETUGAS_BATAL],[GROUP_ENTRI],
+                        //     BAYAR,KLAIM,KEKURANGAN,ID_TR_TARIF_PAKET,ID_TRS_Payment)
+                        //     SELECT '$notrsbill' as notrsbill, '$datenowcreate' as datenow,'$namauserx' as namauserx,'$NoMrfix' AS NoMR, '$NoEpisode' AS xNoEpisode,'$nofixReg' as NoReg,ID,
+                        //     '$IdGrupPerawatan' as Unit,'$JenisBayar' as GroupJaminan,'$perusahaanid' as kdjaminan, Nama_Karcis,'Administrasi' as adm, null as kdkelas, 1 as Qty, Nilai_Karcis, Nilai_Karcis, 0 as Disc, 0 as disc2, Nilai_Karcis, Nilai_Karcis, null as kddokter, null as nmdokter, 0 as batal,null as petugasbatal,'KARCIS',
+                        //     '0','0',Nilai_Karcis,null,null
+                        //     FROM MasterdataSQL.dbo.MstrKarcisAdministrasi
+                        //     WHERE ID=:idadministrasi");
+                        //     $this->db->bind('idadministrasi', $idadministrasi); 
+                        //     $this->db->execute();
 
-                            //Insert ke tabel FO_T_Billing_2
-                        $this->db->query("INSERT INTO  Billing_Pasien.DBO.FO_T_BILLING_2
-                        SELECT '0' as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
-                        A1.NAMA_TARIF AS NAMA_TARIF, 
-                        A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
-                        A1.NILAI_TARIF AS NILAI_TARIF  ,
-                        A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
-                        A1.DISC AS DISC,
-                        (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
-                        ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
-                        (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
-                        (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
-                        A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,null
-                         FROM Billing_Pasien.DBO.FO_T_BILLING A
-                         inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
-                         ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
-                         INNER JOIN MasterdataSQL.DBO.MstrKarcisAdministrasi CC 
-                         ON CC.ID = A1.KODE_TARIF
-                         INNER JOIN Keuangan.DBO.BO_M_PDP2 B
-                        ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
-                        INNER JOIN Keuangan.DBO.BO_M_PDP CX
-                        ON CX.KD_PDP = B.KD_PDP
-                         WHERE A1.GROUP_ENTRI='KARCIS' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill");
-                        $this->db->bind('notrsbill', $notrsbill); 
-                        $this->db->execute();
+                        //     //Insert ke tabel FO_T_Billing_2
+                        // $this->db->query("INSERT INTO  Billing_Pasien.DBO.FO_T_BILLING_2
+                        // SELECT '0' as ID_BILL,A.NO_TRS_BILLING AS NO_TRS_BILLING,A1.KODE_TARIF,B.KD_TIPE_PDP as Kode_komponen,A1.UNIT AS UNIT, A1.GROUP_JAMINAN AS GROUP_JAMINAN, A1.KODE_JAMINAN AS KODE_JAMINAN, 
+                        // A1.NAMA_TARIF AS NAMA_TARIF, 
+                        // A1.GROUP_TARIF AS GROUP_TARIF, A1.KD_KELAS as KELAS,A1.QTY AS QTY, 
+                        // A1.NILAI_TARIF AS NILAI_TARIF  ,
+                        // A1.NILAI_TARIF*A1.QTY  AS SUBTOTAL,
+                        // A1.DISC AS DISC,
+                        // (A1.NILAI_TARIF-((A1.NILAI_TARIF*A1.DISC)/100)) AS DISC_RP,
+                        // ((A1.NILAI_TARIF*A1.QTY)-(((A1.NILAI_TARIF*A1.QTY)*A1.DISC)/100))   SUB_TOTAL_PDP_2,
+                        // (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN ((((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN ((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) NILAI_DISKON_PDP,
+                        // (CASE WHEN CX.KD_JENIS_PDP='PROSEN'  THEN (((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY)-(((A1.NILAI_TARIF*B.NILAI_PROSEN)*A1.QTY*DISC)/100))   WHEN  CX.KD_JENIS_PDP='FIX' THEN (b.NILAI_FIX*A1.QTY)-((b.NILAI_FIX*A1.QTY*DISC)/100)*A1.QTY END ) as NILAI_PDP,
+                        // A1.KD_DR AS KD_DR, '' NM_DR,b.NILAI_PROSEN,'0' AS BATAL,'' PETUGAS_BATAL, '' AS JAM_BATAL, B.KD_POSTING AS KD_POSTING, b.KD_POSTING_DISC as kd_posting_diskon,null
+                        //  FROM Billing_Pasien.DBO.FO_T_BILLING A
+                        //  inner join Billing_Pasien.dbo.FO_T_BILLING_1 A1
+                        //  ON A.NO_TRS_BILLING = A1.NO_TRS_BILLING
+                        //  INNER JOIN MasterdataSQL.DBO.MstrKarcisAdministrasi CC 
+                        //  ON CC.ID = A1.KODE_TARIF
+                        //  INNER JOIN Keuangan.DBO.BO_M_PDP2 B
+                        // ON CC.KD_PDP collate SQL_Latin1_General_CP1_CI_AS = B.KD_PDP collate SQL_Latin1_General_CP1_CI_AS
+                        // INNER JOIN Keuangan.DBO.BO_M_PDP CX
+                        // ON CX.KD_PDP = B.KD_PDP
+                        //  WHERE A1.GROUP_ENTRI='KARCIS' and a.BATAL='0' and A1.BATAL='0' and a.NO_TRS_BILLING=:notrsbill");
+                        // $this->db->bind('notrsbill', $notrsbill); 
+                        // $this->db->execute();
 
-                           //UPDATE TOTAL KE FO_T_BILLING
-                        $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
-                        SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
-                        FROM Billing_Pasien.DBO.FO_T_BILLING A 
-                        INNER JOIN
-                        (
-                            SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
-                            SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
-                            FROM Billing_Pasien.DBO.FO_T_BILLING_1
-                            WHERE NO_REGISTRASI=:noreg and Batal='0'
-                            GROUP BY NO_TRS_BILLING
-                        ) B
-                        ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
-                        WHERE A.NO_REGISTRASI=:noreg2");
-                        $this->db->bind('noreg', $nofixReg);
-                        $this->db->bind('noreg2', $nofixReg);
-                        $this->db->execute();
+                        //    //UPDATE TOTAL KE FO_T_BILLING
+                        // $this->db->query("UPDATE Billing_Pasien.DBO.FO_T_BILLING
+                        // SET TOTAL_TARIF=B.SUM_NILAI_TARIF,TOTAL_QTY=B.SUM_QTY,SUBTOTAL=B.SUM_SUB_TOTAL,SUBTOTAL_2=B.SUM_SUB_TOTAL_2,GRANDTOTAL=B.SUM_GRANDTOTAL
+                        // FROM Billing_Pasien.DBO.FO_T_BILLING A 
+                        // INNER JOIN
+                        // (
+                        //     SELECT  NO_TRS_BILLING,SUM(NILAI_TARIF) AS SUM_NILAI_TARIF,SUM(QTY) AS SUM_QTY,SUM(SUB_TOTAL) AS SUM_SUB_TOTAL,SUM(SUB_TOTAL_2) AS SUM_SUB_TOTAL_2,
+                        //     SUM(GRANDTOTAL) AS SUM_GRANDTOTAL
+                        //     FROM Billing_Pasien.DBO.FO_T_BILLING_1
+                        //     WHERE NO_REGISTRASI=:noreg and Batal='0'
+                        //     GROUP BY NO_TRS_BILLING
+                        // ) B
+                        // ON A.NO_TRS_BILLING = B.NO_TRS_BILLING
+                        // WHERE A.NO_REGISTRASI=:noreg2");
+                        // $this->db->bind('noreg', $nofixReg);
+                        // $this->db->bind('noreg2', $nofixReg);
+                        // $this->db->execute();
 
                     }
 

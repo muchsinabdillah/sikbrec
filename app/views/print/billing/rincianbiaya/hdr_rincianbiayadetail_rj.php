@@ -73,7 +73,7 @@ $this->Cell(0, 18, '', 0, 1); //br
         $this->Cell(2, 5, '', 0, 0);
         $this->Cell(23, 5, 'Tgl Pulang', 0, 0);
         $this->Cell(2, 5, ':', 0, 0);
-        $this->Cell(80, 5, $GLOBALS['listdataheader']['TglKunjungan'], 0, 0);
+        $this->Cell(80, 5, $GLOBALS['listdataheader']['JamPulang'], 0, 0);
 
         $this->Cell(2, 5, '', 0, 0);
         $this->Cell(23, 5, 'COB', 0, 0);
@@ -84,9 +84,11 @@ $this->Cell(0, 18, '', 0, 1); //br
         $this->SetFont('', 'B', 10);
         // $this->Cell(1, 5, '', 'TB', 0);
         $this->Cell(8, 5, 'NO',  'TB', 0);
-        $this->Cell(50, 5, 'KETERANGAN',  'TB', 0);
-        $this->Cell(33, 5, 'GROUP',  'TB', 0, 'R');
-        $this->Cell(80, 5, 'BILL DETAIL',  'TB', 0, 'R');
+        $this->Cell(44, 5, 'KETERANGAN',  'TB', 0);
+        $this->Cell(30, 5, 'HARGA',  'TB', 0, 'R');
+        $this->Cell(27, 5, 'QTY',  'TB', 0, 'R');
+        $this->Cell(30, 5, 'DISC',  'TB', 0, 'R');
+        $this->Cell(33, 5, 'TOTAL',  'TB', 0, 'R');
         $this->Cell(15, 5, ' ',  'TB', 0, 'R');
         // $this->Cell(35, 5, 'KEKURANGAN',  'TB', 0, 'R');
         // $this->Cell(35, 5, 'ASURANSI',  'TB', 0, 'R');
@@ -188,23 +190,30 @@ $totaltarif_asuransi = 0;
 $totaltarif = 0;
 $totaltarif_kekurangan = 0;
 $footer_subtotal = false;
-
-foreach ($data['listdetail_pay'] as $row) {
-
-    $html .= '
-        <tr>
-        <td align="left" width="1%"></td>
-            <td align="center" width="2%">' . $row['No'] .  '</td>
-            <td align="left" width="33%">' . $row['Keterangan'] .  '</td>
-            <td align="right" width="13%">' . $row['jenis_tarif'] . '</td>
-            <td align="right" width="45%">' . number_format($row['BILL'], 0, ',', '.') . '</td>
-        </tr>
-   ';
-    $totaltarif += $row['BILL'];
-    $totaltarif_kekurangan += $row['Kekurangan'];
-    $totaltarif_asuransi += $row['ASURANSI'];
-    $footer_subtotal = true;
+if(count($data['listdetail_pay']) > 0 ){
+    foreach ($data['listdetail_pay'] as $row) { 
+        $html .= '
+                    <tr>
+                            <td align="left" width="1%"></td>
+                            <td align="center" width="2%">' . $row['No'] .  '</td>
+                            <td align="left" width="33%">' . $row['Keterangan'] .  ' <br> - ' . $row['NM_DR'] .  '</td>
+                            <td align="right" width="11%">' . number_format($row['NILAI_TARIF'], 0, ',', '.') . '</td>
+                            <td align="right" width="13%">' . number_format($row['QTY'], 0, ',', '.') . '</td>
+                            <td align="right" width="8%">' . number_format($row['DISC_RP'], 0, ',', '.') . '</td>
+                            <td align="right" width="13%"></td>
+                            <td align="right" width="15%">' . number_format($row['BILL'], 0, ',', '.') . '</td>
+                    </tr>
+       '; 
+        $totaltarif += $row['BILL'];
+        $totaltarif_kekurangan += $row['Kekurangan'];
+        $totaltarif_asuransi += $row['ASURANSI'];
+        $footer_subtotal = true;
+    }
+    
 }
+
+
+
 $html .= '</tbody>
         </table>';
 if ($footer_subtotal) {
@@ -298,12 +307,10 @@ $html .= '
     </tr>
     <tr>
     <td align="left" width="50%"><img src="' . $data['listdatasign']['AWSSign'] . '"  width="80" height="40"></td>
-    <td align="right" width="46%"><img src="../public/' . $url . '.png"  width="50" height="50"></td>
-    </tr>
+     </tr>
     <tr>
     <td width="80%"align="left"><font size="8">' . $data['listdatasign']['username'] . '</font></td>
-    <td width="25%" align="center"><font size="8">Scan this for validate.</font></td>
-    </tr>
+     </tr>
 </tbody>
 </table>';
 

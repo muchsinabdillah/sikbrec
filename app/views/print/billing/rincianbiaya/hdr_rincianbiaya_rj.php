@@ -11,11 +11,11 @@ class PDF extends TCPDF
 
         $this->Cell(0, 18, '', 0, 1); //br
         $this->setFont('', '', 10);
-        $this->Cell(1, 1, 'Jl. Letjen Suprapto No.Kav 13,', 0, 1);
-        $this->Cell(1, 1, 'RT.10/RW.5, Cemp. Putih Tim., Kec.', 0, 1);
-        $this->Cell(1, 1, 'Cemp. Putih, Kota Jakarta Pusat,', 0, 1);
-        $this->Cell(1, 1, 'Daerah Khusus Ibukota Jakarta', 0, 1);
-        $this->Cell(1, 1, '10510, Telp. (021) 80618618 / 80618619', 0, 1);
+        $this->Cell(1, 1, 'Jl. angkasa No.19, Dukuhkrikil', 0, 1);
+        $this->Cell(1, 1, '-', 0, 1);
+        $this->Cell(1, 1, '-', 0, 1);
+        $this->Cell(1, 1, '-', 0, 1);
+        $this->Cell(1, 1, '-', 0, 1);
 
         $this->setFont('', 'b', 12);
         if ($GLOBALS['listdataheader']['IdUnit'] == '1') {

@@ -89,4 +89,47 @@ class StatusPegawai_Model
         $pasing['STATUS'] = $data['STATUS'];
         return $pasing;
     }
+    public function insertPenilaian($data)
+    {
+
+        if ($data['noreg'] == "") {
+            $callback = array(
+                'status' => 'warning',
+                'errorname' => 'Silahkan Masukan No. Register !',
+            );
+            return $callback;
+            exit;
+        }
+        if ($data['statuspuas'] == "") {
+            $callback = array(
+                'status' => 'warning',
+                'errorname' => 'Silahkan Status Penilaian !',
+            );
+            return $callback;
+            exit;
+        }
+        $datenowcreate = Utils::seCurrentDateTime();
+        try {
+            $this->db->transaksi();
+            
+                $this->db->query("INSERT INTO SysLog.dbo.SurveyCustomer
+                            (NoRegister,Penilaian,Waktu)
+                          values
+                          ( :noreg,:statuspuas,:Waktu)");
+                $this->db->bind('noreg', $data['noreg']);
+                $this->db->bind('statuspuas', $data['statuspuas']);
+                $this->db->bind('Waktu', $datenowcreate);
+         
+            $this->db->execute();
+            $this->db->commit();
+            $callback = array(
+                'status' => 'success', // Set array status dengan success   
+                'message' => 'Transkasi Berhasil Disimpan !', // Set array status dengan success    
+            );
+            return $callback;
+        } catch (PDOException $e) {
+            $this->db->rollback();
+            $this->$e;
+        }
+    }
 }

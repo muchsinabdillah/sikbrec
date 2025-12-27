@@ -186,9 +186,9 @@ var itemmcu = document.getElementById('additempaketmcu')
 itemmcu.addEventListener('click',function (e) {
     e.preventDefault()
 
-    if(pemeriksaan.value==""||lokasipemeriksaan.value==""||pemeriksaanpenunjang.value==""||idtest.value==""||tarifitem.value==""||$('#showjasa').val()==""){
-        alert('Pemeriksaan,Lokasi Pemeriksaan,Pemeriksaan penunjang, Idtest,Tarif,showjasa tidak boleh kosong')
-    }else{
+    // if(pemeriksaan.value==""||lokasipemeriksaan.value==""||pemeriksaanpenunjang.value==""||idtest.value==""||tarifitem.value==""||$('#showjasa').val()==""){
+    //     alert('Pemeriksaan,Lokasi Pemeriksaan,Pemeriksaan penunjang, Idtest,Tarif,showjasa tidak boleh kosong')
+    // }else{
 
         if(showjasa.value==1 && kodejasa.value==''){
             alert('kode jasa tidak boleh kosong')
@@ -253,7 +253,7 @@ itemmcu.addEventListener('click',function (e) {
             
         }
     // console.log(header.value)
-    }
+    // }
 })
 
 function formatRupiah(angka="0", prefix='Rp. '){

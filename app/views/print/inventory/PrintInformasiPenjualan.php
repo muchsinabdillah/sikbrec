@@ -21,13 +21,13 @@ $pdf->SetFont('', '', 9);
 $pdf->Cell(55, 4, 'No : 010/FRM/REG/RSY/Rev0/1/2020', 1, 1, 'L');
 $pdf->Cell(0, 2, '', 0, 1);
 $pdf->Cell(210, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Jl. Letjen Suprapto, Kav. 13 Cempaka Putih, ', 0, 1, 'L');
+$pdf->Cell(25, 3, 'Jl. angkasa No.19, Dukuhkrikil ', 0, 1, 'L');
 $pdf->Cell(210, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Jakarta Pusat 10510', 0, 1, 'L');
+$pdf->Cell(25, 3, '-', 0, 1, 'L');
 $pdf->Cell(210, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'Telp: 021-80618618, 80618619 (Hunting),', 0, 1, 'L');
+$pdf->Cell(25, 3, '-', 0, 1, 'L');
 $pdf->Cell(210, 3, '', 0, 0);
-$pdf->Cell(25, 3, 'www.rsyarsi.co.id', 0, 1, 'L');
+$pdf->Cell(25, 3, '-', 0, 1, 'L');
 
 
 //make a dummy empty cell as a vertical spacer

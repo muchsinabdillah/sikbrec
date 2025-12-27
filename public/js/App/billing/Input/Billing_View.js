@@ -23,7 +23,12 @@ $(document).ready(function () {
     asyncShowMain();
    
     // BtnTindakanByUnit();
-     
+      //edit paket MCU
+    $('#btn_approvefrmPaket').click(function () {
+        $("#approvemodalpaket").modal('show');
+        // getDataApprovePaketMCU();
+        getDataPaketMCU();
+    });
     $('#tbl_rekapbiaya').DataTable( {
     } );
 
@@ -948,6 +953,7 @@ async function updateUIdatagetDatabyID(datagetDatabyID) {
         $("#xgrupjaminan").val(convertEntities(dataresponse.data.GroupJaminan));
         
         $("#AlihStatusDari").val(convertEntities(dataresponse.data.NoRegisRWJ));
+        $("#IDDokter").val(convertEntities(dataresponse.data.IDDokter));
         $("#Dokter").val(convertEntities(dataresponse.data.NamaDokter));
         $("#IDUnit").val(convertEntities(dataresponse.data.Unit));
         $("#Unit").val(convertEntities(dataresponse.data.NamaUnit));
@@ -4856,8 +4862,62 @@ async function BtnTindakanByUnit(){
 
 }
 
+function BtnAdmin(){
+    swal({
+        title: "Konfirmasi",
+        text: "Apakah Anda akan menambahkan Administrasi pasien 2% ?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+    })
+        .then((willDelete) => {
+            if (willDelete) {
+                goGenerateAdministrasi();
+                        
+                getDataDetailBilling();
+                getDataDetailRincianHutang();
+                getDataRekapBiaya();
+                getDataRiwayatPayment();
+                getPerusahaan();
+                getAsuransi(); 
+                getTotalPembayaranx();
+            } 
+        });
+
+}
 
 
+function goGenerateAdministrasi() {
+    var base_url = window.location.origin;
+    var noregistrasi = $("#NoRegistrasi").val() 
+    let url = base_url + '/SIKBREC/public/aBillingPasien/generateAdministrasiRajal';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: 'noregistrasi=' + noregistrasi 
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            
+        })
+}
 
 
 
@@ -7655,3 +7715,342 @@ window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintKuitansiDetail/" + l
     }
 }
 //bridging materai
+
+
+
+// nolin tarif
+async function btnIncludePaket(){ 
+    try{
+        var dataIncludePaket =  await IncludePaket();
+        updateUIdataIncludePaket(dataIncludePaket);
+    } catch (err) {
+        toast(err, "error")
+    }
+}
+function IncludePaket(){ 
+    var Idbilling = $('#Idbilling').val(); 
+    // console.log(penjamin_kodex);
+    // return false;
+
+    var url2 = "/SIKBREC/public/aBillingPasien/IncludePaket";
+    var base_url = window.location.origin;
+    let url = base_url + url2;
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: "Idbilling="+Idbilling 
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+
+
+function updateUIdataIncludePaket(datachangetarifbill) {
+    let responseApi = datachangetarifbill;
+    swal("Terima Kasih",  "Transaksi berhasil : ", "success")
+    showdatafobill();
+}
+
+
+//edit paket MCU
+async function getDataPaketMCU() {
+    try {
+        const datagetDataHeaderPaketMCU = await getDataHeaderPaketMCU();
+        updateUIdatagetDataHeaderPaketMCU(datagetDataHeaderPaketMCU);
+    } catch (err) {
+        toast(err.message, "error")
+    }
+}
+
+function updateUIdatagetDataHeaderPaketMCU(params) {
+    let response = params;
+    $("#IDPaketMCU").val(convertEntities(response.IDMCU));
+    $("#IDPaketTarif").val(convertEntities(response.IDPaket));
+    $("#namapaket").val(convertEntities(response.NamaPaket));
+    $("#HargaPaket").val(convertEntities(response.Tarif));
+    getDataApprovePaketMCU(response.NamaPaket);
+}
+
+function getDataHeaderPaketMCU() {
+    var noreg = $("#NoRegistrasi").val();
+    var getreg = $("#NoRegistrasi").val().substring(0, 2);
+    var base_url = window.location.origin;
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getPaketMCUbyNoreg';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body:
+        'noreg=' + noreg
+
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message.errorInfo[2]);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.errorname);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+        })
+}
+
+function getDataApprovePaketMCU(namaPaket) { 
+    //$(".preloader").fadeIn(); 
+    var base_url = window.location.origin;
+    var noreg = $("#NoRegistrasi").val();
+    var tglawal = $("#tglawal").val();
+    var tglakhir = $("#tglakhir").val();
+    var namapaket = namaPaket;
+    $('#tbl_approvepaketmcu').dataTable({
+        "bDestroy": true
+    }).fnDestroy();
+       $('#tbl_approvepaketmcu').DataTable({
+         'ajax':
+    {
+        "url": base_url + "/SIKBREC/public/aBillingPasien/getDataApprovePaketMCU", // URL file untuk proses select datanya
+        "type": "POST",
+        data: function (d) {
+         d.noreg = noreg
+         d.tglawal = tglawal
+         d.tglakhir = tglakhir
+         d.namapaket = namapaket
+     },
+         "dataSrc": "",
+    "deferRender": true,
+    }, 
+    "columns": [
+                            { "data": "No" },
+                            { "data": "Pemeriksaan" },
+                            { "data": "LokasiPemeriksaan" },
+                            { "data": "Keterangan" },
+                            { "data": "Tarif" },
+                           ],
+     });
+}
+
+async function btnApprovePaketMCU() {
+    try {
+        const datagoApprovePaketMCU = await goApprovePaketMCU();
+        updateUIdatagoApprovePaketMCUU(datagoApprovePaketMCU);
+    } catch (err) {
+        //console.log(err);
+        toast(err, "error")
+    }
+}
+function updateUIdatagoApprovePaketMCUU(params) {
+    let response = params;
+    if (response.status == "success") {
+        // toast(response.message, "success")
+        swal({
+            title: "Simpan Berhasil!",
+            text: response.message,
+            icon: "success",
+        })
+        // getDataApproveFarmasi();
+    }else{
+        toast(response.message, "error")
+    }  
+    //var noregistrasi = response.NoRegistrasi; ;
+}
+function goApprovePaketMCU() {
+    $(".preloader").fadeIn();
+    // $('#cb_approvePaketMC').addClass('btn-danger');
+    // $('#cb_approvePaketMC').html('Sending, Please Wait...');
+    
+    // document.getElementById("cb_approvePaketMC").disabled = true;
+    var str = $("#form_approvePaketMCU").serialize();
+    var NoMR = $("#NoMR").val();
+    var NoRegistrasi = $("#NoRegistrasi").val();
+    var NoEpisode = $("#NoEpisode").val();
+    var Dokter = $("#Dokter").val();
+    var IDDokter = $("#IDDokter").val();
+    var NamaPasien = $("#NamaPasien").val();
+    var TanggalLahir = $("#TanggalLahir").val();
+    var Penjamin = $("#Penjamin").val();
+    var Unit = $("#Unit").val();
+    var IDUnit = $("#IDUnit").val();
+    var TypePatientID = $("#TypePatientID").val();
+    var TglMasuk = $("#TglMasuk").val();
+    
+    var base_url = window.location.origin;
+
+    let url = base_url + '/SIKBREC/public/aBillingPasien/goApprovePaketMCU';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: str 
+        + '&NoMR=' + NoMR
+        + '&NoRegistrasi=' + NoRegistrasi
+        + '&NoEpisode=' + NoEpisode
+        + '&Dokter=' + Dokter
+        + '&IDDokter=' + IDDokter
+        + '&NamaPasien=' + NamaPasien
+        + '&DOB=' + TanggalLahir
+        + '&Penjamin=' + Penjamin
+        + '&Unit=' + Unit
+        + '&IDUnit=' + IDUnit
+        + '&TypePatientID=' + TypePatientID
+        + '&TglMasuk=' + TglMasuk
+        
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            if (response.status === "error") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+            // $('#btnOrder').removeClass('btn-danger');
+            // $('#btnOrder').html('Pilih dan Order Paket');
+            // document.getElementById("btnOrder").disabled = false;
+            // $("#btnPrintLabel").prop('disabled',false)
+            
+        })
+}
+
+async function btnBatalApprovePaketMCU() {
+    try {
+        const datagoBatalApprovePaketMCU = await goBatalApprovePaketMCU();
+        updateUIdatagoBatalApprovePaketMCUU(datagoBatalApprovePaketMCU);
+    } catch (err) {
+        //console.log(err);
+        toast(err, "error")
+    }
+}
+function updateUIdatagoBatalApprovePaketMCUU(params) {
+    let response = params;
+    if (response.status == "success") {
+        // toast(response.message, "success")
+        swal({
+            title: "Batal Berhasil!",
+            text: response.message,
+            icon: "success",
+        })
+        // getDataApproveFarmasi();
+    }else{
+        toast(response.message, "error")
+    }  
+    //var noregistrasi = response.NoRegistrasi; ;
+}
+function goBatalApprovePaketMCU() {
+    $(".preloader").fadeIn();
+    // $('#cb_approvePaketMC').addClass('btn-danger');
+    // $('#cb_approvePaketMC').html('Sending, Please Wait...');
+    
+    // document.getElementById("cb_approvePaketMC").disabled = true;
+    var str = $("#form_approvePaketMCU").serialize();
+    var NoMR = $("#NoMR").val();
+    var NoRegistrasi = $("#NoRegistrasi").val();
+    var NoEpisode = $("#NoEpisode").val();
+    var Dokter = $("#Dokter").val();
+    var IDDokter = $("#IDDokter").val();
+    var NamaPasien = $("#NamaPasien").val();
+    var TanggalLahir = $("#TanggalLahir").val();
+    var Penjamin = $("#Penjamin").val();
+    var Unit = $("#Unit").val();
+    var IDUnit = $("#IDUnit").val();
+    var TypePatientID = $("#TypePatientID").val();
+    var TglMasuk = $("#TglMasuk").val();
+    
+    var base_url = window.location.origin;
+
+    let url = base_url + '/SIKBREC/public/aBillingPasien/goBatalApprovePaketMCU';
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            "Content-type": "application/x-www-form-urlencoded; charset=UTF-8"
+        },
+        body: str 
+        + '&NoMR=' + NoMR
+        + '&NoRegistrasi=' + NoRegistrasi
+        + '&NoEpisode=' + NoEpisode
+        + '&Dokter=' + Dokter
+        + '&IDDokter=' + IDDokter
+        + '&NamaPasien=' + NamaPasien
+        + '&DOB=' + TanggalLahir
+        + '&Penjamin=' + Penjamin
+        + '&Unit=' + Unit
+        + '&IDUnit=' + IDUnit
+        + '&TypePatientID=' + TypePatientID
+        + '&TglMasuk=' + TglMasuk
+        
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            return response.json();
+        })
+        .then(response => {
+            // if (response.status === "error") {
+            //     throw new Error(response.message.errorInfo[2]);
+            //     // console.log("ok " + response.message.errorInfo[2])
+            // } else if (response.status === "warning") {
+            //     throw new Error(response.errorname);
+            //     // console.log("ok " + response.message.errorInfo[2])
+            // }
+            // return response
+
+            if (response.status === "error") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            } else if (response.status === "warning") {
+                throw new Error(response.message);
+                // console.log("ok " + response.message.errorInfo[2])
+            }
+            return response
+        })
+        .finally(() => {
+            $(".preloader").fadeOut();
+            // $('#btnOrder').removeClass('btn-danger');
+            // $('#btnOrder').html('Pilih dan Order Paket');
+            // document.getElementById("btnOrder").disabled = false;
+            // $("#btnPrintLabel").prop('disabled',false)
+            
+        })
+}
+//edit paket MCU

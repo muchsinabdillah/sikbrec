@@ -1,4 +1,7 @@
-
+  <!-- File suara yang akan diputar saat notifikasi muncul --> 
+  <audio id="notification-sound" autoplay-policy=no-user-gesture-required hidden  controls>
+        <source src="<?= BASEURL; ?>/notofication.wav" type="audio/wav" autoplay="true">
+    </audio>
 <?php
 date_default_timezone_set('Asia/Jakarta');
 $id = "";
@@ -37,9 +40,11 @@ $datetimenow = date("Y-m-d\TH:i:s");
                             <!-- </form> -->
 
                             <div class="tab-content bg-white p-15">
+                                
                                 <div role="tabpanel" class="tab-pane active" id="resep_aktif">
                                     <div class="form-horizontal" id="frmSimpanTrsRegistrasi">
                                         <div class="form-group">
+                                        <div id="notification-container"></div>
                                             <!-- <h3>Cari Data Reservasi</h3> -->
                                             <!-- <div class="alert alert-info alert-dismissible">
                                                 <p> <strong>Info !</strong> Textbox NOTE di gunakan untuk mengisi jika
@@ -238,6 +243,22 @@ $datetimenow = date("Y-m-d\TH:i:s");
 </div>
 <!-- /.content-wrapper -->
 
+</div>
+<div class="modal fade" id="notif_Cetak" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog  modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                                <h4 class="modal-title" id="myModalLabel">Izin Notifikasi</h4>
+                </div>
+                    <div class="text">Izinkan SIMRS memberikan Notifikasi Suara Saat Order Baru Masuk ?</div>
+                <div class="modal-footer">
+                    <div class="btn-group" role="group"> 
+                        <button type="button" onclick="play()" class="btn btn-success btn-wide btn-rounded" 
+                        id="btnclosemodalcetak" name="btnclosemodalcetak">ALLOW</button>
+                    </div>
+                </div>
+            </div>
+    </div>               
 </div>
 <!-- ========== COMMON JS FILES ========== -->
 <script src="<?= BASEURL; ?>/js/jquery/jquery-2.2.4.min.js"></script>

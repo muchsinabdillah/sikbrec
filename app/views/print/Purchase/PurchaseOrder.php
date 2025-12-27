@@ -115,7 +115,7 @@ class PDF extends FPDF
         $this->setFont('Arial', 'B', 14);
         $this->Cell(0, 15, 'PURCHASE ORDER', 0, 1, 'C'); //end of line
 
-        $this->Image('../public/images/yarsi.png', 10, 20, 38);
+        $this->Image('../public/images/logo.jpeg', 2, 14, 35);
         //var_dump($GLOBALS['header']);
         //line 1
         $this->SetFont('Arial', 'I', 8);
@@ -149,7 +149,7 @@ class PDF extends FPDF
         $this->SetFont('Arial', '', 8);
         $this->Cell(2, 4, ':', 0, 0);
        // $this->Cell(0, 4, '14 Days After Goods & Invoiced are Received', 0, 1);
-       $this->Cell(0, 4, $GLOBALS['header']['Notes1'], 0, 1);
+       $this->Cell(0, 4, "", 0, 1);
 
         //line 5
         $this->SetFont('Arial', 'I', 8);
@@ -157,7 +157,7 @@ class PDF extends FPDF
         $this->Cell(30, 4, 'INSTALLATION', 0, 0);
         $this->SetFont('Arial', '', 8);
         $this->Cell(2, 4, ':', 0, 0);
-        $this->Cell(0, 4, $GLOBALS['header']['Unit'], 0, 1);
+        $this->Cell(0, 4, '', 0, 1);
 
         //line 6
         $this->SetFont('Arial', 'I', 8);
@@ -173,16 +173,15 @@ class PDF extends FPDF
         $this->Cell(30, 4, 'SHIPPING TERM', 0, 0);
         $this->SetFont('Arial', '', 8);
         $this->Cell(2, 4, ':', 0, 0);
-        $this->Cell(0, 4, 'FRANCO YARSI', 0, 1);
+        $this->Cell(0, 4, '', 0, 1);
 
         $this->Ln(-20);
         // cell(widht, height, text, border, end line , [ALIGN] )
 
         // cell(widht, height, text, border, end line , [ALIGN] )
-        $this->SetFont('Arial', '', 8);
-        $this->Cell(0, 4, 'JL. LETJEN SOEPRAPTO, KAV. 13, CEMPAKA PUTIH', 0, 1);
-        $this->Cell(0, 4, 'JAKARTA PUSAT 10510', 0, 1);
-        $this->Cell(0, 4, 'HUNTING : 021 8061 8618, 8061 8619', 0, 1);
+        $this->SetFont('Arial', 'I', 8);
+        $this->Cell(0, 4, 'JL. Angkasa No. 19, Blubuk, Losari, Brebes - 52255.', 0, 1); 
+        $this->Cell(0, 4, 'Call Center : 0811-1901-1119', 0, 1);
 
     //     $h='4';
     //   //row 5 (rigth)--------------------
@@ -229,8 +228,8 @@ $pdf->Cell(60, $height, 'BILLING TO :', 0, 1);
 $pdf->SetFont('Arial', 'B', 8);
 //ROW 2
 $pdf->Cell(70, $height, $GLOBALS['header']['namasupplier'], 0, 0);//ISI SHIPPING FROM
-$pdf->Cell(60, $height, 'RUMAH SAKIT YARSI', 0, 0);//ISI SHIPPING TO
-$pdf->CellFitScale(60, $height, 'PT. INNOCREATIVE - NPWP : 02.408.814.8-024.000', 0, 1);//ISI BILLING TO
+$pdf->Cell(60, $height, 'KLINIK UTAMA BREBES EYE CENTER', 0, 0);//ISI SHIPPING TO
+$pdf->CellFitScale(60, $height, 'CV. BREBES EYE CENTER - NPWP : 12.571.863.5-501.000', 0, 1);//ISI BILLING TO
 
 // $pdf->Cell(130, $height, '', 0, 0);
 // $pdf->Cell(13, $height, 'NPWP', 0, 0);
@@ -259,7 +258,7 @@ $pdf->SetXY($x+70, $y);
 
 //$pdf->Ln(-8);
 //$pdf->Cell(70, $height, '', 1, 0);
-$pdf->MultiCell(55, $height, 'RS YARSI (GUDANG PURCHASING BASEMENT) JL. LETJEN. SOEPRAPTO, KAV. 13, CEMPAKA PUTIH JAKARTA PUSAT 10510', 0);//ISI ALAMAT SHIPPING TO
+$pdf->MultiCell(55, $height, 'JL. Angkasa No. 19, Blubuk, Losari, Brebes - 52255.', 0);//ISI ALAMAT SHIPPING TO
 
 
 $pdf->SetXY($x+130, $y);
@@ -271,38 +270,43 @@ $pdf->SetXY($x+130, $y);
 
 
 //$pdf->Ln(-12);
-$pdf->MultiCell(60, $height, 'GEDUNG YARSI JL. LETJEND SUPRAPTO POSKO RS YARSI LT. 3 NO. 0 RT 000 RW. 000 CEMAPAKA PUTIH TIMUR CEMPAKA PUTIH JAKARTA PUSAT DKI JAKARTA', 0);//ISI ALAMAT BILLING TO
+$pdf->MultiCell(60, $height, 'JL. Angkasa No. 19, Blubuk, Losari, Brebes - 52255.', 0);//ISI ALAMAT BILLING TO
 
-$pdf->SetFont('Arial', 'I', 8);
+$pdf->SetFont('Arial', 'I', 6);
 //ROW 5
 $pdf->Cell(30, $height, 'PHONE', 0, 0);
 $pdf->Cell(2, $height, ':', 0, 0);
-$pdf->SetFont('Arial', '', 8);
+$pdf->SetFont('Arial', '', 6);
 $pdf->Cell(38, $height, $GLOBALS['header']['PhoneSupplier'], 0, 0);
-$pdf->SetFont('Arial', 'I', 8);
+$pdf->SetFont('Arial', 'I', 6);
 $pdf->Cell(23, $height, 'Contact Person', 0, 0);
 $pdf->Cell(2, $height, ':', 0, 0);
-$pdf->SetFont('Arial', 'B', 8);
-$pdf->Cell(35, $height, 'BANGUN NOVIANTO', 0, 1);
+$pdf->SetFont('Arial', 'B', 6);
+$pdf->Cell(35, $height, 'apt. SILFINA APRIYANTI, S.Farm', 0, 1);
+$pdf->SetFont('Arial', 'I', 6);
+//ROW 5
+$pdf->Cell(30, $height, 'PIC', 0, 0);
+$pdf->Cell(2, $height, ':', 0, 0);
+$pdf->SetFont('Arial', '', 6);
+$pdf->Cell(38, $height, $GLOBALS['header']['ContactPerson'], 0, 0);
+$pdf->SetFont('Arial', 'I', 6);
+$pdf->Cell(23, $height, 'Contact Number', 0, 0);
+$pdf->Cell(2, $height, ':', 0, 0);
+$pdf->SetFont('Arial', 'B', 6);
+$pdf->Cell(35, $height, '0896-9895-3711', 0, 1);
 
 $pdf->SetFont('Arial', 'I', 8);
 //ROW 6
-$pdf->Cell(30, $height, 'PIC', 0, 0);
-$pdf->Cell(2, $height, ':', 0, 0);
-$pdf->SetFont('Arial', '', 8);
-$pdf->Cell(38, $height, $GLOBALS['header']['ContactPerson'], 0, 0);
-$pdf->SetFont('Arial', 'I', 8);
-$pdf->Cell(23, $height, 'Contact Number', 0, 0);
-$pdf->Cell(2, $height, ':', 0, 0);
-$pdf->SetFont('Arial', 'B', 8);
-$pdf->Cell(35, $height, '0822 99382233', 0, 1);
-
-$pdf->SetFont('Arial', 'I', 8);
-//ROW 7
 $pdf->Cell(30, $height, 'CONTACT NUMBER', 0, 0);
 $pdf->Cell(2, $height, ':', 0, 0);
 $pdf->SetFont('Arial', '', 8);
-$pdf->Cell(38, $height, $GLOBALS['header']['TlpKantor'], 0, 1);
+$pdf->Cell(38, $height, $GLOBALS['header']['TlpKantor'], 0, 0);
+$pdf->SetFont('Arial', 'I', 6);
+$pdf->Cell(23, $height, 'SIPA', 0, 0);
+$pdf->Cell(2, $height, ':', 0, 0);
+$pdf->SetFont('Arial', 'B', 6);
+$pdf->Cell(35, $height, 'NR33292409003638', 0, 1);
+
 
 
 $pdf->Cell(0,5,'',0,1);
@@ -365,7 +369,8 @@ $pdf->Cell(35, $height, number_format($GLOBALS['header']['GrandtotalPurchase'],0
 $pdf->Cell(0,3,'',0,1);
 $pdf->SetFont('Arial', 'I', 8);
 $pdf->Cell(0, $height, 'REMARKS :', 0, 1,'L');
-$pdf->Cell(0, $height, $GLOBALS['header']['Notes1'], 0, 1,'L');
+// $pdf->Cell(0, $height, $GLOBALS['header']['Notes1'], 0, 1,'L');
+$pdf->Cell(0, $height, '', 0, 1,'L');
 
 $pdf->SetFont('Arial', 'IB', 8);
 $pdf->Cell(121, $height, '', 0, 0,'C');
@@ -387,29 +392,29 @@ $pdf->Cell(37, 7, '', 0, 0);
 $pdf->Cell(30, 5, 'Approved By (2) :', 0, 1);
 
 
-$pdf->Cell(38, 20,$data['approve_1']['FileDocument'] == null ? '' : $pdf->image($data['approve_1']['FileDocument'], 11, $pdf->getY(), -180), 0, 0);//isi
+$pdf->Cell(38, 20,'',  0, 0);//isi
 $pdf->Cell(35, 20, '', 0, 0);
-$pdf->Cell(38, 20,$data['approve_2']['FileDocument'] == null ? '' : $pdf->image($data['approve_2']['FileDocument'], 80, $pdf->getY(), -180), 0, 0);//isi
+$pdf->Cell(38, 20,'', 0, 0);//isi
 $pdf->Cell(35, 20, '', 0, 0);
-$pdf->Cell(38, 20,$data['approve_3']['FileDocument'] == null ? '' : $pdf->image($data['approve_3']['FileDocument'], 150, $pdf->getY(), -180), 0, 1);//isi
+$pdf->Cell(38, 20,'',  0, 1);//isi
 $pdf->Cell(8, 4, '', 0, 0);
-$pdf->Cell(25, 4, $data['approve_1']['username'], 0, 0);
+$pdf->Cell(25, 4, 'apt. Silfina Apriyanti, S.Farm', 0, 0);
 
 $pdf->Cell(45, 4, '', 0, 0);
-$pdf->Cell(25, 4, $data['approve_2']['username'], 0, 0);
+$pdf->Cell(25, 4, 'Uun Kurniasih, SKep, Ners', 0, 0);
 
 $pdf->Cell(42, 4, '', 0, 0);
-$pdf->Cell(25, 4, $data['approve_3']['username'], 0, 1);
+$pdf->Cell(25, 4, 'Heriyanto', 0, 1);
 
 //----
 $pdf->Cell(8, 5, '', 0, 0);
-$pdf->Cell(25, 4, 'Purchasing', 0, 0);
+$pdf->Cell(25, 4, 'Apoteker', 0, 0);
 
 $pdf->Cell(45, 4, '', 0, 0);
-$pdf->Cell(25, 4, 'Purchasing Manager', 0, 0);
+$pdf->Cell(25, 4, 'Operational Manager', 0, 0);
 
 $pdf->Cell(42, 4, '', 0, 0);
-$pdf->Cell(25, 4, 'CEO of YARSI HOSPITAL', 0, 1);
+$pdf->Cell(25, 4, 'CEO Klinik Brebes Eye Center', 0, 1);
 
 //----
 $pdf->Cell(8, 5, '', 0, 0);

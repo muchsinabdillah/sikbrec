@@ -558,7 +558,8 @@ function SaveTrsPayment_closing() {
         + "&totalkekurangan1=" + totalkekurangan1
         + "&totalkekurangan2=" + totalkekurangan2
         + "&totalklaim1=" + totalklaim1
-        + "&totalklaim2=" + totalklaim2
+        + "&namapasien=" + namapasien
+        + "&totalklaim2=" + totalklaim2 
     })
         .then(response => {
             if (!response.ok) {

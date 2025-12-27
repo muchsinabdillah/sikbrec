@@ -1386,7 +1386,10 @@ class aBillingPasien extends Controller
         echo json_encode($this->model('B_Billing_Model')->getAWSURL($_POST));
     }
 
-
+    public function generateAdministrasiRajal()
+    {
+        echo json_encode($this->model('B_Billing_Model')->generateAdministrasiRajal($_POST));
+    }
 
     public function gettarifnew()
     {
@@ -1780,4 +1783,26 @@ class aBillingPasien extends Controller
         echo json_encode($this->model('B_Billing_Model')->getDataCetakDocumentPDF($_POST));
     }
     //bridging materai
+    public function IncludePaket()
+    {
+        echo json_encode($this->model('B_Billing_Model')->IncludePaket($_POST));
+    }
+    //edit paket MCU
+    public function getPaketMCUbyNoreg()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getPaketMCUbyNoreg($_POST));
+    }
+    public function getDataApprovePaketMCU()
+    {
+        echo json_encode($this->model('B_Billing_Model')->getDataApprovePaketMCU($_POST));
+    }
+    public function goApprovePaketMCU()
+    {
+        echo json_encode($this->model('B_Billing_Model')->goApprovePaketMCU($_POST));
+    }
+    public function goBatalApprovePaketMCU()
+    {
+        echo json_encode($this->model('B_Billing_Model')->goBatalApprovePaketMCU($_POST));
+    }
+    //edit paket MCU
 }

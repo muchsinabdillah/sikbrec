@@ -130,10 +130,12 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                 </div>
                                                 <label for=" inputEmail3" class="col-sm-2 control-label">
                                                     Dokter DPJP</label>
-                                                <div class="col-sm-4">
-                                                    <input type="text" name="Dokter" id="Dokter" readonly
+                                                <!-- editmcu -->
+                                                <input type="text" name="Dokter" id="Dokter" readonly
                                                         style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
-                                                </div>
+                                                    <!-- editmcu -->
+                                                    <input type="hidden" name="IDDokter" id="IDDokter" readonly
+                                                        style="background-color: transparent;border-color: transparent; border-bottom: 1px solid darkgrey; border-radius: 0px; width: 300px;">
                                             </div>
 
                                             <div class="form-group gut">
@@ -293,7 +295,12 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                         <button type="button" class="btn btn-xs" style="background-color:#74cf9e"
                                             onclick="BtnTindakanByUnit()"><span class="glyphicon glyphicon-plus"></span>
                                             Tindakan</button>
-
+                                        <button type="button" class="btn btn-xs" style="background-color:#74cf9e"
+                                            onclick="BtnAdmin()"><span class="glyphicon glyphicon-plus"></span>
+                                            Admin</button>
+                                            <button type="button" class="btn btn-success btn-xs" id="btn_approvefrmPaket"
+                                            name="btn_approvefrmPaket">
+                                            <span class="glyphicon glyphicon-check"></span> Approve Paket MCU</button>
                                         <button type="button" class="btn btn-success btn-xs" id="btn_approvefrm"
                                             name="btn_approvefrm">
                                             <span class="glyphicon glyphicon-check"></span> Approve Farmasi</button>
@@ -607,6 +614,7 @@ $datetimenow = date("Y-m-d\TH:i:s");
 <?php include("section/modalclosing.php"); ?>
 <?php include("section/modalpembayaran.php"); ?>
 <?php include("section/modaltariftindakan.php"); ?>
+<?php include("section/modalapprovepaket.php"); ?>
 <?php include("section/modalpilihjenistindakan.php"); ?>
 <?php include("section/modalprint_rincian_modal.php"); ?>
 <?php include("section/modalaprovefarmasi.php"); ?>

@@ -164,7 +164,7 @@ function getDataLaporan() {
         $("#datatable2").hide();
 
        $('#datatable1').DataTable({
-           "ordering": true, // Set true agar bisa di sorting
+           "ordering": false, // Set true agar bisa di sorting
            "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
@@ -184,6 +184,7 @@ function getDataLaporan() {
            "deferRender": true,
            }, 
            "columns": [
+            { "data": "no" }, 
             { "data": "NoTransaksi" }, 
             { "data": "NoKwitansi" }, 
              { "data": "NoEpisode" }, 
@@ -217,7 +218,7 @@ function getDataLaporan() {
         // }).fnDestroy();
 
        $('#datatable2').DataTable({
-           "ordering": true, // Set true agar bisa di sorting
+           "ordering": false, // Set true agar bisa di sorting
            "order": [[ 0, 'desc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
@@ -237,6 +238,7 @@ function getDataLaporan() {
            "deferRender": true,
            }, 
            "columns": [
+            { "data": "no" }, 
             { "data": "NoTransaksi" }, 
             { "data": "NoKwitansi" }, 
              { "data": "NoEpisode" }, 

@@ -207,6 +207,9 @@ $datetimenow = date("Y-m-d\TH:i:s");
                                                                     <th align='center'>
                                                                         <font size="1">Grandtotal
                                                                     </th> 
+                                                                    <th align='center'>
+                                                                        <font size="1">HPP
+                                                                    </th> 
                                                                     <!-- <th align='center'>
                                                                         <font size="1">Uang R
                                                                     </th>

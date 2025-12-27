@@ -48,6 +48,13 @@
                                         <button id="btnCariMrx" type="button" class="btn btn-primary btn-sm"><span
                                                 class="glyphicon glyphicon glyphicon-search"
                                                 id="btnCariMr"></span></button>
+
+                                                <button id="print" type="button" class="btn btn-success btn-sm"><span
+                                                class="glyphicon glyphicon-print"
+                                                id="print"></span></button>
+                                                
+<!-- 
+                                                <a href="#modal_alert_print"  data-toggle="modal"  class="btn btn-success btn-sm"><span class="glyphicon glyphicon-print"></span></a>  -->
                                         <!-- <div class="btn-group" role="group" id="btnSadas">
                                             <a href="#myModal" data-toggle="modal"
                                                 class="btn btn-danger btn-sm btn-rounded " id="btn_caridatamr">
@@ -273,6 +280,31 @@
 </div>
 
 <!-- Modal -->
+ <!-- Modal Print ------------------------------------------------>
+ <div class="modal fade" id="modal_alert_print" tabindex="-1" role="dialog" style="overflow-y: auto">
+
+<div class="modal-dialog modal-md">
+  <!-- Modal content-->
+  <div class="modal-content">
+    <div class="modal-header"> 
+      <h4 class="modal-title"> Print </h4> 
+    </div>
+    <div class="modal-body">
+                             <button class="btn btn-success" id="btnprint" name="btnprint"  >
+                             <i class="fa fa-print" aria-hidden="true"></i> PRINT SURAT</button> 
+                             <button class="btn btn-success" id="btnprint2" name="btnprint2"  >
+                             <span class="glyphicon glyphicon-print"></span> PRINT RINCIAN</button> 
+    </div>
+    <div class="modal-footer">
+                 <div class="form-group row" style="margin-right:1em;float:right;">
+                    <button class="btn btn-secondary" data-dismiss="modal" name="btnclose"  id="btnclose" >
+                    Close</button>  
+                </div>
+    </div>
+  </div>
+</div>
+</div>
+<!--#END Modal Print---------------------------->
 <!-- Modal Untuk Notif Resep ------------------------------------------------>
 <div class="modal fade" id="modal_alert_batalhdr" tabindex="-1" role="dialog" style="overflow-y: auto">
 

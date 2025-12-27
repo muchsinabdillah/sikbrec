@@ -50,7 +50,7 @@
         font: 14px arial;
     }
     .navigationColorLeft{
-        background-color: #990000;
+        background-color: #0046B2;
     }
     .navigationColorTop{
         background-color: #043699;
@@ -514,6 +514,12 @@
                                         <li><a href="<?= BASEURL; ?>/InfoLaporanKasir"><i class="fa fa-thumb-tack"></i>
                                                 <span>Info Laporan Kasir</span></a>
                                         </li>
+                                        <li><a href="<?= BASEURL; ?>/aInfoTarifTindakanBilling/Rajal"><i class="fa fa-thumb-tack"></i>
+                                                <span>Info Tarif Rajal</span></a>
+                                        </li>
+                                        <li><a href="<?= BASEURL; ?>/aInfoTarifTindakanBilling/bInfoJasaDokter"><i class="fa fa-thumb-tack"></i>
+                                                <span>Info Jasa Dokter</span></a>
+                                        </li>
                                         <!--<li><a href="<?= BASEURL; ?>/GenerateAbsensi"><i class="fa fa-thumb-tack"></i> <span>Deposit</span></a></li>
                     <li><a href="<?= BASEURL; ?>/GenerateAbsensi"><i class="fa fa-thumb-tack"></i> <span>Kamar</span></a></li>
                     <li><a href="<?= BASEURL; ?>/GenerateAbsensi"><i class="fa fa-thumb-tack"></i> <span>Pengembalian</span></a></li>
@@ -640,6 +646,16 @@
                                     <span class="">MANAGEMENT</span>
                                 </li>
                                 <li class="has-children">
+                                    <a href="#"><i class="fa fa-file-text"></i> <span>GRAFIK PASIEN</span> <i
+                                    class="fa fa-angle-right arrow"></i></a>
+                                    <ul class="child-nav">
+                                            <li><a href="<?= BASEURL; ?>/GrafikKunjunganPasien"><i
+                                                    class="fa fa-bank"></i> <span>Pasien Baru Lama ( Bulanan )</span></a></li>
+                                            <li><a href="<?= BASEURL; ?>/GrafikKunjunganPasien/yearly"><i
+                                                    class="fa fa-bank"></i> <span>Pasien Baru Lama ( Tahunan )</span></a></li>
+                                        </ul>
+</li>
+<li class="has-children">
                                     <a href="#"><i class="fa fa-file-text"></i> <span>REKAP PASIEN</span> <i
                                             class="fa fa-angle-right arrow"></i></a>
                                     <ul class="child-nav">
@@ -999,6 +1015,11 @@
                                                     class="fa fa-bar-chart"></i>
                                                 <span>Info Penjualan</span></a></li>
                                     </ul>
+                                    <ul class="child-nav">
+                                        <li><a href="<?= BASEURL; ?>/bInfoHargaJual"><i
+                                                    class="fa fa-bar-chart"></i>
+                                                <span>Info Harga Jual</span></a></li>
+                                    </ul>
                                 </li>
                                 <li class="has-children">
                                     <a href="#"><i class="fa fa-bars"></i> <span>Consumable</span> <i
@@ -1031,10 +1052,9 @@
                                     <a href="#"><i class="fa fa-bars"></i> <span>Kas Pengeluaran</span> <i
                                             class="fa fa-angle-right arrow"></i></a>
                                     <ul class="child-nav">
-                                        <!-- <li><a href="<?= BASEURL; ?>/OrderBonSementara/listOrderBon"><i class="fa fa-bar-chart"></i> <span>Order Bon Sementara</span></a>
-                                        </li>
-                                        <li><a href="<?= BASEURL; ?>/PencairanKasbon"><i class="fa fa-bar-chart"></i>
-                                                <span>Realisasi Bon Sementara</span></a></li> -->
+                                      
+                                        <li><a href="<?= BASEURL; ?>/JurnalUmum/JurnalUmumList"><i class="fa fa-bar-chart"></i>
+                                                <span>Jurnal Umum</span></a></li> 
                                         <li><a href="<?= BASEURL; ?>/PencairanKasbon/listpengajuanbonsementara"><i
                                                     class="fa fa-bar-chart"></i> <span>Pengajuan Bon Sementara</span></a>
                                         </li>

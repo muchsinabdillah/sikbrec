@@ -376,7 +376,7 @@ function SaveTrsPayment() {
     // console.log(bilito);
     // return false;
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/SaveTrsPayment';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/SaveTrsPayment';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -465,7 +465,7 @@ function SaveTrsPayment_closing() {
 
     var base_url = window.location.origin;
 
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/SaveTrsPayment_closing_Bebas';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/SaveTrsPayment_closing_Bebas';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -507,7 +507,7 @@ async function printkuitansi(base_url) {
     var jeniscetak = 'PrintKuitansiAll';
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0, 2);
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/"+jeniscetak+"/"+kodereg+"/"+notrs, "_blank",
             "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
 }
 
@@ -515,7 +515,7 @@ async function printrincian(base_url) {
     var base_url = base_url;
     var notrs = $("#NoRegistrasi").val();
     var kodereg = $("#NoRegistrasi").val().slice(0,2);
-    window.open(base_url + "/ESIRYARSI/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
+    window.open(base_url + "/SIKBREC/public/aBillingPasien/PrintRincianAll"+kodereg+"/"+notrs, "_blank",
     "toolbar=yes,scrollbars=yes,resizable=yes,top=500,left=500,width=800,height=800");
 }
 
@@ -584,7 +584,7 @@ function getTotalPembayaranxx() {
     var nomr = $("#NoMR").val();
     // console.log(noreg);
     
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getTotalPembayaran';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getTotalPembayaran';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -638,7 +638,7 @@ async function updateUIdatagetDatabyID(datagetDatabyID) {
 
 function getDatabyID() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getDataPasienBebas';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getDataPasienBebas';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -758,7 +758,7 @@ function UpdateKlaimBayar() {
     // var tglpayment = $("#tglpayment").val();
     var tipepembayaran = $("#tipepembayaran").val();
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/UpdateKlaimBayarclose';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/UpdateKlaimBayarclose';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -806,7 +806,7 @@ function updateUIgetPaymentType(datagetPaymentType) {
 }
 function getPaymentType() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getPaymentType';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getPaymentType';
     return fetch(url, {
         method: 'GET',
         headers: {
@@ -865,7 +865,7 @@ function updateUIdatagetAllDataPerusahaan(param) {
 }
 function getAllDataPerusahaan() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataPerusahaan/getAllDataPerusahaan';
+    let url = base_url + '/SIKBREC/public/MasterDataPerusahaan/getAllDataPerusahaan';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -924,7 +924,7 @@ function updateUIdatagetAllDataAsuransi(param) {
 }
 function getAllDataAsuransi() {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/MasterDataAsuransi/getAllDataAsuransi';
+    let url = base_url + '/SIKBREC/public/MasterDataAsuransi/getAllDataAsuransi';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -974,7 +974,7 @@ function getDataDetailBilling_Payment(attr) {
            "order": [[ 2, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataDetailBillingx", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataDetailBillingx", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -1025,7 +1025,7 @@ function getDataRincianBilling() {
            "order": [[ 2, 'asc' ]], // Default sortingnya berdasarkan kolom / field ke 0 (paling pertama)
            "ajax":
            {
-               "url": base_url + "/ESIRYARSI/public/aBillingPasien/getDataDetailRincianBilling", // URL file untuk proses select datanya
+               "url": base_url + "/SIKBREC/public/aBillingPasien/getDataDetailRincianBilling", // URL file untuk proses select datanya
                "type": "POST",
                data: function (d) {
                 d.noreg = noreg
@@ -1381,7 +1381,7 @@ function updateUIgetEDC(datagetEDC) {
 }
 function getPaymentEDC(param) {
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getPaymentEDC';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getPaymentEDC';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1447,7 +1447,7 @@ function getKodeRekening(param) {
     var jenispasien = 'RAJAL';
     var namabank = $("#namabank").val();
     var idjaminan = $("#penjamin_kode").val();
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/getKodeRekening';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/getKodeRekening';
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -1538,7 +1538,7 @@ function getTarifAllSum(data) {
     var form = $("#form_sumtarif_all").serialize();
 
     var base_url = window.location.origin;
-    let url = base_url + '/ESIRYARSI/public/aBillingPasien/sumAllTarif';
+    let url = base_url + '/SIKBREC/public/aBillingPasien/sumAllTarif';
     return fetch(url, {
         method: 'POST',
         headers: {

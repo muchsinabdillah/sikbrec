@@ -1,4 +1,15 @@
 $(document).ready(function () {
+    // setTimeout(function() { 
+    //     showdatatabel();
+    // }, 100);
+    var modalShown = localStorage.getItem('modalShown');
+    if (!modalShown) {
+        $('#notif_Cetak').modal('show'); 
+    }
+    $('#notif_Cetak').modal('show'); 
+    setInterval(function() {
+        showNotification(); 
+    }, 10000);
     //onloadForm();
     $('#example').dataTable({
     })
@@ -14,6 +25,41 @@ $(document).ready(function () {
         showdatatabelArsip();
     });
 });
+
+// 11122024
+function showNotification() { 
+    $.ajax({ 
+        url: '/SIKBREC/public/aaNotification/getOrderResepRajal', // URL PHP yang mengirimkan data notifikasi
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) { 
+            if(data[0].rowData){
+               (`
+                    <div style="background-color: #f0f0f0; border: 1px solid #ccc; padding: 10px; margin-top: 20px;">
+                        <strong>${data[0].title}</strong>
+                        <p>${data[0].message}</p>
+                    </div>
+                `);
+                showdatatabel();
+                $('#notification-container').html
+                var audio = document.getElementById('notification-sound');
+                audio.play();
+            }else{
+                $('#notification-container').html('');
+            }
+            
+        },
+        error: function() {
+            alert('Terjadi kesalahan dalam mengambil data notifikasi.');
+        }
+    });
+}
+
+function play() {
+    var audio = document.getElementById("notification-sound");
+    audio.play();
+    $('#notif_Cetak').modal('hide');
+}
 // async function onloadForm() {
 //     await getHakAksesByForm(18);
 //     await showdatatabel();

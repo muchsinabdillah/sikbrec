@@ -16,9 +16,9 @@ class PDF extends TCPDF
             $this->Cell(50, 6, '  No: 033/FRM/IRJ/BPJS/RSY/Rev0/II/2021', 1, 1, 'L');
             $this->Cell(0,1, '', 0, 1);
             $this->Cell(80, 3, '', 0, 0);
-            $this->Cell(25, 3, 'Jl. Letjen Suprapto, Kav. 13 Cempaka Putih, ', 0, 1, 'L');
+            $this->Cell(25, 3, 'Jl. angkasa No.19, Dukuhkrikil', 0, 1, 'L');
             $this->Cell(80, 3, '', 0, 0);
-            $this->Cell(25, 3, 'Jakarta Pusat 10510', 0, 1, 'L');
+            $this->Cell(25, 3, '-', 0, 1, 'L');
             //$this->Cell(80, 3, '', 0, 0);
             //$this->Cell(25, 3, 'Telp: 021-80618618, 80618619 (Hunting),', 0, 1, 'L');
             //$this->Cell(80, 3, '', 0, 0);

@@ -804,7 +804,7 @@ EOT;
                 return self::JsonDecode(200, $callback, "warning");
             }
         }
-
+       
         // END - VALIDASI KUOTA
         try {
             $this->db->transaksi();
@@ -941,6 +941,7 @@ EOT;
                     $no_pass = $nomorurut['urut'];
                     $id = $no_pass;
                     $id++;
+                    
                     // var_dump($id);
                     //CONVERT No. Mr
                     $idkanan = substr($NoMr, 4); // xx-xx-03 kanan
@@ -1071,6 +1072,7 @@ EOT;
                         $this->db->bind('IdDokter', $IdDokter);
                         $this->db->execute();
                         $booking = $this->db->single();
+                        
                         if (!empty($booking)) {
                             $dataidregfieedback = $booking['NoBooking'];
                             $callback = array(
@@ -1191,7 +1193,7 @@ EOT;
                                        :BPJS_xNorujukan,
                                        :BPJS_NoKartu,
                                        :BPJS_NoSEP,
-                                       :BPJS_NoRencKontrol 
+                                       :BPJS_NoRencKontrol,
                                        :lama_praktek_perpasien_in_minutes,
                                        :estimasi_waktu_pelayanan
                                        
@@ -1252,7 +1254,8 @@ EOT;
                             $this->db->bind('estimasi_waktu_pelayanan', $estimasi_waktu_pelayanan);
                             $this->db->bind('lama_praktek_perpasien_in_minutes', $lama_praktek_perpasien_in_minutes);
 
-                            $this->db->execute();
+                            
+                            $this->db->execute(); 
                             $antianpasienwalkin = "INSERT INTO perawatanSQL.dbo.AntrianPasien (
                                         no_transaksi,
                                         Doctor_1,
@@ -1906,8 +1909,11 @@ EOT;
     public function sendNotifWapin($token, $NoHandphone, $PasienNama, $nobokingreal, $TglBookingx, $getwaktujadwal, $viewNamaPoliklinik, $namadokter, $fixNoAntrian, $NoMr)
     {
   
-                                
-$text = urlencode("Bapak/Ibu ".$PasienNama."\nBerikut adalah Data NoReservasi anda :\nNo. Reservasi : ".$nobokingreal . "\nTanggal : ".$TglBookingx . "\nWaktu Pelayanan  : ".$getwaktujadwal . "\nPoliklinik : ".$viewNamaPoliklinik . "\nDokter : ".$namadokter . "\nNo. Antrian : ".$fixNoAntrian . "\nNo. MR : ".$NoMr . "\nKlinik Utama Brebes Eye Center.\nTerima Kasih. "  );
+    $text = urlencode("Halo ".$PasienNama.", \n\n Anda sudah terdaftar Konsultasi/Kontrol ke ".$viewNamaPoliklinik . " (".$namadokter . "), pada : \n\n Hari/Tgl : ".$TglBookingx . " \n Jam Praktek : ".$getwaktujadwal . " WIB \n No. Booking : ".$nobokingreal . " \n No. Antrian : ".$fixNoAntrian . " \n\n Silhakan lakukan Checkin pada Counter pendaftaran kami pada hari H Konsultasi/Kontrol dengan menunjukan Pesan Whatsapp ini kepada Petugas kami. \n\n Terima Kasih. \n\n Klinik Utama Brebes Eye Center "); 
+
+// Klinik Utama Brebes Eye Center \n Halo ".$PasienNama." \n Terima kasih telah melakukan reservasi di Klinik Utama Brebes Eye Center. Kami ingin mengonfirmasi bahwa reservasi Anda  untuk ".$viewNamaPoliklinik . " -  ".$namadokter . " pada Tanggal : ".$TglBookingx . " Pukul : ".$getwaktujadwal . " No. Antrian : ".$fixNoAntrian . " telah berhasil dengan No. Booking : ".$nobokingreal . " \n\n Jika Anda membutuhkan perubahan jadwal atau informasi lebih lanjut, jangan ragu untuk menghubungi kami di sini. \n\n Kami tunggu kedatangannya dan semoga Anda sehat selalu! \n\n Terima Kasih." );
+
+// Pendaftaran Anda No. Reservasi anda :\nNo. Reservasi : ".$nobokingreal . "\nTanggal : ".$TglBookingx . "\nWaktu Pelayanan  : ".$getwaktujadwal . " WIB \nPoliklinik : ".$viewNamaPoliklinik . "\nDokter : ".$namadokter . "\nNo. Antrian : ".$fixNoAntrian . "\nNo. MR : ".$NoMr . "\nKlinik Utama Brebes Eye Center.\n\n\nTerima Kasih. "  );
         
         $curl = curl_init();
         $url = "https://api.kirimpesan.net/api/sendText?token=66b5ace5c302c5956a66b6f3&phone=".$NoHandphone."&message=".$text;
@@ -2098,13 +2104,14 @@ $text = urlencode("Bapak/Ibu ".$PasienNama."\nBerikut adalah Data NoReservasi an
                 $idresv = $data;
                 //get data
                 $this->db->query("SELECT NamaPasien,NamaDokter,Poli,
-                replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') as TglResv,JamPraktek,NoAntrianAll,HP,ID_JadwalPraktek,DoctorID,IdPoli
+                replace(CONVERT(VARCHAR(11), ApmDate, 111), '/','-') as TglResv,NoBooking,JamPraktek,NoAntrianAll,HP,ID_JadwalPraktek,DoctorID,IdPoli
                                     FROM PerawatanSQL.dbo.Apointment
                                     WHERE ID=:idresv
                                     ");
                 $this->db->bind('idresv', $idresv);
                 $data2 =  $this->db->single();
 
+                $NoBooking = $data2['NoBooking'];
                 $nama = $data2['NamaPasien'];
                 $namadokter = $data2['NamaDokter'];
                 $namapoli = $data2['Poli'];
@@ -2131,66 +2138,28 @@ $text = urlencode("Bapak/Ibu ".$PasienNama."\nBerikut adalah Data NoReservasi an
                     $getwaktujadwal = $jampoli;
                 }
 
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.chat.wappin.app/v1/messages',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_SSL_VERIFYPEER => FALSE,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => '{
-                    "to": "' . $NoHandphone . '",
-                    "type": "template",
-                    "template": {
-                        "name": "reminderapoitment_1",
-                        "namespace": "700eb891_fb62_4d15_8d30_d493e38bbfc9", 
-                        "language": {
-                            "policy": "deterministic",
-                            "code": "id"
-                        },
-                        "components": [
-                            {
-                                "type": "body",
-                                "parameters": [ 
-                                    {
-                                        "type": "text",
-                                        "text": "' . $nama . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $namadokter . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $namapoli . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $hari_dmy . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $getwaktujadwal . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $antrian . '"
-                                    } , {
-                                        "type": "text",
-                                        "text": "' . $notereminderx . '"
-                                    }  
-                                ]
-                            } 
-                        ]
-                    }
-                }',
-                    CURLOPT_HTTPHEADER => array(
-                        'Authorization: Bearer ' . $token,
+                $text = urlencode("Halo, Yth. Bapak/Ibu ".$nama.",\n\nKami ingin mengingatkan bahwa Anda memiliki jadwal appointment di Klinik Utama Brebes Eye Center pada hari ".$hari_dmy.", ".$getwaktujadwal." dengan No. Reservasi ".$NoBooking.".\nHarap pastikan untuk hadir tepat waktu.\n\nJika ada perubahan atau Anda perlu menjadwalkan ulang, anda bisa melakukannya dengan cara membalas pesan ini.\nTunjukan No. Reservasi anda kepada Petugas Pendaftaran kami pada Hari H berobat untuk dilakukan Checkin Reservasi.\n\nKami menantikan kedatangan Anda dan berkomitmen untuk memberikan perawatan terbaik.\n\nSalam Sehat,\nKlinik Utama Brebes Eye Center\nCustomer Service Team"); 
+                    $curl = curl_init();
+                    $url = "https://api.kirimpesan.net/api/sendText?token=66b5ace5c302c5956a66b6f3&phone=".$NoHandphone."&message=".$text;
+                    curl_setopt_array($curl, array(
+                      CURLOPT_URL => $url,
+                      CURLOPT_RETURNTRANSFER => true,
+                      CURLOPT_ENCODING => '',
+                      CURLOPT_MAXREDIRS => 10,
+                      CURLOPT_TIMEOUT => 0,
+                      CURLOPT_FOLLOWLOCATION => true,
+                      CURLOPT_SSL_VERIFYPEER => FALSE,
+                      CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                      CURLOPT_CUSTOMREQUEST => 'GET', 
+                      CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
                         'Content-Type: application/json'
-                    ),
-                ));
-                $response = curl_exec($curl);
-                $JsonData = json_decode($response, TRUE);
-                curl_close($curl);
+                      ),
+                    ));
+                    
+                    $response = curl_exec($curl);
+                    $JsonData = json_decode($response, TRUE);
+                    curl_close($curl);
             }
             //exit;
 

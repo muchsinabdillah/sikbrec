@@ -92,7 +92,7 @@ class B_Info_laporan_Kasir_Model
                     on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                     -- inner join MasterdataSQL.dbo.Employees c on a.USER_KASIR collate Latin1_General_CI_AS = c.username collate Latin1_General_CI_AS
                     where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and TIPE_PEMBAYARAN=:pembayaran AND IdUnit ='1'
-                    
+                    order by  a.TGL_TRS asc
             ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -108,7 +108,7 @@ class B_Info_laporan_Kasir_Model
                     on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                     -- inner join MasterdataSQL.dbo.Employees c on a.USER_KASIR collate Latin1_General_CI_AS = c.username collate Latin1_General_CI_AS
                     where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and TIPE_PEMBAYARAN=:pembayaran AND IdUnit not in ('1','29','9','10','47','48','49','53','103')
-                    
+                    order by  a.TGL_TRS asc
             ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -124,7 +124,7 @@ class B_Info_laporan_Kasir_Model
                     on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                     -- inner join MasterdataSQL.dbo.Employees c on a.USER_KASIR collate Latin1_General_CI_AS = c.username collate Latin1_General_CI_AS
                     where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and TIPE_PEMBAYARAN=:pembayaran
-                    
+order by  a.TGL_TRS asc
             ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -140,7 +140,7 @@ class B_Info_laporan_Kasir_Model
                     on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                     -- inner join MasterdataSQL.dbo.Employees c on a.USER_KASIR collate Latin1_General_CI_AS = c.username collate Latin1_General_CI_AS
                     where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and TIPE_PEMBAYARAN=:pembayaran AND IdUnit in ('82','83','84','85','86','87','88','89','90')
-                    
+                    order by  a.TGL_TRS asc
             ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -151,9 +151,9 @@ class B_Info_laporan_Kasir_Model
 
                 $data =  $this->db->resultSet();
                 $rows = array();
-                $no = 1;
+                $no = 0;
                 foreach ($data as $row) {
-                    // $pasing['no'] = $no++;
+                    $pasing['no'] = $no++;
                     //$pasing['TglKunjungan'] = date('d-m-Y', strtotime($row['tglregisx']));
                     $pasing['NoTransaksi'] = $row['NO_TRS'];
                     $pasing['NoKwitansi'] = $row['NO_KWITANSI'];
@@ -183,7 +183,7 @@ class B_Info_laporan_Kasir_Model
                         inner join DashboardData.dbo.dataRWJ b
                         on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                         where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and b.Batal='0' AND IdUnit ='1'
-                        
+                        order by  a.TGL_TRS asc
                 ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -196,7 +196,7 @@ class B_Info_laporan_Kasir_Model
                             inner join DashboardData.dbo.dataRWJ b
                             on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                             where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and b.Batal='0' AND IdUnit not in ('1','29','9','10','47','48','49','53','103')
-                            
+                            order by  a.TGL_TRS asc
                     ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -209,7 +209,7 @@ class B_Info_laporan_Kasir_Model
                             left join DashboardData.dbo.dataRWJ b
                             on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS and b.Batal='0'
                             where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir  and USER_KASIR=:kasir  
-                            
+                            order by  a.TGL_TRS asc
                     ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -222,7 +222,7 @@ class B_Info_laporan_Kasir_Model
                             inner join DashboardData.dbo.dataRWJ b
                             on a.NO_REGISTRASI collate Latin1_General_CI_AS = b.NoRegistrasi collate Latin1_General_CI_AS
                             where a.BATAL='0' and replace(CONVERT(VARCHAR(11), a.TGL_TRS, 111), '/','-') between :tglawal and :tglakhir and b.Batal='0' and USER_KASIR=:kasir and b.Batal='0' and IdUnit in ('82','83','84','85','86','87','88','89','90')
-                            
+                            order by  a.TGL_TRS asc
                     ";
                     $this->db->query($query);
                     $this->db->bind('tglawal', $tglawal);
@@ -234,7 +234,7 @@ class B_Info_laporan_Kasir_Model
                 $rows = array();
                 $no = 1;
                 foreach ($data as $row) {
-                    // $pasing['no'] = $no++;
+                    $pasing['no'] = $no++;
                     //$pasing['TglKunjungan'] = date('d-m-Y', strtotime($row['tglregisx']));
                     $pasing['NoTransaksi'] = $row['NO_TRS'];
                     $pasing['NoKwitansi'] = $row['NO_KWITANSI'];

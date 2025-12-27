@@ -20,58 +20,7 @@ class  B_InformationRegistrasi_Model
 
             //PASIEN RAWAT JALAN DAN IGD
             if ($jenis_info == '1') {
-                //     $query_master1 = "SELECT * from (SELECT ROW_NUMBER()Over(partition by a.NoRegistrasi order by a.NoRegistrasi) as totalreg,a.TglKunjungan,a.NoMR,a.NoRegistrasi,b.PatientName, b.Tipe_Idcard, b.ID_Card_number,
-                //     replace(CONVERT(VARCHAR(11), b.Date_of_birth, 111), '/','-') as Date_of_birth,
-                //                  b.Gander,a.Unit,pg.NamaUnit,a.[Status ID],pg.ID as 'IDUNIT',
-                //                 c.First_Name,d.TypePatient,b.Address ,
-                //                 case when d.ID='2' then opx.NamaPerusahaan
-                //                  when d.ID='5' then op.NamaPerusahaan
-                //                 else 'UMUM' end AS NamaPerusahaan  , hh.NamaCaraMasuk,hj.NamaCaraMasukRef,
-                //                 --jk.[Product Name] as tarif,jk.TarifRS,
-                //                 replace(CONVERT(VARCHAR(11), a.TglKunjungan, 111), '/','-') as tglregisx,
-                //                 replace(CONVERT(VARCHAR(11), b.InputDate, 111), '/','-') as tglregis,
-                //                 case 
-                //                 when replace(CONVERT(VARCHAR(11), a.TglKunjungan, 111), '/','-') > replace(CONVERT(VARCHAR(11), b.InputDate, 111), '/','-')
-                //                 then 'Lama'  ELSE 'Baru'
-                //                 end as 'JenisPasien' 
-                //                 ,co.[Status Name] as statusregis,(isnull(cg.[Total Radiologi],0)+isnull(cg.TotalBHP,0)+isnull(cg.TotalLab,0)+isnull(cg.TotalObat,0)+isnull(cg.TotalVisit,0)) as totalbill
-                //                 ,xm.Kecamatan,mx.Kelurahan,msx.kabupatenNama,ggg.ProvinsiNama,'' as AssTriase,ttv.StatusHamil,ttv.Gravida,ttv.Para,ttv.Abortus,replace(CONVERT(VARCHAR(11), ttv.HPHT, 111), '/','-') as HPHT,replace(CONVERT(VARCHAR(11), ttv.HPL, 111), '/','-') as HPL,ttv.UsiaKehamilan,ttv.CatatanKehamilan,replace(CONVERT(VARCHAR(max),kkl.A_Diagnosa),char(13)+char(10), '') as A_Diagnosa,b.[Home Phone],b.[Mobile Phone],admx.Nama_Karcis as 'tarif',admx.Nilai_Karcis as 'TarifRS',
-                //                 case when d.ID='2' then opx.ID
-                //                 else op.ID end AS idpenjamin 
-                //                 from PerawatanSQL.dbo.Visit a
-                //                 inner join MasterdataSQL.dbo.Admision b
-                //                 on a.NoMR = b.NoMR
-                //                 inner join MasterdataSQL.dbo.Doctors c
-                //                 on c.ID = a.Doctor_1
-                //                 inner join MasterdataSQL.dbo.MstrTypePatient d
-                //                 on d.ID = a.PatientType 
-                //                 left join MasterdataSQL.dbo.MstrPerusahaanJPK op on op.ID = a.Perusahaan
-                //                 left join MasterdataSQL.dbo.MstrPerusahaanAsuransi opx on opx.ID = a.Asuransi
-                //                 inner join MasterdataSQL.dbo.MstrUnitPerwatan pg on pg.ID = a.Unit
-                //                 left join MasterdataSQL.dbo.MstrCaraMasuk hh on hh.id = a.idCaraMasuk
-                //                 left join MasterdataSQL.dbo.MstrCaraMasuk_2 hj on hj.id = a.idCaraMasuk2
-                //                 left join PerawatanSQL.dbo.Tarif_RJ_UGD jk on jk.ID = a.idAdmin
-                //                 inner join PerawatanSQL.dbo.[Visit Status] co on co.[Status ID] = a.[Status ID]
-                //                 inner join  PerawatanSQL.dbo.View_VisitExtnded cg on cg.NoRegistrasi = a.NoRegistrasi
-                //                -- left join MedicalRecord.dbo.EMR_RWJ kkl on kkl.NoRegistrasi  collate  Latin1_General_CS_AS = a.NoRegistrasi  collate  Latin1_General_CS_AS
-                //                 inner join MasterdataSQL.dbo.mstrKecamatan xm on xm.kecamatanId = b.Kecamatan
-                //                 inner join MasterdataSQL.dbo.mstrKelurahan mx on mx.desaId = b.Kelurahan
-                //                 inner join MasterdataSQL.dbo.MstrKabupaten msx on msx.kabupatenId=b.City
-                //                 inner join MasterdataSQL.dbo.MstrProvinsi ggg on ggg.PovinsiID = b.[State/Province]
-                //         --            outer apply (
-                //         --                SELECT TOP 1 NoRegistrasi,A_Diagnosa
-                //         --from MedicalRecord.dbo.EMR_RWJ where NoRegistrasi collate Latin1_General_CS_AS=a.NoRegistrasi collate Latin1_General_CS_AS and YgMelapor is null
-                //         --                ) kkl
-                // 		left join (select NoRegistrasi,A_Diagnosa from MedicalRecord.dbo.EMR_RWJ where YgMelapor is null ) kkl on a.NoRegistrasi collate SQL_Latin1_General_CP1_CI_AS=kkl.NoRegistrasi collate SQL_Latin1_General_CP1_CI_AS
-                // --                outer apply
-                // --(SELECT top 1 NoRegistrasi,StatusHamil,Gravida,Para,Abortus,HPHT,HPL,UsiaKehamilan,CatatanKehamilan
-                // --from MedicalRecord.dbo.EMR_RWJ_TTV where NoRegistrasi collate Latin1_General_CS_AS=a.NoRegistrasi collate Latin1_General_CS_AS and NamaUser is not null)ttv
-                // left join (select NoRegistrasi,StatusHamil,Gravida,Para,Abortus,HPHT,HPL,UsiaKehamilan,CatatanKehamilan from MedicalRecord.dbo.EMR_RWJ_TTV where NamaUser is not null) 
-                // ttv on a.NoRegistrasi collate SQL_Latin1_General_CP1_CI_AS=ttv.NoRegistrasi collate SQL_Latin1_General_CP1_CI_AS
-                // left join MasterdataSQL.dbo.MstrKarcisAdministrasi admx on a.idAdmin=admx.ID
-                //                 where replace(CONVERT(VARCHAR(11), a.TglKunjungan, 111), '/','-') between  :tglawal and :tglakhir AND pg.grup_instalasi in ('RAWAT JALAN','PENUNJANG','IGD')
-                //                 and a.Batal='0' )x where totalreg=1 ";
-                $query_master1 = "SELECT *,replace(CONVERT(VARCHAR(11), a.[Visit Date], 111), '/','-') as tglregisx,BL as 'JenisPasien',TipeIdCard as 'Tipe_Idcard',NoIdCard as 'ID_Card_number',DateOfBirth as 'Date_of_birth',Sex as Gander, Diagnosa_Awal as A_Diagnosa,a.NamaDokter as First_Name,NamaJaminan as NamaPerusahaan,'' as 'AssTriase',NamaCaraMasuk,NamaCaraMasukRef,NamaKarcis as tarif,NilaiKarcis as TarifRS,(isnull(cg.[Total Radiologi],0)+isnull(cg.TotalBHP,0)+isnull(cg.TotalLab,0)+isnull(cg.TotalObat,0)+isnull(cg.TotalVisit,0)) as totalbill,'' as StatusHamil,'' as Gravida,'' as Para,'' as Abortus,'' as HPHT,'' as HPL,'' as UsiaKehamilan,'' as CatatanKehamilan,IdUnit as Unit,HomePhone as [Home Phone],MobilePhone as [Mobile Phone],--'' as statusregis,
+                  $query_master1 = "SELECT *,replace(CONVERT(VARCHAR(11), a.[Visit Date], 111), '/','-') as tglregisx,BL as 'JenisPasien',TipeIdCard as 'Tipe_Idcard',NoIdCard as 'ID_Card_number',DateOfBirth as 'Date_of_birth',Sex as Gander, Diagnosa_Awal as A_Diagnosa,a.NamaDokter as First_Name,NamaJaminan as NamaPerusahaan,'' as 'AssTriase',NamaCaraMasuk,NamaCaraMasukRef,NamaKarcis as tarif,'' as TarifRS,'0' as totalbill,'' as StatusHamil,'' as Gravida,'' as Para,'' as Abortus,'' as HPHT,'' as HPL,'' as UsiaKehamilan,'' as CatatanKehamilan,IdUnit as Unit,HomePhone as [Home Phone],MobilePhone as [Mobile Phone],--'' as statusregis,
            -- '' as tarif,
             Case When StatusID = '0' Then 'New'
                 WHEN StatusID = '1' Then 'Invoiced'
@@ -80,7 +29,7 @@ class  B_InformationRegistrasi_Model
                 WHEN StatusID = '4' Then 'Close'
                 End As 'statusregis'
              from DashboardData.dbo.dataRWJ a
-             inner join  PerawatanSQL.dbo.View_VisitExtnded cg on cg.NoRegistrasi = a.NoRegistrasi
+           
              WHERE replace(CONVERT(VARCHAR(11), a.[Visit Date], 111), '/','-') between  :tglawal and :tglakhir AND Batal='0' AND LEFT(a.NoMR,1) <> 'W'";
                 if ($GrupPerawatan != null || $GrupPerawatan != '') {
                     //$where = " AND x.IDUNIT=:GrupPerawatan";
@@ -248,9 +197,9 @@ class  B_InformationRegistrasi_Model
                 $pasing['NamaCaraMasuk'] = $row['NamaCaraMasuk'];
                 $pasing['NamaCaraMasukRef'] = $row['NamaCaraMasukRef'];
 
-                $pasing['tarif'] = $row['tarif'];
-                $pasing['TarifRS'] = $row['TarifRS'];
-                $pasing['totalbill'] = $row['totalbill'];
+                $pasing['tarif'] = '';
+                $pasing['TarifRS'] = '';
+                $pasing['totalbill'] = '';
 
                 $pasing['HomePhone'] = $row['Home Phone'];
                 $pasing['MobilePhone'] = $row['Mobile Phone'];

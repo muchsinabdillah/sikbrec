@@ -47,7 +47,7 @@ class OrderBonSementara extends Controller
     {
         $data['noregistrasi'] =  Utils::setDecode($ID);
         $session = SessionManager::getCurrentSession();
-        $data['listdata1'] = $this->model('BonSementara_Model')->CetakBon($ID);
+        $data['listdata1'] = $this->model('BonSementara_Model')->CetakBon($ID); 
         $this->View('print/finance/print_kas_pengeluaran', $data);
     }
     public function getDataBonbyID()
