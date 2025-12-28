@@ -1,6 +1,6 @@
 <?php
-define('BASEURL', 'http://72.62.122.16:8002/SIKBREC/public');
-define('BASEURL_PHOTO_SIGNATURE', 'http://72.62.122.16:8002/SIKBREC/public');
+define('BASEURL', 'https://sikbrec.brebeseyecenter.com');
+define('BASEURL_PHOTO_SIGNATURE', 'https://sikbrec.brebeseyecenter.com');
 //ADD_BPJS
 //define('URL_BPJS', 'https://dvlp.bpjs-kesehatan.go.id/vclaim-rest-1.1/Peserta/');
 define('URL_BPJS', 'https://apijkn-dev.bpjs-kesehatan.go.id/vclaim-rest-dev/');
@@ -17,7 +17,7 @@ define('URL_BPJS_ANTRIAN_RS_YARSI', 'http://172.16.40.12:8002/api/v1/');
 
 define('KODE_RS_BPJS', '0114R067');
 // define('URL_API_RS', 'https://api.rsyarsi.co.id/api/');
-define('URL_API_RS', 'http://72.62.122.16:8070/api/');
+define('URL_API_RS', 'https://apiapp.brebeseyecenter.com/api/');
 // define('URL_API_RS', 'http://127.0.0.1:8000/api/');
 define('URL_API_MYSDI', 'http://202.51.196.89/api/');
 define('URL_API_KEMENKES', 'https://api-satusehat-stg.dto.kemkes.go.id/oauth2/v1/');
