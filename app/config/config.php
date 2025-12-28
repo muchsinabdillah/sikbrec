@@ -1,6 +1,6 @@
 <?php
-define('BASEURL', 'https://sikbrecappclinic.brebeseyecenter.com');
-define('BASEURL_PHOTO_SIGNATURE', 'https://sikbrecappclinic.brebeseyecenter.com');
+define('BASEURL', 'https://sikbrecappclinic.brebeseyecenter.com/public');
+define('BASEURL_PHOTO_SIGNATURE', 'https://sikbrecappclinic.brebeseyecenter.com/public');
 //ADD_BPJS
 //define('URL_BPJS', 'https://dvlp.bpjs-kesehatan.go.id/vclaim-rest-1.1/Peserta/');
 define('URL_BPJS', 'https://apijkn-dev.bpjs-kesehatan.go.id/vclaim-rest-dev/');
