@@ -1,6 +1,6 @@
 <?php
-define('BASEURL', 'https://sikbrecappclinic.brebeseyecenter.com/public');
-define('BASEURL_PHOTO_SIGNATURE', 'https://sikbrecappclinic.brebeseyecenter.com/public');
+define('BASEURL', 'https://sikbrecappclinic.brebeseyecenter.com');
+define('BASEURL_PHOTO_SIGNATURE', 'https://sikbrecappclinic.brebeseyecenter.com');
 //ADD_BPJS
 //define('URL_BPJS', 'https://dvlp.bpjs-kesehatan.go.id/vclaim-rest-1.1/Peserta/');
 define('URL_BPJS', 'https://apijkn-dev.bpjs-kesehatan.go.id/vclaim-rest-dev/');
@@ -41,9 +41,9 @@ define('URL_EKLAIM', 'http://172.16.40.211/E-Klaim/ws.php');
 
 define('DB_HOST', '72.62.122.16');
 define('DB_USER', 'sa');
-define('DB_PASSWORD', 'Brec_2024');
+define('DB_PASSWORD', 'Password123!');
 define('DB_NAME', 'Apotik_V1.1SQL');
- 
+
 // define('DB_HOST', '172.16.40.29');
 // define('DB_USER', 'sa');
 // define('DB_PASSWORD', 'rsyarsi123');
